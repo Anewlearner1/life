@@ -19,6 +19,8 @@ function check(state: GameState, c: Condition): boolean {
       return state.workSessions.length >= c.atLeast;
     case "day": // 1-based day number, as displayed ("第N天")
       return Math.floor(state.gameClock.totalMinutes / MINUTES_PER_DAY) + 1 >= c.atLeast;
+    case "noOtherPartner":
+      return !Object.values(state.relationships).some((r) => r.stage === "partner" && r.npcId !== c.npcId);
   }
 }
 

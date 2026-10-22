@@ -124,3 +124,17 @@ describe("EventSystem events", () => {
     expect(s.unlockedMapIds.filter((m) => m === MAP.rural)).toHaveLength(1);
   });
 });
+
+describe("noOtherPartner condition", () => {
+  it("is false only when another NPC is already the partner", () => {
+    const content = makeContent();
+    const state = newGame(content);
+    const ids = Object.keys(content.npcs);
+    content.conditions.c_excl = { id: "c_excl", all: [{ type: "noOtherPartner", npcId: ids[0] }] };
+    expect(checkCondition(state, content, "c_excl")).toBe(true);
+    state.relationships[ids[0]] = { npcId: ids[0], affection: 90, stage: "partner", completedEventIds: [] };
+    expect(checkCondition(state, content, "c_excl")).toBe(true);
+    state.relationships[ids[1]] = { npcId: ids[1], affection: 90, stage: "partner", completedEventIds: [] };
+    expect(checkCondition(state, content, "c_excl")).toBe(false);
+  });
+});

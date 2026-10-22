@@ -408,7 +408,7 @@ export class GameController implements WorldBridge {
   private describeCondition(c: Condition): string {
     switch (c.type) {
       case "shiftsWorked":
-        return `完成${c.atLeast}次咖啡店班表`;
+        return `完成${c.atLeast}次打工`;
       case "money":
         return `擁有${c.atLeast}元`;
       case "day":
@@ -419,6 +419,8 @@ export class GameController implements WorldBridge {
         return `與${this.npcName(c.npcId)}成為${STAGE_LABEL[c.stage]}`;
       case "eventCompleted":
         return "完成特定事件";
+      case "noOtherPartner":
+        return "目前沒有其他伴侶";
     }
   }
 

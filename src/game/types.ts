@@ -171,7 +171,9 @@ export type Condition =
   | { type: "stage"; npcId: string; stage: RelationshipStage }
   | { type: "eventCompleted"; eventId: string }
   | { type: "shiftsWorked"; atLeast: number }
-  | { type: "day"; atLeast: number };
+  | { type: "day"; atLeast: number }
+  /** True while the player has no partner other than npcId (keeps romance exclusive). */
+  | { type: "noOtherPartner"; npcId: string };
 
 export type ConditionDefinition = { id: string; all: Condition[] };
 
