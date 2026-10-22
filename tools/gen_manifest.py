@@ -96,7 +96,8 @@ def asset_id(name):
 def main():
     files = {}
     for p in sorted(ASSETS.rglob("*.png")):
-        aid = asset_id(p.name)
+        # NPC files are numbered per character (NPC_00N_Name), not per asset ID
+        aid = "NPC-001" if "npcs" in p.parts else asset_id(p.name)
         if aid:
             w, h = Image.open(p).size
             files.setdefault(aid, []).append(f"{p.relative_to(ROOT)} ({w}x{h})")
