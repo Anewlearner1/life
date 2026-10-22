@@ -246,7 +246,9 @@ export class WorldScene extends Phaser.Scene {
       const def = propsCatalog[p.key];
       if (!def) continue;
       const img = this.add.image(p.x * TS, (p.y + def.h) * TS, propTextureKey(p.key)).setOrigin(0, 1);
-      img.setDepth(def.ground ? -500 : (p.y + def.h) * TS);
+      // Enterable buildings sort by their door row (not the bottom edge) so a character standing on the
+      // door tile is drawn in front of the building; everything else sorts by its bottom edge.
+      img.setDepth(def.ground ? -500 : (p.y + def.h - (def.door ? 1 : 0)) * TS + (def.door ? 1 : 0));
       this.layerObjs.push(img);
     }
   }
