@@ -3,7 +3,7 @@ import { GameConfig } from "../game/GameConfig";
 import type { Facing, MapDefinition, WorldPosition } from "../game/types";
 import { findPath, type Tile } from "../systems/Pathfinding";
 import { buildCollisionGrid } from "./collision";
-import { PLAYER_SPRITE_KEY, idleAnimKey, walkAnimKey } from "./BootScene";
+import { idleAnimKey, playerSpriteKeyFor, walkAnimKey } from "./BootScene";
 import { propDoorTile, propsCatalog, propTextureKey } from "./props";
 import type { InteractTarget, WorldBridge, WorldSceneData } from "./WorldBridge";
 
@@ -107,10 +107,10 @@ export class WorldScene extends Phaser.Scene {
     this.pQueue = [];
     this.pending = null;
     this.pMoving = false;
-    this.player = this.add.sprite(0, 0, `${PLAYER_SPRITE_KEY}_idle_down`).setOrigin(0.5, 1);
+    this.player = this.add.sprite(0, 0, `${this.playerKey()}_idle_down`).setOrigin(0.5, 1);
     this.layerObjs.push(this.player);
     this.placeSprite(this.player, this.pTile.x * TS + TS / 2, (this.pTile.y + 1) * TS - FOOT_INSET);
-    this.playChar(this.player, PLAYER_SPRITE_KEY, "idle", this.pFacing);
+    this.playChar(this.player, this.playerKey(), "idle", this.pFacing);
 
     this.applyZoom();
     this.syncNpcs(0, true);
@@ -129,8 +129,13 @@ export class WorldScene extends Phaser.Scene {
     this.pTile = { x: pos.x, y: pos.y };
     this.pFacing = pos.facing;
     this.placeSprite(this.player, pos.x * TS + TS / 2, (pos.y + 1) * TS - FOOT_INSET);
-    this.playChar(this.player, PLAYER_SPRITE_KEY, "idle", this.pFacing);
+    this.playChar(this.player, this.playerKey(), "idle", this.pFacing);
     this.pMoving = false;
+  }
+
+  /** Sprite family for the player's chosen outfit. */
+  private playerKey(): string {
+    return playerSpriteKeyFor(this.bridge.getState().player.appearance.outfitId);
   }
 
   get currentMapId(): string {
@@ -458,7 +463,7 @@ export class WorldScene extends Phaser.Scene {
     const p = this.pending;
     if (this.pendingFace) this.pFacing = this.pendingFace;
     else if (p?.kind === "location") this.pFacing = "up";
-    this.playChar(this.player, PLAYER_SPRITE_KEY, "idle", this.pFacing);
+    this.playChar(this.player, this.playerKey(), "idle", this.pFacing);
     this.pending = null;
     this.pendingFace = null;
     if (p) this.bridge.onInteract(p);
@@ -477,7 +482,7 @@ export class WorldScene extends Phaser.Scene {
         this.pSeg = { from: { ...this.pTile }, to: next, t: 0 };
         this.pFacing = dirOf(this.pTile, next);
         this.pMoving = true;
-        this.playChar(this.player, PLAYER_SPRITE_KEY, "walk", this.pFacing);
+        this.playChar(this.player, this.playerKey(), "walk", this.pFacing);
       }
       const seg = this.pSeg;
       const adv = Math.min(budget, 1 - seg.t);

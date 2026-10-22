@@ -16,6 +16,9 @@ import { propsCatalog, propTextureKey } from "./props";
 // ---------------------------------------------------------------------------
 
 export const PLAYER_SPRITE_KEY = "CHAR_001_Player";
+export const OUTFIT2_SPRITE_KEY = "CHAR_005_Player_Outfit2";
+/** Sprite key family for the player's chosen outfit (see CreateScene OUTFITS). */
+export const playerSpriteKeyFor = (outfitId: string): string => (outfitId === "outfit2" ? OUTFIT2_SPRITE_KEY : PLAYER_SPRITE_KEY);
 export const DIRS: Facing[] = ["down", "left", "right", "up"];
 
 export const NPC_SPRITES: { id: string; spriteKey: string; folder: string }[] = [
@@ -186,6 +189,13 @@ export class BootScene extends Phaser.Scene {
       this.load.spritesheet(`${PLAYER_SPRITE_KEY}_idle_${d}`, `characters/player/idle/CHAR_003_Player_${D}_Idle_v01.png`, { frameWidth: 16, frameHeight: 24 });
     }
 
+    // Outfit2 variant: same walk strips; the idle texture reuses the walk file (anim uses frame 0 only)
+    for (const d of DIRS) {
+      const file = `characters/player/outfits/CHAR_005_Player_Outfit2_${cap(d)}_Walk_v01.png`;
+      this.load.spritesheet(`${OUTFIT2_SPRITE_KEY}_walk_${d}`, file, { frameWidth: 16, frameHeight: 24 });
+      this.load.spritesheet(`${OUTFIT2_SPRITE_KEY}_idle_${d}`, file, { frameWidth: 16, frameHeight: 24 });
+    }
+
     // NPCs: 4-direction walk, Down idle only; portraits for dialogue UI
     for (const n of NPC_SPRITES) {
       const dir = `characters/npcs/${n.folder}/${n.spriteKey}`;
@@ -230,6 +240,13 @@ export class BootScene extends Phaser.Scene {
         // NPCs only ship a Down idle strip; reuse it for every facing.
         const idleTex = this.textures.exists(`${sk}_idle_${d}`) ? `${sk}_idle_${d}` : `${sk}_idle_down`;
         mk(idleAnimKey(sk, d), idleTex, 2);
+      }
+    }
+    for (const d of DIRS) {
+      mk(walkAnimKey(OUTFIT2_SPRITE_KEY, d), `${OUTFIT2_SPRITE_KEY}_walk_${d}`, 8);
+      const key = idleAnimKey(OUTFIT2_SPRITE_KEY, d);
+      if (!this.anims.exists(key) && this.textures.exists(`${OUTFIT2_SPRITE_KEY}_idle_${d}`)) {
+        this.anims.create({ key, frames: this.anims.generateFrameNumbers(`${OUTFIT2_SPRITE_KEY}_idle_${d}`, { frames: [0] }), frameRate: 1, repeat: -1 });
       }
     }
     if (!this.anims.exists("water")) {
