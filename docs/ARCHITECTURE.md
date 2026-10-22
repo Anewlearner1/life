@@ -87,6 +87,10 @@
 | `=` | crosswalk_h | ✓ |
 | `\|` | crosswalk_v | ✓ |
 | `W` | floorwood | ✓ |
+| `T` | floortile | ✓ |
+| `m` | door mat（室內出口） | ✓ |
+| `i` / `j` | 室內牆 A（米白壁紙）/ B（木板） | ✗ |
+| `v` | 室內邊牆（深木框） | ✗ |
 | `w` | brick wall | ✗ |
 | `f` | fence | ✗ |
 | `h` | hedge | ✗ |

@@ -35,10 +35,11 @@ export function updateNPCs(state: GameState, content: ContentDB): void {
     const map = content.maps[loc.mapId];
     const slot = (perLocation[loc.id] = (perLocation[loc.id] ?? -1) + 1);
     const clamp = (v: number, max?: number) => Math.max(0, max === undefined ? v : Math.min(max - 1, v));
+    const stand = loc.npcStand ?? { x: loc.door.x, y: loc.door.y + 1 };
     npc.position = {
       mapId: loc.mapId,
-      x: clamp(loc.door.x + slotOffset(slot), map?.width),
-      y: clamp(loc.door.y + 1, map?.height),
+      x: clamp(stand.x + slotOffset(slot), map?.width),
+      y: clamp(stand.y, map?.height),
       facing: "down",
     };
   }

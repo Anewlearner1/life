@@ -367,7 +367,7 @@ export class GameController implements WorldBridge {
     const st = this.getState();
     if (loc.type === "gate") {
       const target = loc.targetMapId ?? "";
-      if (!st.unlockedMapIds.includes(target)) {
+      if (!this.mapOpen(target)) {
         this.events.emit("open", { panel: "locked", locationId, hint: this.unlockHint(target) });
         return;
       }
@@ -396,6 +396,12 @@ export class GameController implements WorldBridge {
         this.travel(loc.id);
         break;
     }
+  }
+
+  /** Maps without an unlock condition (interiors, town) are always open; others once unlocked. */
+  private mapOpen(mapId: string): boolean {
+    const m = this.content.maps[mapId];
+    return !!m && (!m.unlockConditionId || this.getState().unlockedMapIds.includes(mapId));
   }
 
   unlockHint(mapId: string): string {
@@ -429,7 +435,8 @@ export class GameController implements WorldBridge {
     const m = this.content.maps[map.id];
     const grid = buildCollisionGrid(m);
     const dx = door.x === 0 ? 1 : door.x === m.width - 1 ? -1 : 0;
-    const dy = door.y === 0 ? 1 : door.y === m.height - 1 ? -1 : 0;
+    // Doors inside the map (building entrances): arrive on the tile below the door.
+    const dy = door.y === 0 ? 1 : door.y === m.height - 1 ? -1 : dx === 0 ? 1 : 0;
     const cands = [
       { x: door.x + dx, y: door.y + dy },
       { x: door.x + 1, y: door.y },
@@ -446,12 +453,20 @@ export class GameController implements WorldBridge {
     const gate = this.content.locations[gateId];
     const targetId = gate?.targetMapId;
     const target = targetId ? this.content.maps[targetId] : undefined;
-    if (!gate || !target || !st.unlockedMapIds.includes(target.id)) return;
+    if (!gate || !target || !this.mapOpen(target.id)) return;
     const back = Object.values(this.content.locations).find(
       (l) => l.mapId === target.id && l.type === "gate" && l.targetMapId === gate.mapId,
     );
     const tile = back ? this.arrivalTile(target, back.door) : target.spawn;
-    const facing = back ? (back.door.x === 0 ? "right" : back.door.x === target.width - 1 ? "left" : "down") : "down";
+    const facing = !back
+      ? "down"
+      : back.door.x === 0
+        ? "right"
+        : back.door.x === target.width - 1
+          ? "left"
+          : back.door.y === target.height - 1
+            ? "up"
+            : "down";
     const pos: WorldPosition = { mapId: target.id, x: tile.x, y: tile.y, facing };
     st.currentMapId = target.id;
     st.player.position = pos;

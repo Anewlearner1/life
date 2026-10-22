@@ -6,7 +6,7 @@ export const jobs: Record<string, JobDefinition> = {
   [JOB.barista]: {
     id: JOB.barista,
     name: "咖啡店店員",
-    workplaceLocationId: LOC.cafe,
+    workplaceLocationId: LOC.cafeCounter,
     shiftRules: [
       { startMinute: 540, endMinute: 720 },
       { startMinute: 840, endMinute: 1080 },

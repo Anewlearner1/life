@@ -165,6 +165,8 @@ export type LocationDefinition = {
   interactionIds: string[];
   /** For gates: map they lead to. */
   targetMapId?: string;
+  /** Tile where scheduled NPCs stand (default: one tile below the door), e.g. behind a counter. */
+  npcStand?: { x: number; y: number };
 };
 
 export type Condition =

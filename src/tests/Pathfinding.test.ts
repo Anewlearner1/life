@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import { findPath } from "../systems/Pathfinding";
 import { buildCollisionGrid } from "../scenes/collision";
 import { propsCatalog } from "../scenes/props";
+import { JOB, LOC, MAP } from "../data/ids";
+import { jobs } from "../data/jobs";
 import { locations, maps } from "../data/maps";
+import { schedules } from "../data/schedules";
 
 const parse = (rows: string[]): boolean[][] => rows.map((r) => [...r].map((c) => c === "#"));
 
@@ -89,7 +92,7 @@ describe("buildCollisionGrid + maps", () => {
               if (def.collision[ry][rx] !== "#") continue;
               const x = p.x + rx;
               const y = p.y + ry;
-              expect("., dsW".includes(map.rows[y][x]), `${p.key}@${x},${y} on '${map.rows[y][x]}'`).toBe(true);
+              expect("., dsWT".includes(map.rows[y][x]), `${p.key}@${x},${y} on '${map.rows[y][x]}'`).toBe(true);
               const k = `${x},${y}`;
               expect(owner.has(k), `${p.key}@${k} overlaps ${owner.get(k)}`).toBe(false);
               owner.set(k, p.key);
@@ -111,6 +114,14 @@ describe("buildCollisionGrid + maps", () => {
         }
       });
 
+      it("has every prop door tile (furniture fronts included) on walkable ground", () => {
+        for (const p of map.props) {
+          const d = propsCatalog[p.key].door;
+          if (!d) continue;
+          expect(grid[p.y + d.y]?.[p.x + d.x], `${p.key}@${p.x},${p.y} door`).toBe(false);
+        }
+      });
+
       it("matches location doors to prop doors", () => {
         for (const id of map.locationIds) {
           const loc = locations[id];
@@ -124,6 +135,46 @@ describe("buildCollisionGrid + maps", () => {
       });
     });
   }
+
+  it("interiors are always open, link to the street and every gate pairs with a gate back", () => {
+    for (const id of [MAP.homeIn, MAP.shopIn, MAP.cafeIn]) {
+      expect(maps[id].unlockConditionId, id).toBeUndefined();
+      const exits = maps[id].locationIds.map((l) => locations[l]).filter((l) => l.type === "gate");
+      expect(exits, id).toHaveLength(1);
+      expect(exits[0].targetMapId).toBe(MAP.starter);
+      // exit door is the mat tile in the bottom wall; the spawn sits right above it
+      expect(exits[0].door).toEqual({ x: maps[id].spawn.x, y: maps[id].height - 1 });
+      expect(maps[id].rows[exits[0].door.y][exits[0].door.x]).toBe("m");
+    }
+    for (const gate of Object.values(locations).filter((l) => l.type === "gate")) {
+      const back = Object.values(locations).find((l) => l.type === "gate" && l.mapId === gate.targetMapId && l.targetMapId === gate.mapId);
+      expect(back, `${gate.id} has no gate back`).toBeDefined();
+    }
+    expect(locations[LOC.home]).toMatchObject({ type: "gate", targetMapId: MAP.homeIn });
+    expect(locations[LOC.shop]).toMatchObject({ type: "gate", targetMapId: MAP.shopIn });
+    expect(locations[LOC.cafe]).toMatchObject({ type: "gate", targetMapId: MAP.cafeIn });
+  });
+
+  it("indoor spots have the right types and the barista works at the cafe counter", () => {
+    expect(locations[LOC.homeBed].type).toBe("home");
+    expect(locations[LOC.shopCounter].type).toBe("shop");
+    expect(locations[LOC.cafeCounter]).toMatchObject({ type: "workplace", mapId: MAP.cafeIn });
+    expect(jobs[JOB.barista].workplaceLocationId).toBe(LOC.cafeCounter);
+  });
+
+  it("every schedule location exists and scheduled NPCs stand on free tiles of that map", () => {
+    const grids: Record<string, boolean[][]> = {};
+    for (const sch of Object.values(schedules))
+      for (const e of sch.entries) {
+        const loc = locations[e.locationId];
+        expect(loc, `${sch.id} -> ${e.locationId}`).toBeDefined();
+        const grid = (grids[loc.mapId] ??= buildCollisionGrid(maps[loc.mapId], propsCatalog));
+        const stand = loc.npcStand ?? { x: loc.door.x, y: loc.door.y + 1 };
+        expect(grid[stand.y]?.[stand.x], `${e.locationId} stand ${stand.x},${stand.y}`).toBe(false);
+      }
+    expect(schedules.sch_npc_001.entries.some((e) => e.locationId === LOC.cafeCounter && e.activity === "work")).toBe(true);
+    expect(schedules.sch_npc_002.entries.some((e) => e.locationId === LOC.shopCounter && e.activity === "work")).toBe(true);
+  });
 
   it("rural map is locked behind cond_unlock_rural and gates link both ways", () => {
     expect(maps.map_rural.unlockConditionId).toBe("cond_unlock_rural");

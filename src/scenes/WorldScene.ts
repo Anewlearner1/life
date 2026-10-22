@@ -21,6 +21,7 @@ const ROAD = {
   path_h: 29, path_v: 30,
 };
 const BLOCK = { brick: 0, fence_h: 1, fence_v: 2, hedge: 3, water: 4 };
+const INTERIOR = { wall_a: 0, wall_b: 1, trim: 2, door_mat: 3 };
 const ROAD_CODES = new Set(["r", "R", "+", "=", "|"]);
 const GRASS_CODES = new Set([".", ","]);
 
@@ -185,6 +186,11 @@ export class WorldScene extends Phaser.Scene {
       case ".": return [g("grassa")];
       case ",": return [g("grassb")];
       case "W": return [g("floorwood")];
+      case "T": return [g("floortile")];
+      case "i": return [["tiles_interior", INTERIOR.wall_a]];
+      case "j": return [["tiles_interior", INTERIOR.wall_b]];
+      case "v": return [["tiles_interior", INTERIOR.trim]];
+      case "m": return [["tiles_interior", INTERIOR.door_mat]];
       case "r": return [r("road_h")];
       case "R": return [r("road_v")];
       case "+": return [r("crossroad")];
@@ -246,10 +252,13 @@ export class WorldScene extends Phaser.Scene {
     for (const p of map.props) {
       const def = propsCatalog[p.key];
       if (!def) continue;
-      const img = this.add.image(p.x * TS, (p.y + def.h) * TS, propTextureKey(p.key)).setOrigin(0, 1);
+      const img = this.add.image(p.x * TS, (p.y + def.h) * TS - (def.lift ?? 0), propTextureKey(p.key)).setOrigin(0, 1);
       // Enterable buildings sort by their door row (not the bottom edge) so a character standing on the
       // door tile is drawn in front of the building; everything else sorts by its bottom edge.
-      img.setDepth(def.ground ? -500 : (p.y + def.h - (def.door ? 1 : 0)) * TS + (def.door ? 1 : 0));
+      // Furniture whose door lies in front of it (outside the footprint) sorts normally; items lying on
+      // furniture (lift) draw just above their base.
+      const doorInside = !!def.door && def.door.y < def.h;
+      img.setDepth(def.ground ? -500 : (p.y + def.h - (doorInside ? 1 : 0)) * TS + (doorInside ? 1 : 0) + (def.lift ? 0.5 : 0));
       this.layerObjs.push(img);
     }
   }

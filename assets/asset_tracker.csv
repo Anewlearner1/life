@@ -18,7 +18,7 @@ MAP-003,建築外觀套組,必要-MVP,共用素材,0,見 BLD-00
 MAP-004,建築門窗與入口,必要-MVP,共用素材,0,見 BLD-00
 MAP-005,自然環境圖塊,建議-MVP,已完成(v01),4,assets/maps/urban/MAP_005_Nature_Bush_v01.png (16x16); assets/maps/urban/MAP_005_Nature_FlowerPatch_v01.png (16x16); assets/maps/urban/MAP_005_Nature_Rock_v01.png (16x16); assets/maps/urban/MAP_005_Nature_Tree_v01.png (32x40)
 MAP-006,街區裝飾物,建議-MVP,已完成(v01),6,assets/maps/urban/MAP_006_Deco_Bench_v01.png (32x16); assets/maps/urban/MAP_006_Deco_Mailbox_v01.png (16x16); assets/maps/urban/MAP_006_Deco_Signboard_v01.png (16x16); assets/maps/urban/MAP_006_Deco_Streetlamp_v01.png (16x40); assets/maps/urban/MAP_006_Deco_TrafficSign_v01.png (16x32); assets/maps/urban/MAP_006_Deco_TrashCan_v01.png (16x16)
-MAP-007,室內場景圖塊,建議-MVP,已完成(v01),3,assets/maps/interiors/MAP_007_Interior_Wall_A_v01.png (16x16); assets/maps/interiors/MAP_007_Interior_Wall_B_v01.png (16x16); assets/maps/interiors/MAP_007_Interior_Wall_v01.png (32x16)
+MAP-007,室內場景圖塊,建議-MVP,已完成(v01),5,assets/maps/interiors/MAP_007_Interior_Tileset_v01.png (64x16); assets/maps/interiors/MAP_007_Interior_Wall_A_v01.png (16x16); assets/maps/interiors/MAP_007_Interior_Wall_B_v01.png (16x16); assets/maps/interiors/MAP_007_Interior_Wall_v01.png (32x16); assets/maps/interiors/MAP_007_Interior_Window_v01.png (16x16)
 MAP-008,鄉村環境套組,未來擴充,未製作,0,
 MAP-009,都市環境套組,必要方向,共用素材,0,見 MAP-00
 MAP-010,地圖邊界與不可通行物件,必要-MVP,已完成(v01),1,assets/maps/tilesets/MAP_010_Blockers_v01.png (96x16)
@@ -27,7 +27,7 @@ BLD-002,商店外觀,必要-MVP,已完成(v01),1,assets/buildings/shops/BLD_002_
 BLD-003,工作場所外觀,必要-MVP,已完成(v01),1,assets/buildings/workplaces/BLD_003_Cafe_v01.png (64x64)
 BLD-004,社交場所外觀,建議-MVP,已完成(v01),1,assets/buildings/social/BLD_004_Park_Gazebo_v01.png (48x64)
 BLD-005,建築招牌與營業標誌,建議-MVP,已完成(v01),2,assets/buildings/shops/BLD_005_Sign_Shop_v01.png (16x16); assets/buildings/workplaces/BLD_005_Sign_Cafe_v01.png (16x16)
-BLD-006,室內家具與陳設,建議-MVP,已完成(v01),6,assets/objects/furniture/BLD_006_Bed_v01.png (16x32); assets/objects/furniture/BLD_006_Chair_v01.png (16x16); assets/objects/furniture/BLD_006_Counter_v01.png (32x16); assets/objects/furniture/BLD_006_Lamp_v01.png (16x16); assets/objects/furniture/BLD_006_Shelf_v01.png (16x32); assets/objects/furniture/BLD_006_Table_v01.png (16x16)
+BLD-006,室內家具與陳設,建議-MVP,已完成(v01),7,assets/objects/furniture/BLD_006_Bed_v01.png (16x32); assets/objects/furniture/BLD_006_Chair_v01.png (16x16); assets/objects/furniture/BLD_006_Counter_v01.png (32x16); assets/objects/furniture/BLD_006_Lamp_v01.png (16x16); assets/objects/furniture/BLD_006_Rug_v01.png (48x32); assets/objects/furniture/BLD_006_Shelf_v01.png (16x32); assets/objects/furniture/BLD_006_Table_v01.png (16x16)
 BLD-007,房屋裝修與家具擺放素材,未來擴充,未製作,0,
 OBJ-001,互動提示圖示,必要-MVP,已完成(v01),2,assets/ui/icons/OBJ_001_Interact_v01.png (16x16); assets/ui/icons/OBJ_001_Talk_v01.png (16x16)
 OBJ-002,床與休息物件,待確認,共用素材,0,見 BLD-006

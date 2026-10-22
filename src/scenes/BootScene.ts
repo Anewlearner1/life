@@ -4,7 +4,8 @@ import { propsCatalog, propTextureKey } from "./props";
 
 // ---------------------------------------------------------------------------
 // Texture keys
-//  - tilesets:   "tiles_ground" (6 frames), "tiles_road" (8x4 frames), "tiles_blockers" (6 frames)
+//  - tilesets:   "tiles_ground" (6 frames), "tiles_road" (8x4 frames), "tiles_blockers" (6 frames),
+//                "tiles_interior" (wall_a, wall_b, trim, door_mat)
 //  - props:      "prop_<key>" (see props.ts)
 //  - characters: textures `${spriteKey}_walk_${dir}` (96x32, 4 frames 24x32)
 //                          `${spriteKey}_idle_${dir}` (48x32, 2 frames; NPCs only have "down")
@@ -182,6 +183,7 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet("tiles_ground", "maps/tilesets/MAP_001_Ground_Tileset_v01.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("tiles_road", "maps/tilesets/MAP_002_Road_Tileset_v01.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("tiles_blockers", "maps/tilesets/MAP_010_Blockers_v01.png", { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet("tiles_interior", "maps/interiors/MAP_007_Interior_Tileset_v01.png", { frameWidth: 16, frameHeight: 16 });
 
     // Props
     for (const p of Object.values(propsCatalog)) this.load.image(propTextureKey(p.key), p.texturePath);

@@ -218,9 +218,88 @@ function buildRural(): MapDefinition {
   };
 }
 
+// ---------------------------------------------------------------- interiors
+/**
+ * Small room: wall row on top (`wall` = 'i' cream / 'j' wood), trim ('v') on the sides and bottom,
+ * `floor` inside, and a door mat ('m') in the bottom wall at doorX. Spawn = tile above the door.
+ */
+function buildInterior(
+  id: string,
+  name: string,
+  w: number,
+  h: number,
+  wall: string,
+  floor: string,
+  doorX: number,
+  locationIds: string[],
+  props: MapProp[],
+): MapDefinition {
+  const g = new Grid(w, h, floor);
+  g.rect(0, 0, w - 1, 0, wall);
+  g.rect(0, 1, 0, h - 1, "v");
+  g.rect(w - 1, 1, w - 1, h - 1, "v");
+  g.rect(1, h - 1, w - 2, h - 1, "v");
+  g.set(doorX, h - 1, "m");
+  return { id, name, width: w, height: h, rows: g.rows(), locationIds, spawn: { x: doorX, y: h - 2 }, props };
+}
+
+// map_home_in (10 x 8): bed + nightstand lamp on the left, shelves and a small dining set on the right.
+const homeIn = buildInterior(MAP.homeIn, "我的家（室內）", 10, 8, "i", "W", 4, [LOC.homeBed, LOC.homeExit], [
+  P("window", 4, 0),
+  P("shelf", 6, 0),
+  P("shelf", 7, 0),
+  P("rug", 2, 3),
+  P("bed", 1, 1),
+  P("table", 2, 1),
+  P("tablelamp", 2, 1),
+  P("table", 6, 4),
+  P("chair", 5, 4),
+  P("chair", 7, 4),
+]);
+
+// map_shop_in (11 x 8): shelves along the back wall, counter on the right (shopkeeper behind it).
+const shopIn = buildInterior(MAP.shopIn, "商店（室內）", 11, 8, "i", "T", 5, [LOC.shopCounter, LOC.shopExit], [
+  P("window", 5, 0),
+  P("shelf", 1, 0),
+  P("shelf", 2, 0),
+  P("shelf", 3, 0),
+  P("shelf", 7, 0),
+  P("shelf", 8, 0),
+  P("shelf", 9, 0),
+  P("counter", 8, 3),
+  P("table", 2, 4),
+  P("table", 3, 4),
+  P("table", 2, 6),
+  P("table", 3, 6),
+]);
+
+// map_cafe_in (12 x 9): counter + espresso machine at the back, tables and chairs in front.
+const cafeIn = buildInterior(MAP.cafeIn, "咖啡店（室內）", 12, 9, "j", "W", 5, [LOC.cafeCounter, LOC.cafeSeat, LOC.cafeExit], [
+  P("window", 1, 0),
+  P("window", 10, 0),
+  P("shelf", 6, 0),
+  P("shelf", 7, 0),
+  P("counter", 3, 3),
+  P("counter", 5, 3),
+  P("espresso", 3, 3),
+  P("grinder", 5, 3),
+  P("menuboard", 8, 2),
+  P("table", 2, 6),
+  P("chair", 1, 6),
+  P("chair", 3, 6),
+  P("cup", 2, 6),
+  P("seattable", 8, 6),
+  P("chair", 7, 6),
+  P("chair", 9, 6),
+  P("cup", 8, 6),
+]);
+
 export const maps: Record<string, MapDefinition> = {
   [MAP.starter]: buildStarter(),
   [MAP.rural]: buildRural(),
+  [MAP.homeIn]: homeIn,
+  [MAP.shopIn]: shopIn,
+  [MAP.cafeIn]: cafeIn,
 };
 
 // Door tiles match the prop door positions (prop top-left + collision.json door_tile).
@@ -229,25 +308,28 @@ export const locations: Record<string, LocationDefinition> = {
     id: LOC.home,
     mapId: MAP.starter,
     name: "我的家",
-    type: "home",
+    type: "gate",
     door: { x: 5, y: 10 }, // house at (4,8) + (1,2)
-    interactionIds: ["sleep", "rest"],
+    interactionIds: [],
+    targetMapId: MAP.homeIn,
   },
   [LOC.shop]: {
     id: LOC.shop,
     mapId: MAP.starter,
     name: "商店",
-    type: "shop",
+    type: "gate",
     door: { x: 19, y: 12 }, // shop at (17,10) + (2,2)
-    interactionIds: ["shop"],
+    interactionIds: [],
+    targetMapId: MAP.shopIn,
   },
   [LOC.cafe]: {
     id: LOC.cafe,
     mapId: MAP.starter,
     name: "咖啡店",
-    type: "workplace",
+    type: "gate",
     door: { x: 23, y: 12 }, // cafe at (21,10) + (2,2)
-    interactionIds: ["work"],
+    interactionIds: [],
+    targetMapId: MAP.cafeIn,
   },
   [LOC.park]: {
     id: LOC.park,
@@ -280,6 +362,70 @@ export const locations: Record<string, LocationDefinition> = {
     name: "西側出口",
     type: "gate",
     door: { x: 0, y: 9 },
+    interactionIds: [],
+    targetMapId: MAP.starter,
+  },
+
+  // ---- interiors (door = tile in front of the furniture, exits = door mat in the bottom wall)
+  [LOC.homeBed]: {
+    id: LOC.homeBed,
+    mapId: MAP.homeIn,
+    name: "我的床",
+    type: "home",
+    door: { x: 1, y: 3 }, // bed at (1,1) + (0,2)
+    interactionIds: ["sleep", "rest"],
+  },
+  [LOC.homeExit]: {
+    id: LOC.homeExit,
+    mapId: MAP.homeIn,
+    name: "出口",
+    type: "gate",
+    door: { x: 4, y: 7 },
+    interactionIds: [],
+    targetMapId: MAP.starter,
+  },
+  [LOC.shopCounter]: {
+    id: LOC.shopCounter,
+    mapId: MAP.shopIn,
+    name: "商店櫃檯",
+    type: "shop",
+    door: { x: 8, y: 4 }, // counter at (8,3) + (0,1)
+    interactionIds: ["shop"],
+    npcStand: { x: 8, y: 2 }, // behind the counter
+  },
+  [LOC.shopExit]: {
+    id: LOC.shopExit,
+    mapId: MAP.shopIn,
+    name: "出口",
+    type: "gate",
+    door: { x: 5, y: 7 },
+    interactionIds: [],
+    targetMapId: MAP.starter,
+  },
+  [LOC.cafeCounter]: {
+    id: LOC.cafeCounter,
+    mapId: MAP.cafeIn,
+    name: "咖啡店吧台",
+    type: "workplace",
+    door: { x: 3, y: 4 }, // counter at (3,3) + (0,1)
+    interactionIds: ["work"],
+    npcStand: { x: 4, y: 2 }, // behind the counter
+  },
+  [LOC.cafeSeat]: {
+    id: LOC.cafeSeat,
+    mapId: MAP.cafeIn,
+    name: "咖啡店座位",
+    type: "social",
+    door: { x: 8, y: 5 }, // table at (8,6) + (0,-1)
+    interactionIds: ["rest"],
+    npcStand: { x: 8, y: 5 }, // visitors stand beside the player's spot (slots spread along the row)
+  },
+  [LOC.cafeExit]: {
+    id: LOC.cafeExit,
+    mapId: MAP.cafeIn,
+    name: "出口",
+    type: "gate",
+    door: { x: 5, y: 8 },
     interactionIds: [],
     targetMapId: MAP.starter,
   },

@@ -839,6 +839,53 @@ def lamp():
     return outline(im, "A")
 
 
+def interior_trim():
+    """Dark wood border (side / bottom walls seen from above): planks with a lit top edge."""
+    r = random.Random(15)
+    im = new(T, T)
+    for y in range(T):
+        for x in range(T):
+            if y in (0, 15): c = "A"
+            elif y == 1: c = "E"
+            elif x % 8 == 0: c = "A"
+            elif x % 8 == 1: c = "E"
+            elif r.random() < .04: c = "E"
+            else: c = "D"
+            px(im, x, y, c)
+    return im
+
+
+def door_mat():
+    """Wood floor with a red doormat (walkable exit tile in the bottom wall)."""
+    im = grid_img(WOOD)
+    rect(im, 2, 1, 13, 14, "B"); rect(im, 3, 2, 12, 13, "C")
+    for y in (4, 7, 10):
+        rect(im, 4, y, 11, y, "I")
+    rect(im, 3, 2, 12, 2, "@"); rect(im, 2, 1, 13, 1, "A"); rect(im, 2, 14, 13, 14, "A")
+    return im
+
+
+def interior_window():
+    """Wall decoration: framed window with curtains, drawn over an interior wall tile."""
+    im = new(T, T)
+    window(im, 2, 1, 13, 10, frame="E", glass="p", sill=True)
+    rect(im, 2, 2, 3, 9, "C"); rect(im, 12, 2, 13, 9, "C"); rect(im, 2, 2, 3, 2, "@"); rect(im, 12, 2, 13, 2, "@")
+    rect(im, 3, 5, 3, 9, "B"); rect(im, 12, 5, 12, 9, "B")
+    return im
+
+
+def rug():
+    """3x2 tile rug: red border, cream stripes, fringe."""
+    im = new(48, 32)
+    rect(im, 2, 3, 45, 28, "B"); rect(im, 3, 4, 44, 27, "C"); rect(im, 5, 6, 42, 25, "N"); rect(im, 6, 7, 41, 24, "C")
+    rect(im, 3, 4, 44, 4, "@")
+    for x in range(10, 40, 6):
+        rect(im, x, 11, x + 2, 13, "I"); rect(im, x + 3, 18, x + 5, 20, "N")
+    for x in range(3, 45, 3):
+        px(im, x, 2, "N"); px(im, x, 29, "N")
+    return outline(im, "A")
+
+
 def coffee():
     im = new(16, 16)
     rect(im, 3, 7, 10, 12, "9"); rect(im, 4, 13, 9, 13, "9"); rect(im, 9, 8, 10, 12, "7"); rect(im, 4, 13, 9, 13, "8")
@@ -1024,6 +1071,14 @@ def build():
     out(strip([w0, w1]), "maps/interiors/MAP_007_Interior_Wall_v01.png")
     for n, fn in (("Bed", bed), ("Table", table), ("Chair", chair), ("Counter", counter), ("Shelf", shelf), ("Lamp", lamp)):
         out(fn(), f"objects/furniture/BLD_006_{n}_v01.png")
+    out(rug(), "objects/furniture/BLD_006_Rug_v01.png")
+    out(interior_window(), "maps/interiors/MAP_007_Interior_Window_v01.png")
+    # interior tileset: wall A, wall B, side/bottom trim, door mat (frames 0..3)
+    it = [("wall_a", w0), ("wall_b", w1), ("trim", interior_trim()), ("door_mat", door_mat())]
+    out(strip([i for _, i in it]), "maps/interiors/MAP_007_Interior_Tileset_v01.png")
+    out_json({"tile_size": T, "columns": len(it), "tiles": {str(i): n for i, (n, _) in enumerate(it)},
+              "note": "wall_a/wall_b/trim are impassable; door_mat is the walkable exit tile in the bottom wall"},
+             "maps/interiors/MAP_007_Interior_Tileset_v01.json")
     for n, fn in (("Coffee", coffee), ("Bread", bread), ("Apple", apple), ("Bento", bento), ("Sandwich", sandwich)):
         out(fn(), f"objects/food/OBJ_003_{n}_v01.png")
     for n, fn in (("Shirt", shirt), ("Flower", flower_item), ("Book", book), ("Gift", gift)):

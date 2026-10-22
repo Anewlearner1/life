@@ -4,25 +4,27 @@ import { LOC } from "./ids";
 // Each schedule covers 0–1440 with no gaps. Sleep entries wrap midnight (start 1320 -> end 360).
 // Times are minutes of day: 360 = 06:00, 540 = 09:00, 1320 = 22:00.
 export const schedules: Record<string, ScheduleDefinition> = {
-  // npc_001 陳書豪: works at the cafe
+  // Indoor spots: LOC.cafeCounter / LOC.shopCounter (staff behind the counter), LOC.cafeSeat (visitors).
+  // LOC.home / LOC.shop / LOC.cafe are the building entrances on the street (NPC stands outside the door).
+  // npc_001 陳書豪: works at the cafe counter
   sch_npc_001: {
     id: "sch_npc_001",
     entries: [
       { startMinute: 1320, endMinute: 360, activity: "sleep", locationId: LOC.home },
       { startMinute: 360, endMinute: 420, activity: "rest", locationId: LOC.home },
-      { startMinute: 420, endMinute: 1140, activity: "work", locationId: LOC.cafe },
+      { startMinute: 420, endMinute: 1140, activity: "work", locationId: LOC.cafeCounter },
       { startMinute: 1140, endMinute: 1260, activity: "social", locationId: LOC.park },
       { startMinute: 1260, endMinute: 1320, activity: "rest", locationId: LOC.home },
     ],
   },
-  // npc_002 李美玲: works at the shop
+  // npc_002 李美玲: works at the shop counter
   sch_npc_002: {
     id: "sch_npc_002",
     entries: [
       { startMinute: 1320, endMinute: 360, activity: "sleep", locationId: LOC.home },
       { startMinute: 360, endMinute: 480, activity: "rest", locationId: LOC.home },
-      { startMinute: 480, endMinute: 1140, activity: "work", locationId: LOC.shop },
-      { startMinute: 1140, endMinute: 1230, activity: "social", locationId: LOC.cafe },
+      { startMinute: 480, endMinute: 1140, activity: "work", locationId: LOC.shopCounter },
+      { startMinute: 1140, endMinute: 1230, activity: "social", locationId: LOC.cafeSeat },
       { startMinute: 1230, endMinute: 1320, activity: "rest", locationId: LOC.home },
     ],
   },
@@ -34,14 +36,14 @@ export const schedules: Record<string, ScheduleDefinition> = {
       { startMinute: 420, endMinute: 540, activity: "rest", locationId: LOC.home },
       { startMinute: 540, endMinute: 600, activity: "shopping", locationId: LOC.shop },
       { startMinute: 600, endMinute: 720, activity: "social", locationId: LOC.park },
-      { startMinute: 720, endMinute: 840, activity: "social", locationId: LOC.cafe },
+      { startMinute: 720, endMinute: 840, activity: "social", locationId: LOC.cafeSeat },
       { startMinute: 840, endMinute: 960, activity: "rest", locationId: LOC.park },
       { startMinute: 960, endMinute: 1080, activity: "shopping", locationId: LOC.shop },
       { startMinute: 1080, endMinute: 1200, activity: "social", locationId: LOC.park },
       { startMinute: 1200, endMinute: 1320, activity: "rest", locationId: LOC.home },
     ],
   },
-  // npc_004 林小晴: studies (work) at the cafe, socializes at the park
+  // npc_004 林小晴: studies (work) at the cafe entrance, socializes at the park
   sch_npc_004: {
     id: "sch_npc_004",
     entries: [
@@ -64,7 +66,7 @@ export const schedules: Record<string, ScheduleDefinition> = {
       { startMinute: 1140, endMinute: 1260, activity: "social", locationId: LOC.park },
     ],
   },
-  // npc_006 許偉杰: office work simulated at the cafe
+  // npc_006 許偉杰: office work simulated at the cafe entrance
   sch_npc_006: {
     id: "sch_npc_006",
     entries: [
@@ -83,9 +85,9 @@ export const schedules: Record<string, ScheduleDefinition> = {
       { startMinute: 1380, endMinute: 540, activity: "sleep", locationId: LOC.home },
       { startMinute: 540, endMinute: 660, activity: "work", locationId: LOC.park },
       { startMinute: 660, endMinute: 720, activity: "shopping", locationId: LOC.shop },
-      { startMinute: 720, endMinute: 840, activity: "rest", locationId: LOC.cafe },
+      { startMinute: 720, endMinute: 840, activity: "rest", locationId: LOC.cafeSeat },
       { startMinute: 840, endMinute: 1020, activity: "work", locationId: LOC.park },
-      { startMinute: 1020, endMinute: 1140, activity: "social", locationId: LOC.cafe },
+      { startMinute: 1020, endMinute: 1140, activity: "social", locationId: LOC.cafeSeat },
       { startMinute: 1140, endMinute: 1380, activity: "rest", locationId: LOC.home },
     ],
   },
@@ -96,10 +98,10 @@ export const schedules: Record<string, ScheduleDefinition> = {
       { startMinute: 1290, endMinute: 360, activity: "sleep", locationId: LOC.home },
       { startMinute: 360, endMinute: 420, activity: "rest", locationId: LOC.home },
       { startMinute: 420, endMinute: 720, activity: "work", locationId: LOC.park },
-      { startMinute: 720, endMinute: 780, activity: "rest", locationId: LOC.cafe },
+      { startMinute: 720, endMinute: 780, activity: "rest", locationId: LOC.cafeSeat },
       { startMinute: 780, endMinute: 1020, activity: "work", locationId: LOC.shop },
       { startMinute: 1020, endMinute: 1110, activity: "social", locationId: LOC.park },
-      { startMinute: 1110, endMinute: 1200, activity: "social", locationId: LOC.cafe },
+      { startMinute: 1110, endMinute: 1200, activity: "social", locationId: LOC.cafeSeat },
       { startMinute: 1200, endMinute: 1290, activity: "rest", locationId: LOC.home },
     ],
   },

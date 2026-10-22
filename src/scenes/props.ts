@@ -18,6 +18,8 @@ export type PropDef = {
   entry?: { x: number; y: number };
   /** Decoration lying on the ground (always drawn below characters). */
   ground?: boolean;
+  /** Raise the image by this many px (item standing on top of furniture). */
+  lift?: number;
 };
 
 const b = (
@@ -61,6 +63,21 @@ export const propsCatalog: Record<string, PropDef> = {
   trash: b("trash", "maps/urban/MAP_006_Deco_TrashCan_v01.png", 1, 1, ["#"]),
   mailbox: b("mailbox", "maps/urban/MAP_006_Deco_Mailbox_v01.png", 1, 1, ["#"]),
   signboard: b("signboard", "maps/urban/MAP_006_Deco_Signboard_v01.png", 1, 1, ["#"]),
+
+  // Interior furniture. Doors of these props lie one tile in front (outside the footprint).
+  bed: b("bed", "objects/furniture/BLD_006_Bed_v01.png", 1, 2, ["#", "#"], { door: { x: 0, y: 2 } }),
+  table: b("table", "objects/furniture/BLD_006_Table_v01.png", 1, 1, ["#"]),
+  seattable: b("seattable", "objects/furniture/BLD_006_Table_v01.png", 1, 1, ["#"], { door: { x: 0, y: -1 } }),
+  chair: b("chair", "objects/furniture/BLD_006_Chair_v01.png", 1, 1, ["#"]),
+  shelf: b("shelf", "objects/furniture/BLD_006_Shelf_v01.png", 1, 2, [".", "#"]),
+  counter: b("counter", "objects/furniture/BLD_006_Counter_v01.png", 2, 1, ["##"], { door: { x: 0, y: 1 } }),
+  tablelamp: b("tablelamp", "objects/furniture/BLD_006_Lamp_v01.png", 1, 1, ["."], { lift: 7 }),
+  rug: b("rug", "objects/furniture/BLD_006_Rug_v01.png", 3, 2, ["...", "..."], { ground: true }),
+  window: b("window", "maps/interiors/MAP_007_Interior_Window_v01.png", 1, 1, ["."], { ground: true }),
+  espresso: b("espresso", "objects/work_tools/MINI_006_EspressoMachine_v01.png", 1, 1, ["."], { lift: 9 }),
+  grinder: b("grinder", "objects/work_tools/MINI_006_Grinder_v01.png", 1, 1, ["."], { lift: 7 }),
+  cup: b("cup", "objects/work_tools/MINI_006_Cup_v01.png", 1, 1, ["."], { lift: 6 }),
+  menuboard: b("menuboard", "objects/work_tools/MINI_006_MenuBoard_v01.png", 1, 2, [".", "#"]),
 };
 
 export const propTextureKey = (key: string): string => `prop_${key}`;
