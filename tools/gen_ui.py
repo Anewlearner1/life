@@ -657,22 +657,28 @@ FONT3x5 = {
     "G": ["011", "100", "101", "101", "011"],
     "O": ["111", "101", "101", "101", "111"],
     "D": ["110", "101", "101", "101", "110"],
-    "M": ["101", "111", "111", "101", "101"],
+    "M": ["10001", "11011", "10101", "10001", "10001"],
     "I": ["111", "010", "010", "010", "111"],
     "S": ["011", "100", "010", "001", "110"],
 }
 
 
+JUDGE_W, JUDGE_H = 40, 12   # wide enough for PERFECT with 2px letter gaps
+
+
 def judge_word(text, fill, bottom):
-    canvas = blank_wh(32, 12)
-    x0 = (32 - (len(text) * 4 - 1)) // 2
+    canvas = blank_wh(JUDGE_W, JUDGE_H)
+    gap = 2                                    # 2px gap between glyphs (outline keeps letters apart)
+    total = sum(len(FONT3x5[ch][0]) for ch in text) + gap * (len(text) - 1)
+    x = (JUDGE_W - total) // 2
     y0 = 3
     cells = {}
-    for i, ch in enumerate(text):
+    for ch in text:
         for ry, row in enumerate(FONT3x5[ch]):
             for rx, bit in enumerate(row):
                 if bit == "1":
-                    cells[(x0 + i * 4 + rx, y0 + ry)] = fill if ry < 4 else bottom
+                    cells[(x + rx, y0 + ry)] = fill if ry < 4 else bottom
+        x += len(FONT3x5[ch][0]) + gap
     for (x, y), c in cells.items():
         canvas[y][x] = c
     add_outline(canvas)
@@ -746,7 +752,8 @@ def coin_pop_frame(rx):
     return to_image(c)
 
 
-def sparkle_frame(arm, centre="w", ray=None, diag=None):
+def sparkle_frame(arm, centre="w", ray=None, diag=None, edge=None, inner=None):
+    """Cross sparkle. `inner` colours the first ray pixel, `edge` the outermost one."""
     c = blank(16)
     cx = cy = 8
     if diag:
@@ -754,8 +761,9 @@ def sparkle_frame(arm, centre="w", ray=None, diag=None):
             c[cy + dy][cx + dx] = diag
     if ray:
         for i in range(1, arm + 1):
+            col = edge if (edge and i == arm and arm > 1) else (inner if (inner and i == 1) else ray)
             for dx, dy in ((i, 0), (-i, 0), (0, i), (0, -i)):
-                c[cy + dy][cx + dx] = ray
+                c[cy + dy][cx + dx] = col
     if centre:
         c[cy][cx] = centre
     return to_image(c)
@@ -858,8 +866,11 @@ def build():
     base_heart = add_outline(centred(heart_rows("full")))
     put(strip([to_image(shift(base_heart, dy)) for dy in (2, 1, 0, -1)]),
         "effects/rewards/FX_003_HeartUp_v01.png")
-    put(strip([sparkle_frame(0, "w"), sparkle_frame(1, "w", "y"),
-               sparkle_frame(3, "w", "y", "Y"), sparkle_frame(2, None, "Y")]),
+    # small -> large -> medium -> fade; every frame has a visible cross
+    put(strip([sparkle_frame(2, "w", "y", None, "Y", "w"),
+               sparkle_frame(5, "w", "y", "y", "Y", "w"),
+               sparkle_frame(3, "w", "y", "Y", "Y"),
+               sparkle_frame(2, None, "Y", None)]),
         "effects/unlocks/FX_004_Sparkle_v01.png")
     put(strip([lowneed_frame("r"), lowneed_frame("R")]),
         "effects/interaction/FX_005_LowNeed_v01.png")

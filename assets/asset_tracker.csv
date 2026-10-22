@@ -2,7 +2,7 @@
 CHAR-001,玩家角色基礎 Sprite,必要-MVP,已完成(v01),5,assets/characters/player/portraits/CHAR_001_Player_Portrait_v01.png (48x48); assets/characters/player/walk/CHAR_001_Player_Down_Walk_v01.png (64x24); assets/characters/player/walk/CHAR_001_Player_Left_Walk_v01.png (64x24); assets/characters/player/walk/CHAR_001_Player_Right_Walk_v01.png (64x24); assets/characters/player/walk/CHAR_001_Player_Up_Walk_v01.png (64x24)
 CHAR-002,玩家四方向行走動畫,必要-MVP,共用素材,0,見 CHAR-001
 CHAR-003,玩家待機動畫,必要-MVP,已完成(v01),4,assets/characters/player/idle/CHAR_003_Player_Down_Idle_v01.png (32x24); assets/characters/player/idle/CHAR_003_Player_Left_Idle_v01.png (32x24); assets/characters/player/idle/CHAR_003_Player_Right_Idle_v01.png (32x24); assets/characters/player/idle/CHAR_003_Player_Up_Idle_v01.png (32x24)
-CHAR-004,角色髮型素材,建議-MVP,未製作,0,
+CHAR-004,角色髮型素材,建議-MVP,已完成(v01),8,assets/characters/player/hair/CHAR_004_BaseHead_Down_v01.png (16x24); assets/characters/player/hair/CHAR_004_Hair_Bob_Down_v01.png (16x24); assets/characters/player/hair/CHAR_004_Hair_Buzz_Down_v01.png (16x24); assets/characters/player/hair/CHAR_004_Hair_Long_Down_v01.png (16x24); assets/characters/player/hair/CHAR_004_Hair_Ponytail_Down_v01.png (16x24); assets/characters/player/hair/CHAR_004_Hair_Preview_v01.png (124x32); assets/characters/player/hair/CHAR_004_Hair_Short_Down_v01.png (16x24); assets/characters/player/hair/CHAR_004_Hair_Spiky_Down_v01.png (16x24)
 CHAR-005,角色服裝素材,建議-MVP,已完成(v01),4,assets/characters/player/outfits/CHAR_005_Player_Outfit2_Down_Walk_v01.png (64x24); assets/characters/player/outfits/CHAR_005_Player_Outfit2_Left_Walk_v01.png (64x24); assets/characters/player/outfits/CHAR_005_Player_Outfit2_Right_Walk_v01.png (64x24); assets/characters/player/outfits/CHAR_005_Player_Outfit2_Up_Walk_v01.png (64x24)
 CHAR-006,角色配件素材,未來擴充,未製作,0,
 CHAR-007,角色動作動畫,待確認,未製作,0,
@@ -45,18 +45,18 @@ UI-006,按鈕套組,必要-MVP,已完成(v01),4,assets/ui/buttons/UI_006_Button_
 UI-007,分頁／功能圖示,建議-MVP,已完成(v01),6,assets/ui/icons/UI_007_Tab_Bag_v01.png (16x16); assets/ui/icons/UI_007_Tab_Character_v01.png (16x16); assets/ui/icons/UI_007_Tab_Map_v01.png (16x16); assets/ui/icons/UI_007_Tab_Relationship_v01.png (16x16); assets/ui/icons/UI_007_Tab_Settings_v01.png (16x16); assets/ui/icons/UI_007_Tab_Work_v01.png (16x16)
 UI-008,提示、警告與通知圖示,建議-MVP,已完成(v01),4,assets/ui/icons/UI_008_Notice_Info_v01.png (16x16); assets/ui/icons/UI_008_Notice_SaveOk_v01.png (16x16); assets/ui/icons/UI_008_Notice_Unlock_v01.png (16x16); assets/ui/icons/UI_008_Notice_Warning_v01.png (16x16)
 UI-009,商店介面框體,建議-MVP,已完成(v01),1,assets/ui/panels/UI_009_ShopPanel_v01.png (24x24)
-UI-010,角色創建介面素材,建議-MVP,未製作,0,
+UI-010,角色創建介面素材,建議-MVP,已完成(v01),6,assets/ui/menus/UI_010_Arrow_Left_v01.png (16x16); assets/ui/menus/UI_010_Arrow_Right_v01.png (16x16); assets/ui/menus/UI_010_ColorSwatch_Frame_v01.png (12x12); assets/ui/menus/UI_010_CreatePanel_v01.png (24x24); assets/ui/menus/UI_010_NameField_v01.png (96x16); assets/ui/menus/UI_010_Preview_v01.png (160x120)
 UI-011,關係／好感度介面,建議-MVP,已完成(v01),3,assets/ui/icons/UI_011_Heart_Empty_v01.png (16x16); assets/ui/icons/UI_011_Heart_Full_v01.png (16x16); assets/ui/icons/UI_011_Heart_Half_v01.png (16x16)
 UI-012,存檔／載入介面,必要-MVP,已完成(v01),3,assets/ui/icons/UI_012_Load_v01.png (16x16); assets/ui/icons/UI_012_SaveError_v01.png (16x16); assets/ui/icons/UI_012_Save_v01.png (16x16)
-UI-013,區域解鎖提示,建議-MVP,未製作,0,
+UI-013,區域解鎖提示,建議-MVP,已完成(v01),4,assets/ui/menus/UI_013_Lock_Locked_v01.png (16x16); assets/ui/menus/UI_013_Lock_Unlocked_v01.png (16x16); assets/ui/menus/UI_013_MapPin_New_v01.png (16x16); assets/ui/menus/UI_013_UnlockBanner_v01.png (128x32)
 MINI-001,小遊戲背景／面板,必要-MVP,已完成(v01),1,assets/minigames/rhythm/MINI_001_Panel_v01.png (24x24)
 MINI-002,節奏提示符號,必要-MVP,已完成(v01),2,assets/minigames/rhythm/MINI_002_RhythmCue_Hold_v01.png (16x16); assets/minigames/rhythm/MINI_002_RhythmCue_Tap_v01.png (16x16)
 MINI-003,判定區／時間軌道,必要-MVP,已完成(v01),2,assets/minigames/rhythm/MINI_003_HitZone_v01.png (24x24); assets/minigames/rhythm/MINI_003_Track_v01.png (128x24)
-MINI-004,成功／普通／失誤提示,必要-MVP,已完成(v01),3,assets/minigames/rhythm/MINI_004_Judge_Good_v01.png (32x12); assets/minigames/rhythm/MINI_004_Judge_Miss_v01.png (32x12); assets/minigames/rhythm/MINI_004_Judge_Perfect_v01.png (32x12)
+MINI-004,成功／普通／失誤提示,必要-MVP,已完成(v01),3,assets/minigames/rhythm/MINI_004_Judge_Good_v01.png (40x12); assets/minigames/rhythm/MINI_004_Judge_Miss_v01.png (40x12); assets/minigames/rhythm/MINI_004_Judge_Perfect_v01.png (40x12)
 MINI-005,分數與薪資結算面板,必要-MVP,已完成(v01),1,assets/minigames/rhythm/MINI_005_ResultPanel_v01.png (24x24)
-MINI-006,工作場所裝飾與工具,建議-MVP,未製作,0,
+MINI-006,工作場所裝飾與工具,建議-MVP,已完成(v01),7,assets/objects/work_tools/MINI_006_Apron_v01.png (16x16); assets/objects/work_tools/MINI_006_Cup_v01.png (16x16); assets/objects/work_tools/MINI_006_EspressoMachine_v01.png (16x24); assets/objects/work_tools/MINI_006_Grinder_v01.png (16x16); assets/objects/work_tools/MINI_006_MenuBoard_v01.png (16x24); assets/objects/work_tools/MINI_006_Milk_v01.png (16x16); assets/objects/work_tools/MINI_006_Tray_v01.png (16x16)
 EVT-001,事件對話面板,必要-MVP,共用素材,0,見 UI-005
-EVT-002,關係階段提示,建議-MVP,未製作,0,
+EVT-002,關係階段提示,建議-MVP,已完成(v01),7,assets/ui/icons/EVT_002_StageBar_v01.png (96x12); assets/ui/icons/EVT_002_Stage_Acquaintance_v01.png (16x16); assets/ui/icons/EVT_002_Stage_CloseFriend_v01.png (16x16); assets/ui/icons/EVT_002_Stage_Crush_v01.png (16x16); assets/ui/icons/EVT_002_Stage_Friend_v01.png (16x16); assets/ui/icons/EVT_002_Stage_Partner_v01.png (16x16); assets/ui/icons/EVT_002_Stage_Stranger_v01.png (16x16)
 EVT-003,戀愛事件背景,未來擴充,未製作,0,
 EVT-004,事件插圖／CG,未來擴充,未製作,0,
 EVT-005,成就／解鎖特效,建議-MVP,共用素材,0,見 FX-004
