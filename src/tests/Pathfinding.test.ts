@@ -92,7 +92,7 @@ describe("buildCollisionGrid + maps", () => {
               if (def.collision[ry][rx] !== "#") continue;
               const x = p.x + rx;
               const y = p.y + ry;
-              expect("., dsWT".includes(map.rows[y][x]), `${p.key}@${x},${y} on '${map.rows[y][x]}'`).toBe(true);
+              expect("., dsWTt".includes(map.rows[y][x]), `${p.key}@${x},${y} on '${map.rows[y][x]}'`).toBe(true);
               const k = `${x},${y}`;
               expect(owner.has(k), `${p.key}@${k} overlaps ${owner.get(k)}`).toBe(false);
               owner.set(k, p.key);

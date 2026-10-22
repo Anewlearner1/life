@@ -988,35 +988,83 @@ def hitzone():
     return im
 
 
-def track():
-    """128x24 lane: navy panel with glowing cyan grid, centre line and edge rails."""
+def track(rail="#498aa8", edge="navy2", lo="navy2", hi="navyd", rung="blue", rung2="#22578e", side="#3a73a8",
+          line1="sky2", line2="sky"):
+    """128x24 lane: navy panel with glowing cyan grid, centre line and edge rails (colour args: farm variant)."""
     W, Hh = 128, 24
     im = new(W, Hh)
     px = im.load()
+    col = lambda v: H(v) if v.startswith("#") else UP[v]  # noqa: E731
     for y in range(Hh):
         for x in range(W):
             if y in (0, Hh - 1):
-                c = UP["ink"]
+                c = UP["ink"] if rail == "#498aa8" else UP["outw"]
             elif y in (1, Hh - 2):
-                c = H("#498aa8")
+                c = col(rail)
             elif y in (2, Hh - 3):
-                c = UP["navy2"]
+                c = col(edge)
             else:
                 t = abs(y - 11.5) / 9.5
-                c = vgrad("navy2", "navyd", min(1, t))
+                c = vgrad(lo, hi, min(1, t))
                 if x % 16 == 8:
-                    c = vgrad("blue", "navy2", t)           # grid rungs
+                    c = vgrad(rung, lo, t)           # grid rungs
                 if (x % 16) in (7, 9) and 4 <= y <= 19:
-                    c = vgrad("navy2", H("#22578e"), 1 - t)
+                    c = vgrad(lo, col(rung2), 1 - t)
                 if y in (11, 12):
-                    c = UP["sky2"] if y == 11 else UP["sky"]  # glowing centre line
+                    c = UP[line1] if y == 11 else UP[line2]  # glowing centre line
                 elif y in (10, 13):
-                    c = H("#3a73a8")
+                    c = col(side)
             px[x, y] = c
     # rounded end caps (clip the four corners)
     for x, y in ((0, 0), (W - 1, 0), (0, Hh - 1), (W - 1, Hh - 1)):
         px[x, y] = (0, 0, 0, 0)
     return im
+
+
+def track_farm():
+    """Earthy furrow lane: dark soil, leaf-green rails, lime centre line."""
+    return track(rail="leaf", edge="leafd", lo=H("#4a2f22"), hi=H("#2e1c14"), rung="brown", rung2="#6b4630",
+                 side="#5f3a2c", line1="limel", line2="lime")
+
+
+def crop_cue(kind):
+    """16x16 round-ish crop icon for the farm rhythm lane (carrot / cabbage / pumpkin), warm dark outline."""
+    im = new(16, 16)
+    if kind == "carrot":
+        body = {(x, y) for y in range(5, 15) for x in range(16)
+                if abs(x + 0.5 - (8.5 - (y - 5) * 0.12)) <= 4.3 * (14.8 - y) / 9.8}
+        shade_cells(im, body, "orange", "orangel", "oranged", deep=True)
+        for (x, y) in ((6, 8), (7, 8), (9, 11), (10, 11), (7, 13)):   # growth rings
+            if (x, y) in body:
+                put(im, x, y, "oranged")
+        for (x, y) in ((6, 6), (7, 6)):
+            put(im, x, y, "orangel")
+        leaf = ["..G....G....G...",
+                "..gG...gG..Gg...",
+                "...gG..gG.Gg....",
+                "....gGgggGgd....",
+                ".....dgggdd....."]
+        paste(im, grid(leaf, {"G": "greenl", "g": "green", "d": "greend"}, 16, 5, 0, 0), 0, 1)
+    elif kind == "cabbage":
+        body = disc_cells(8, 8.5, 6.6)
+        shade_cells(im, body, "lime", "limel", "green", deep=True)
+        for (x, y) in ((8, 4), (8, 5), (8, 6), (7, 7), (6, 8), (9, 7), (10, 8), (5, 11), (6, 12), (10, 12), (11, 11)):
+            put(im, x, y, "green")
+        for (x, y) in ((5, 4), (6, 3), (4, 5), (7, 4)):
+            put(im, x, y, "white")
+    else:  # pumpkin
+        body = ellipse_cells(8, 9.2, 6.9, 5.4)
+        shade_cells(im, body, "orange", "orangel", "oranged", deep=True)
+        for x in (4, 8, 12):
+            for y in range(6, 14):
+                if (x, y) in body:
+                    put(im, x, y, "oranged" if x != 8 else "orangel")
+        for (x, y) in ((5, 7), (6, 6)):
+            put(im, x, y, "goldl")
+        for (x, y) in ((7, 3), (8, 3), (7, 4), (8, 4), (8, 5)):
+            put(im, x, y, "greend" if y > 3 else "green")
+        put(im, 9, 4, "green"); put(im, 10, 4, "greenl")
+    return outline_img(im, "outw")
 
 
 # ================================================================= effects (16x16 frames)
@@ -1181,6 +1229,9 @@ def build():
     put_(rhythm_cue("blue", "sky", "navy2", 1), "minigames/rhythm/MINI_002_RhythmCue_Hold_v01.png")
     put_(track(), "minigames/rhythm/MINI_003_Track_v01.png")
     put_(hitzone(), "minigames/rhythm/MINI_003_HitZone_v01.png")
+    put_(track_farm(), "minigames/rhythm/MINI_003_Track_Farm_v01.png")
+    for kind, name in (("carrot", "Carrot"), ("cabbage", "Cabbage"), ("pumpkin", "Pumpkin")):
+        put_(crop_cue(kind), f"minigames/rhythm/MINI_002_RhythmCue_Crop_{name}_v01.png")
     put_(judge_word("PERFECT", "goldl", "gold", "orange", "outw", False), "minigames/rhythm/MINI_004_Judge_Perfect_v01.png")
     put_(judge_word("GOOD", "limel", "greenl", "green", "greeno", True), "minigames/rhythm/MINI_004_Judge_Good_v01.png")
     put_(judge_word("MISS", "redl", "red", "redd", "redo", True), "minigames/rhythm/MINI_004_Judge_Miss_v01.png")

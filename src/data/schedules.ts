@@ -56,12 +56,12 @@ export const schedules: Record<string, ScheduleDefinition> = {
       { startMinute: 1140, endMinute: 1380, activity: "rest", locationId: LOC.home },
     ],
   },
-  // npc_005 黃德福: works at the farm
+  // npc_005 黃德福: works in the crop field
   sch_npc_005: {
     id: "sch_npc_005",
     entries: [
       { startMinute: 1260, endMinute: 300, activity: "sleep", locationId: LOC.home },
-      { startMinute: 300, endMinute: 1080, activity: "work", locationId: LOC.farm },
+      { startMinute: 300, endMinute: 1080, activity: "work", locationId: LOC.field },
       { startMinute: 1080, endMinute: 1140, activity: "shopping", locationId: LOC.shop },
       { startMinute: 1140, endMinute: 1260, activity: "social", locationId: LOC.park },
     ],

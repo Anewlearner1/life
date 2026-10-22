@@ -23,6 +23,7 @@ export const LOC = {
   gateEast: "loc_gate_east", // starter -> rural (locked until cond_unlock_rural)
   farm: "loc_farm", // rural social place
   gateWest: "loc_gate_west", // rural -> starter
+  field: "loc_field", // rural crop field; workplace for job_farmhand, the farmer works here
 } as const;
 
 export const NPC_IDS = [
@@ -36,6 +37,6 @@ export const NPC_IDS = [
   "npc_008", // Mailcarrier
 ] as const;
 
-export const JOB = { barista: "job_barista" } as const;
-export const MINIGAME = { rhythmCafe: "mg_rhythm_cafe" } as const;
+export const JOB = { barista: "job_barista", farmhand: "job_farmhand" } as const;
+export const MINIGAME = { rhythmCafe: "mg_rhythm_cafe", rhythmFarm: "mg_rhythm_farm" } as const;
 export const COND = { unlockRural: "cond_unlock_rural" } as const;

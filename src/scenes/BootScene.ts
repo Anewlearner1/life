@@ -5,7 +5,7 @@ import { propsCatalog, propTextureKey } from "./props";
 // ---------------------------------------------------------------------------
 // Texture keys
 //  - tilesets:   "tiles_ground" (6 frames), "tiles_road" (8x4 frames), "tiles_blockers" (6 frames),
-//                "tiles_interior" (wall_a, wall_b, trim, door_mat)
+//                "tiles_interior" (wall_a, wall_b, trim, door_mat), "tiles_farm" (soil, cabbage_row, wheat_row)
 //  - props:      "prop_<key>" (see props.ts)
 //  - characters: textures `${spriteKey}_walk_${dir}` (96x32, 4 frames 24x32)
 //                          `${spriteKey}_idle_${dir}` (48x32, 2 frames; NPCs only have "down")
@@ -57,9 +57,13 @@ const MISC_ASSETS: string[] = [
   "effects/rewards/FX_003_HeartUp_v01.png",
   "effects/unlocks/FX_004_Sparkle_v01.png",
   "minigames/rhythm/MINI_001_Panel_v01.png",
+  "minigames/rhythm/MINI_002_RhythmCue_Crop_Cabbage_v01.png",
+  "minigames/rhythm/MINI_002_RhythmCue_Crop_Carrot_v01.png",
+  "minigames/rhythm/MINI_002_RhythmCue_Crop_Pumpkin_v01.png",
   "minigames/rhythm/MINI_002_RhythmCue_Hold_v01.png",
   "minigames/rhythm/MINI_002_RhythmCue_Tap_v01.png",
   "minigames/rhythm/MINI_003_HitZone_v01.png",
+  "minigames/rhythm/MINI_003_Track_Farm_v01.png",
   "minigames/rhythm/MINI_003_Track_v01.png",
   "minigames/rhythm/MINI_004_Judge_Good_v01.png",
   "minigames/rhythm/MINI_004_Judge_Miss_v01.png",
@@ -183,6 +187,7 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet("tiles_ground", "maps/tilesets/MAP_001_Ground_Tileset_v01.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("tiles_road", "maps/tilesets/MAP_002_Road_Tileset_v01.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("tiles_blockers", "maps/tilesets/MAP_010_Blockers_v01.png", { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet("tiles_farm", "maps/tilesets/MAP_011_Farm_Tileset_v01.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("tiles_interior", "maps/interiors/MAP_007_Interior_Tileset_v01.png", { frameWidth: 16, frameHeight: 16 });
 
     // Props

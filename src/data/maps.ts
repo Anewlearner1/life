@@ -151,8 +151,12 @@ function buildRural(): MapDefinition {
   g.rect(15, 7, 15, 9, "d");
   g.rect(16, 9, 16, 13, "d");
 
-  // Fenced field (south-east).
-  g.rect(18, 11, 21, 15, "d");
+  // Fenced crop field (south-east): 't' tilled soil (walkable paths), 'c' cabbage row, 'y' wheat row (impassable).
+  // Soil paths: y=12 from the gate, x=18 down the west side, y=14 to the scarecrow at the east end.
+  g.rect(18, 11, 21, 15, "t");
+  g.rect(18, 11, 21, 11, "c");
+  g.rect(18, 15, 21, 15, "c");
+  g.rect(19, 13, 20, 13, "y");
   for (let x = 17; x <= 22; x++) {
     g.set(x, 10, "f");
     g.set(x, 16, "f");
@@ -161,7 +165,7 @@ function buildRural(): MapDefinition {
     g.set(17, y, "f");
     g.set(22, y, "f");
   }
-  g.set(17, 12, "d"); // field gate
+  g.set(17, 12, "d"); // field gate (the work tile is in front of the scarecrow at (21,14))
 
   // Pond (south-west).
   g.rect(3, 12, 6, 15, "~");
@@ -201,8 +205,15 @@ function buildRural(): MapDefinition {
     P("flower", 18, 4),
     P("flower", 12, 12),
     P("flower", 9, 16),
-    P("flower", 19, 8),
     P("flower", 4, 10),
+    // crop garden beside the farmhouse + the scarecrow that marks the work spot in the field
+    P("cabbage", 18, 8),
+    P("cabbage", 19, 8),
+    P("pumpkin", 20, 8),
+    P("pumpkin", 21, 8),
+    P("wheat", 17, 6),
+    P("wheat", 18, 6),
+    P("scarecrow", 21, 12),
   ];
 
   return {
@@ -211,7 +222,7 @@ function buildRural(): MapDefinition {
     width: W,
     height: H,
     rows: g.rows(),
-    locationIds: [LOC.farm, LOC.gateWest],
+    locationIds: [LOC.farm, LOC.field, LOC.gateWest],
     unlockConditionId: COND.unlockRural,
     spawn: { x: 1, y: 9 },
     props,
@@ -355,6 +366,15 @@ export const locations: Record<string, LocationDefinition> = {
     type: "social",
     door: { x: 15, y: 6 }, // farmhouse (house) at (14,4) + (1,2)
     interactionIds: ["rest"],
+  },
+  [LOC.field]: {
+    id: LOC.field,
+    mapId: MAP.rural,
+    name: "農場田地",
+    type: "workplace",
+    door: { x: 21, y: 14 }, // scarecrow at (21,12) + (0,2)
+    interactionIds: ["work"],
+    npcStand: { x: 19, y: 14 }, // the farmer works along the soil path
   },
   [LOC.gateWest]: {
     id: LOC.gateWest,

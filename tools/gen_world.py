@@ -492,6 +492,126 @@ def trafficsign():
     return outline(im)
 
 
+# ------------------------------------------------------------------ farm field (rural crops)
+def soil_grid(seed=21):
+    """Tilled soil: two horizontal ridges per tile (period 8, tiles seamlessly in both directions)."""
+    r = random.Random(seed)
+    prof = "DEFGFEED"
+    g = [[prof[y % 8]] * T for y in range(T)]
+    for y in range(T):
+        for x in range(T):
+            v = r.random()
+            if v < .07:
+                g[y][x] = "D" if y % 8 in (2, 3, 4) else "G"
+            elif v < .10:
+                g[y][x] = "H"
+    return g
+
+
+def tile_soil():
+    return grid_img(soil_grid())
+
+
+def tile_cabbage_row():
+    """Soil with two staggered rows of round cabbage heads (one per ridge, wraps seamlessly sideways)."""
+    r = random.Random(22)
+    im = grid_img(soil_grid(23))
+    for cy, xs in ((4.5, (4, 12)), (12.5, (0, 8, 16))):
+        for cx in xs:
+            clump(im, cx, cy, 4.3, 3.7, r, "OSRUT", fleck=.05)
+            px(im, cx - 1, int(cy) - 1, "M"); px(im, cx, int(cy) - 2, "O"); px(im, cx - 2, int(cy), "O")
+    return im
+
+
+def tile_wheat_row():
+    """Soil with ripe golden wheat: fanned bunches on two ridges, heads in three golds (back row first)."""
+    r = random.Random(24)
+    im = grid_img(soil_grid(25))
+    for base, xs in ((9, (2, 6, 10, 14)), (16, (0, 4, 8, 12))):
+        for cx in xs:
+            for dx, h in ((-1, 6), (0, 8), (1, 6)):
+                x = cx + dx
+                top = base - h - r.randint(0, 1)
+                for y in range(top + 3, base + 1):
+                    px(im, x, y, "G" if dx else "J")
+                px(im, x, top, "K"); px(im, x, top + 1, "K"); px(im, x, top + 2, "I"); px(im, x, top + 3, "H")
+                px(im, x + dx, top + 1, "I"); px(im, x - dx, top + 2, "H") if dx else None
+            px(im, cx, base, "E"); px(im, cx - 1, base, "D"); px(im, cx + 1, base, "D")
+    return im
+
+
+def crop_cabbage():
+    r = random.Random(31)
+    im = new(16, 16)
+    mask_of_soil = mask_of([(8, 13, 6.5, 2.2)])
+    for (x, y) in sorted(mask_of_soil):
+        px(im, x, y, "E" if (x + y) % 3 else "D")
+    clump(im, 8, 8.5, 6.4, 5.6, r, "OSRUT", fleck=.05)
+    clump(im, 8, 7.5, 3.4, 3, r, "MOSRU", fleck=0)
+    for (x, y) in ((8, 4), (8, 5), (7, 6), (9, 6)):      # leaf veins
+        px(im, x, y, "O")
+    for (x, y) in ((3, 9), (4, 10), (12, 9), (11, 10), (8, 11)):
+        px(im, x, y, "T")
+    return outline(im, "T")
+
+
+def crop_pumpkin():
+    r = random.Random(32)
+    im = new(16, 16)
+    for (x, y) in sorted(mask_of([(8, 13.5, 6.5, 2)])):
+        px(im, x, y, "E" if (x + y) % 3 else "D")
+    m = mask_of([(8, 9.5, 7, 5.2)])
+    shade(im, m, (8, 9.5, 7, 5.2), ("I", "!", "#"), r, noise=.05)
+    for x in (4, 8, 12):                                   # ribs
+        for y in range(6, 14):
+            if (x, y) in m:
+                px(im, x, y, "#" if x != 8 else "@")
+    for (x, y) in ((5, 7), (6, 6)):
+        px(im, x, y, "K")
+    rect(im, 7, 3, 8, 5, "T"); px(im, 7, 3, "R"); rect(im, 9, 4, 10, 4, "U")   # stem + curl
+    return outline(im, "$")
+
+
+def crop_wheat():
+    """A tied sheaf of wheat standing in the field."""
+    im = new(16, 16)
+    for (x, y) in sorted(mask_of([(8, 14, 5.5, 1.6)])):
+        px(im, x, y, "E" if (x + y) % 3 else "D")
+    for i, x in enumerate((4, 6, 8, 10, 12)):
+        top = (2, 1, 0, 1, 2)[i]
+        for y in range(top + 3, 14):
+            px(im, x, y, "G" if i % 2 == 0 else "J")
+        px(im, x, top, "K"); px(im, x, top + 1, "I"); px(im, x, top + 2, "I")
+        px(im, x - 1, top + 2, "H"); px(im, x + 1, top + 1, "K")
+    rect(im, 3, 9, 13, 10, "B"); rect(im, 3, 9, 13, 9, "C")         # red tie
+    rect(im, 2, 13, 14, 14, "G")                                    # cut stalk ends
+    rect(im, 2, 14, 14, 14, "E")
+    return outline(im, "A")
+
+
+def scarecrow():
+    """16x32 scarecrow on a post: straw hat, sack face, red patched shirt, straw hands."""
+    im = new(16, 32)
+    rect(im, 7, 15, 8, 30, "F"); rect(im, 7, 15, 7, 30, "H"); rect(im, 8, 17, 8, 30, "E")     # post
+    rect(im, 5, 30, 10, 31, "D"); rect(im, 6, 30, 9, 30, "F")                                   # base mound
+    rect(im, 1, 14, 14, 15, "F"); rect(im, 1, 14, 14, 14, "H"); rect(im, 1, 15, 14, 15, "E")    # arms
+    for x in (0, 15):                                                                           # straw hands
+        for y in (12, 13, 15, 16):
+            px(im, x, y, "K")
+        px(im, x, 14, "I")
+    rect(im, 4, 12, 11, 22, "B"); rect(im, 4, 12, 5, 22, "C"); rect(im, 10, 12, 11, 22, "$")   # shirt
+    rect(im, 6, 18, 9, 20, "b" if False else "M"); rect(im, 6, 18, 9, 18, "L"); px(im, 7, 19, "G")  # patch
+    for x in (4, 6, 9, 11):                                                                     # straw at hem
+        rect(im, x, 23, x, 25, "K"); px(im, x, 25, "I")
+    rect(im, 5, 5, 10, 11, "L"); rect(im, 5, 5, 6, 11, "M"); rect(im, 10, 5, 10, 11, "J")     # sack head
+    px(im, 6, 7, "0"); px(im, 9, 7, "0"); rect(im, 6, 10, 9, 10, "D"); px(im, 7, 9, "S" if False else "H")
+    px(im, 6, 10, "0"); px(im, 9, 10, "0")
+    rect(im, 2, 4, 13, 5, "I"); rect(im, 2, 4, 13, 4, "K"); rect(im, 2, 5, 13, 5, "Y" if False else "H")   # hat brim
+    rect(im, 5, 0, 10, 3, "I"); rect(im, 5, 0, 7, 0, "K"); rect(im, 5, 3, 10, 3, "H")                   # hat crown
+    rect(im, 5, 3, 10, 3, "B")
+    return outline(im, "A")
+
+
 # ------------------------------------------------------------------ buildings
 def window(im, x0, y0, x1, y1, frame="E", glass="p", sill=True):
     rect(im, x0, y0, x1, y1, "D")
@@ -1036,6 +1156,16 @@ def build():
                      ("trafficsign", "TrafficSign", trafficsign)):
         obj[n] = fn()
         out(obj[n], f"maps/urban/MAP_006_Deco_{f}_v01.png")
+
+    # --- MAP_011 farm field tiles + MAP_008 rural crop props (tilled soil, cabbage row, wheat row)
+    farm = [("soil", tile_soil()), ("cabbage_row", tile_cabbage_row()), ("wheat_row", tile_wheat_row())]
+    out(strip([i for _, i in farm]), "maps/tilesets/MAP_011_Farm_Tileset_v01.png")
+    out_json({"tile_size": T, "columns": len(farm), "tiles": {str(i): n for i, (n, _) in enumerate(farm)},
+              "note": "soil is walkable (tilled path between rows); cabbage_row and wheat_row are crop rows (impassable)"},
+             "maps/tilesets/MAP_011_Farm_Tileset_v01.json")
+    for n, f, fn in (("cabbage", "Cabbage", crop_cabbage), ("pumpkin", "Pumpkin", crop_pumpkin),
+                     ("wheat", "Wheat", crop_wheat), ("scarecrow", "Scarecrow", scarecrow)):
+        out(fn(), f"maps/rural/MAP_008_Farm_{f}_v01.png")
 
     # --- buildings
     sh_sign, cf_sign = sign_icon("shop"), sign_icon("cafe")

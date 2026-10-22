@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { GameConfig } from "../game/GameConfig";
+import { GameConfig, type MinigameConfig } from "../game/GameConfig";
 import type { GameController } from "../game/GameController";
 import { createChart, judge, scoreRun, type Judgement } from "../systems/RhythmGame";
 import { performanceFromScore } from "../systems/JobSystem";
@@ -15,9 +15,10 @@ const EARLY_IGNORE_MS = 380; // taps earlier than this before a cue are ignored 
 
 type CueView = { id: number; timeMs: number; img: Phaser.GameObjects.Image; result?: Judgement };
 
-/** Cafe rhythm mini-game: cues fall down a lane to a hit zone; tap anywhere (or Space). */
+/** Rhythm mini-game (cafe, farm, ...): cues fall down a lane to a hit zone; tap anywhere (or Space). Themed by minigameId. */
 export class RhythmScene extends Phaser.Scene {
   private d!: RhythmData;
+  private cfg: MinigameConfig = GameConfig.minigames.mg_rhythm_cafe;
   private chart = createChart(1);
   private cues: CueView[] = [];
   private results: Judgement[] = [];
@@ -42,7 +43,9 @@ export class RhythmScene extends Phaser.Scene {
 
   init(data: RhythmData): void {
     this.d = data;
-    this.chart = createChart(data.seed);
+    const job = data.controller.content.jobs[data.jobId];
+    this.cfg = GameConfig.minigames[job?.minigameId ?? ""] ?? GameConfig.minigames.mg_rhythm_cafe;
+    this.chart = createChart(data.seed + this.cfg.seedOffset, this.cfg.rhythm);
     this.cues = [];
     this.results = [];
     this.elapsed = -LEAD_MS;
@@ -53,7 +56,7 @@ export class RhythmScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor(0x181425);
+    this.cameras.main.setBackgroundColor(this.cfg.background);
     this.build();
     this.input.on("pointerdown", this.onTap, this);
     this.input.keyboard?.on("keydown-SPACE", this.onTap, this);
@@ -78,7 +81,7 @@ export class RhythmScene extends Phaser.Scene {
     };
     const job = this.d.controller.content.jobs[this.d.jobId];
 
-    add(makeText(this, W / 2, 18, `${job?.name ?? "打工"}　節奏挑戰`, { size: 20, bold: true, color: COLOR.paper, ox: 0.5 }));
+    add(makeText(this, W / 2, 18, this.cfg.title ?? `${job?.name ?? "打工"}　節奏挑戰`, { size: 20, bold: true, color: COLOR.paper, ox: 0.5 }));
     this.statusText = add(makeText(this, W / 2, 48, "", { size: 15, color: COLOR.gold, ox: 0.5, bold: true }));
 
     const top = 84;
@@ -89,17 +92,17 @@ export class RhythmScene extends Phaser.Scene {
     this.laneX = W / 2;
     this.cueScale = s * 0.8;
     const trackLen = 128 * s;
-    const track = add(this.add.image(this.laneX, top + trackLen / 2, "MINI_003_Track").setScale(s).setAngle(90));
+    const track = add(this.add.image(this.laneX, top + trackLen / 2, this.cfg.trackTexture).setScale(s).setAngle(90));
     track.setDepth(1);
     const zoneH = 24 * s;
     this.hitY = top + trackLen - zoneH / 2 - 6 * s;
-    add(this.add.image(this.laneX, this.hitY, "MINI_003_HitZone").setScale(s).setDepth(2));
+    const zone = add(this.add.image(this.laneX, this.hitY, "MINI_003_HitZone").setScale(s).setDepth(2));
+    if (this.cfg.hitZoneTint !== undefined) zone.setTint(this.cfg.hitZoneTint);
     this.judgeImg = add(this.add.image(this.laneX, this.hitY - zoneH, "MINI_004_Judge_Perfect").setScale(Math.max(2, s * 0.9)).setAlpha(0).setDepth(30));
 
     // decoration on wide screens
     if (W > 700) {
-      add(this.add.image(W / 2 - 24 * s - 90, this.hitY - 40, "MINI_006_EspressoMachine").setScale(4));
-      add(this.add.image(W / 2 + 24 * s + 90, this.hitY - 20, "MINI_006_Cup").setScale(5));
+      for (const d of this.cfg.decor) add(this.add.image(W / 2 + d.side * (24 * s + 90), this.hitY - d.dy, d.key).setScale(d.scale));
     }
 
     add(
@@ -109,7 +112,7 @@ export class RhythmScene extends Phaser.Scene {
     for (const c of this.cues) c.img.setScale(this.cueScale).setX(this.laneX);
     if (this.cues.length === 0) {
       for (const ch of this.chart) {
-        const img = this.add.image(this.laneX, -100, "MINI_002_RhythmCue_Tap").setScale(this.cueScale).setDepth(10).setVisible(false);
+        const img = this.add.image(this.laneX, -100, this.cfg.cueTextures[ch.id % this.cfg.cueTextures.length]).setScale(this.cueScale).setDepth(10).setVisible(false);
         this.cues.push({ id: ch.id, timeMs: ch.timeMs, img });
       }
     }
@@ -126,10 +129,10 @@ export class RhythmScene extends Phaser.Scene {
     this.lastFrameWall = performance.now();
     if (this.finished) return;
     this.elapsed += dt;
-    const travel = GameConfig.rhythm.travelMs;
+    const travel = this.cfg.rhythm.travelMs;
     const total = this.cues.length;
     for (const c of this.cues) {
-      if (c.result === undefined && this.elapsed > c.timeMs + GameConfig.rhythm.goodWindowMs) this.resolve(c, "miss");
+      if (c.result === undefined && this.elapsed > c.timeMs + this.cfg.rhythm.goodWindowMs) this.resolve(c, "miss");
       const p = 1 - (c.timeMs - this.elapsed) / travel;
       const show = p > 0 && p < 1.2 && (c.result === undefined || c.result === "miss");
       c.img.setVisible(show);
@@ -178,7 +181,7 @@ export class RhythmScene extends Phaser.Scene {
     }
     if (r !== "miss") {
       c.img.setVisible(false);
-      const fx = this.add.image(this.laneX, this.hitY, "MINI_002_RhythmCue_Tap").setScale(this.cueScale).setDepth(20);
+      const fx = this.add.image(this.laneX, this.hitY, c.img.texture.key).setScale(this.cueScale).setDepth(20);
       this.tweens.add({ targets: fx, scale: this.cueScale * 1.7, alpha: 0, duration: 220, onComplete: () => fx.destroy() });
     }
   }

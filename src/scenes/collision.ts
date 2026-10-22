@@ -2,7 +2,7 @@ import type { MapDefinition } from "../game/types";
 import { propsCatalog, type PropDef } from "./props";
 
 /** Tile codes that cannot be walked on (see docs/ARCHITECTURE.md legend). */
-export const BLOCKING_TILES = new Set(["w", "f", "h", "~", "i", "j", "v"]);
+export const BLOCKING_TILES = new Set(["w", "f", "h", "~", "i", "j", "v", "c", "y"]);
 
 /**
  * Build the blocked-grid for a map: grid[y][x] === true means blocked.

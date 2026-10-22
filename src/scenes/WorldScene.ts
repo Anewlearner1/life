@@ -22,6 +22,7 @@ const ROAD = {
 };
 const BLOCK = { brick: 0, fence_h: 1, fence_v: 2, hedge: 3, water: 4 };
 const INTERIOR = { wall_a: 0, wall_b: 1, trim: 2, door_mat: 3 };
+const FARM = { soil: 0, cabbage_row: 1, wheat_row: 2 };
 const ROAD_CODES = new Set(["r", "R", "+", "=", "|"]);
 const GRASS_CODES = new Set([".", ","]);
 
@@ -191,6 +192,9 @@ export class WorldScene extends Phaser.Scene {
       case "j": return [["tiles_interior", INTERIOR.wall_b]];
       case "v": return [["tiles_interior", INTERIOR.trim]];
       case "m": return [["tiles_interior", INTERIOR.door_mat]];
+      case "t": return [["tiles_farm", FARM.soil]];
+      case "c": return [["tiles_farm", FARM.cabbage_row]];
+      case "y": return [["tiles_farm", FARM.wheat_row]];
       case "r": return [r("road_h")];
       case "R": return [r("road_v")];
       case "+": return [r("crossroad")];

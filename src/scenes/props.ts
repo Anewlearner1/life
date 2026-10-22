@@ -64,6 +64,12 @@ export const propsCatalog: Record<string, PropDef> = {
   mailbox: b("mailbox", "maps/urban/MAP_006_Deco_Mailbox_v01.png", 1, 1, ["#"]),
   signboard: b("signboard", "maps/urban/MAP_006_Deco_Signboard_v01.png", 1, 1, ["#"]),
 
+  // Rural crops (tools of the farmhand job); the scarecrow marks the work spot in the field.
+  cabbage: b("cabbage", "maps/rural/MAP_008_Farm_Cabbage_v01.png", 1, 1, ["#"]),
+  pumpkin: b("pumpkin", "maps/rural/MAP_008_Farm_Pumpkin_v01.png", 1, 1, ["#"]),
+  wheat: b("wheat", "maps/rural/MAP_008_Farm_Wheat_v01.png", 1, 1, ["#"]),
+  scarecrow: b("scarecrow", "maps/rural/MAP_008_Farm_Scarecrow_v01.png", 1, 2, [".", "#"], { door: { x: 0, y: 2 } }),
+
   // Interior furniture. Doors of these props lie one tile in front (outside the footprint).
   bed: b("bed", "objects/furniture/BLD_006_Bed_v01.png", 1, 2, ["#", "#"], { door: { x: 0, y: 2 } }),
   table: b("table", "objects/furniture/BLD_006_Table_v01.png", 1, 1, ["#"]),
