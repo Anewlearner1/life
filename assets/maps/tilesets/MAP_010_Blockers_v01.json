@@ -1,0 +1,14 @@
+{
+  "tile_size": 16,
+  "columns": 6,
+  "impassable": true,
+  "note": "fence tiles have transparent background (draw over grass); water_0/water_1 are animation frames",
+  "tiles": {
+    "0": "brick_wall",
+    "1": "fence_h",
+    "2": "fence_v",
+    "3": "hedge",
+    "4": "water_0",
+    "5": "water_1"
+  }
+}
