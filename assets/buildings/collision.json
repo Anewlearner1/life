@@ -10,7 +10,7 @@
       "image": "houses/BLD_001_House_v01.png",
       "size_px": [
         48,
-        48
+        64
       ],
       "footprint_tiles": [
         3,
@@ -34,7 +34,7 @@
       "image": "shops/BLD_002_Shop_v01.png",
       "size_px": [
         64,
-        48
+        64
       ],
       "footprint_tiles": [
         4,
@@ -58,7 +58,7 @@
       "image": "workplaces/BLD_003_Cafe_v01.png",
       "size_px": [
         64,
-        48
+        64
       ],
       "footprint_tiles": [
         4,
@@ -82,7 +82,7 @@
       "image": "social/BLD_004_Park_Gazebo_v01.png",
       "size_px": [
         48,
-        48
+        64
       ],
       "footprint_tiles": [
         3,

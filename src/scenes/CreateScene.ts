@@ -3,15 +3,16 @@ import type { GameController } from "../game/GameController";
 import type { CharacterAppearance, GameState } from "../game/types";
 import { formatClock } from "../systems/TimeSystem";
 import { COLOR, makeText, TOUCH } from "../ui/theme";
+import { CHAR_FRAME, playerSpriteKeyFor } from "./BootScene";
 import { Button, makePanel } from "../ui/widgets";
 
 export const HAIRS = [
-  { id: "hair_short", name: "短髮", key: "CHAR_004_Hair_Short_Down" },
-  { id: "hair_bob", name: "鮑伯頭", key: "CHAR_004_Hair_Bob_Down" },
-  { id: "hair_buzz", name: "平頭", key: "CHAR_004_Hair_Buzz_Down" },
-  { id: "hair_long", name: "長髮", key: "CHAR_004_Hair_Long_Down" },
-  { id: "hair_ponytail", name: "馬尾", key: "CHAR_004_Hair_Ponytail_Down" },
-  { id: "hair_spiky", name: "刺蝟頭", key: "CHAR_004_Hair_Spiky_Down" },
+  { id: "hair_short", name: "短髮" },
+  { id: "hair_bob", name: "鮑伯頭" },
+  { id: "hair_buzz", name: "平頭" },
+  { id: "hair_long", name: "長髮" },
+  { id: "hair_ponytail", name: "馬尾" },
+  { id: "hair_spiky", name: "刺蝟頭" },
 ];
 export const OUTFITS = [
   { id: "outfit1", name: "吊帶褲" },
@@ -32,6 +33,7 @@ export class CreateScene extends Phaser.Scene {
   private objs: Phaser.GameObjects.GameObject[] = [];
   private input_?: HTMLInputElement;
   private busy = false;
+  private bannerH = 0;
 
   constructor() {
     super("Create");
@@ -86,8 +88,10 @@ export class CreateScene extends Phaser.Scene {
     this.clear();
     const W = this.scale.width;
     const H = this.scale.height;
-    this.add_(makeText(this, W / 2, Math.max(24, Math.min(64, H * 0.06)), "像素人生", { size: 36, bold: true, color: COLOR.gold, ox: 0.5, stroke: COLOR.ink }));
-    this.add_(makeText(this, W / 2, Math.max(24, Math.min(64, H * 0.06)) + 46, "都市與鄉村", { size: 16, color: COLOR.paper, ox: 0.5 }));
+    // Concept key-art banner (1024x190, painted title text included) at the top, scaled to fit the width.
+    const bs = Math.min(W / 1024, (H * 0.3) / 190);
+    this.bannerH = Math.round(190 * bs);
+    this.add_(this.add.image(W / 2, 0, "UI_000_TitleBanner").setOrigin(0.5, 0).setScale(bs));
     if (this.mode === "menu") this.buildMenu(W, H);
     else this.buildCreate(W, H);
   }
@@ -97,7 +101,7 @@ export class CreateScene extends Phaser.Scene {
     const pw = Math.min(W - 32, 360);
     const ph = 270;
     const px = Math.round((W - pw) / 2);
-    const py = Math.round(Math.max(130, (H - ph) / 2));
+    const py = Math.round(Math.max(this.bannerH + 16, (H - ph) / 2));
     this.add_(makePanel(this, "UI_010_CreatePanel", px, py, pw, ph, 2, 8));
     const s = this.saved;
     const info = s ? `${s.player.name}　${formatClock(s.gameClock.totalMinutes)}　$${s.player.money}` : "";
@@ -140,9 +144,9 @@ export class CreateScene extends Phaser.Scene {
     const compact = H < 700;
     const pw = Math.min(W - 24, 420);
     const iw = pw - 48;
-    const previewScale = compact ? 4 : 6;
-    const previewH = 24 * previewScale;
-    const top = Math.max(110, Math.min(150, H * 0.14));
+    const previewScale = compact ? 3 : 5;
+    const previewH = CHAR_FRAME.frameHeight * previewScale;
+    const top = this.bannerH + 28;
     const ph = 24 + 22 + 6 + 48 + 14 + previewH + 14 + 52 + 8 + 52 + 16 + 56 + (this.hasSave ? 60 : 0) + 24;
     const px = Math.round((W - pw) / 2);
     const py = Math.round(Math.max(top - 20, Math.min((H - ph) / 2 + 40, H - ph - 8)));
@@ -159,10 +163,9 @@ export class CreateScene extends Phaser.Scene {
     const feetY = y + previewH;
     const outfit = OUTFITS[this.outfit];
     const hair = HAIRS[this.hair];
-    this.add_(this.add.rectangle(cx, y + previewH / 2, previewScale * 16 + 24, previewH + 8, 0xd8d2c4, 1).setOrigin(0.5));
-    const bodyKey = outfit.id === "outfit2" ? "CHAR_005_Player_Outfit2_walk_down" : "CHAR_004_BaseHead_Down";
-    this.add_(this.add.image(cx, feetY, bodyKey, outfit.id === "outfit2" ? 0 : undefined).setOrigin(0.5, 1).setScale(previewScale));
-    this.add_(this.add.image(cx, feetY, hair.key).setOrigin(0.5, 1).setScale(previewScale));
+    this.add_(this.add.rectangle(cx, y + previewH / 2, previewScale * CHAR_FRAME.frameWidth + 24, previewH + 8, 0xd8d2c4, 1).setOrigin(0.5));
+    const previewKey = `${playerSpriteKeyFor(outfit.id, hair.id)}_idle_down`;
+    this.add_(this.add.image(cx, feetY, previewKey, 0).setOrigin(0.5, 1).setScale(previewScale));
     y += previewH + 14;
 
     y = this.selector(px + 24, y, iw, "髮型", hair.name, `${this.hair + 1}/${HAIRS.length}`, (d) => this.cycle("hair", d), "hair");

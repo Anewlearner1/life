@@ -6,8 +6,9 @@ import { propsCatalog, propTextureKey } from "./props";
 // Texture keys
 //  - tilesets:   "tiles_ground" (6 frames), "tiles_road" (8x4 frames), "tiles_blockers" (6 frames)
 //  - props:      "prop_<key>" (see props.ts)
-//  - characters: textures `${spriteKey}_walk_${dir}` (64x24, 4 frames 16x24)
-//                          `${spriteKey}_idle_${dir}` (32x24, 2 frames; NPCs only have "down")
+//  - characters: textures `${spriteKey}_walk_${dir}` (96x32, 4 frames 24x32)
+//                          `${spriteKey}_idle_${dir}` (48x32, 2 frames; NPCs only have "down")
+//                player keys are per hair x outfit: `CHAR_004_Player_<Hair>_<Outfit>` (see playerSpriteKeyFor)
 //                anims    `${spriteKey}-walk-${dir}` (4f, 8fps, loop)
 //                         `${spriteKey}-idle-${dir}` (2f, 2fps, loop; NPC idle reuses the Down strip)
 //  - everything else (UI, icons, portraits, items, effects, minigame art): key = file name without
@@ -15,10 +16,23 @@ import { propsCatalog, propTextureKey } from "./props";
 //    FX_* files are 16x16 spritesheets.
 // ---------------------------------------------------------------------------
 
-export const PLAYER_SPRITE_KEY = "CHAR_001_Player";
-export const OUTFIT2_SPRITE_KEY = "CHAR_005_Player_Outfit2";
-/** Sprite key family for the player's chosen outfit (see CreateScene OUTFITS). */
-export const playerSpriteKeyFor = (outfitId: string): string => (outfitId === "outfit2" ? OUTFIT2_SPRITE_KEY : PLAYER_SPRITE_KEY);
+export const CHAR_FRAME = { frameWidth: 24, frameHeight: 32 };
+
+/** hairId (CreateScene HAIRS) -> art style name used in assets/characters/player/hair_variants. */
+export const HAIR_STYLES: Record<string, string> = {
+  hair_spiky: "Spiky",
+  hair_short: "Short",
+  hair_long: "Long",
+  hair_bob: "Bob",
+  hair_ponytail: "Ponytail",
+  hair_buzz: "Buzz",
+};
+const OUTFIT_STYLES: Record<string, string> = { outfit1: "Default", outfit2: "Outfit2" };
+
+/** Sprite key family for the player's chosen hair + outfit; unknown ids fall back to the default look. */
+export const playerSpriteKeyFor = (outfitId: string, hairId = "hair_spiky"): string =>
+  `CHAR_004_Player_${HAIR_STYLES[hairId] ?? "Spiky"}_${OUTFIT_STYLES[outfitId] ?? "Default"}`;
+const PLAYER_VARIANTS = Object.keys(HAIR_STYLES).flatMap((h) => Object.keys(OUTFIT_STYLES).map((o) => playerSpriteKeyFor(o, h)));
 export const DIRS: Facing[] = ["down", "left", "right", "up"];
 
 export const NPC_SPRITES: { id: string; spriteKey: string; folder: string }[] = [
@@ -34,18 +48,7 @@ export const NPC_SPRITES: { id: string; spriteKey: string; folder: string }[] = 
 
 /** Misc images (UI, HUD, icons, portraits, items, effects, minigame art) keyed by file basename. */
 const MISC_ASSETS: string[] = [
-  "characters/player/hair/CHAR_004_BaseHead_Down_v01.png",
-  "characters/player/hair/CHAR_004_Hair_Bob_Down_v01.png",
-  "characters/player/hair/CHAR_004_Hair_Buzz_Down_v01.png",
-  "characters/player/hair/CHAR_004_Hair_Long_Down_v01.png",
-  "characters/player/hair/CHAR_004_Hair_Ponytail_Down_v01.png",
   "characters/player/hair/CHAR_004_Hair_Preview_v01.png",
-  "characters/player/hair/CHAR_004_Hair_Short_Down_v01.png",
-  "characters/player/hair/CHAR_004_Hair_Spiky_Down_v01.png",
-  "characters/player/outfits/CHAR_005_Player_Outfit2_Down_Walk_v01.png",
-  "characters/player/outfits/CHAR_005_Player_Outfit2_Left_Walk_v01.png",
-  "characters/player/outfits/CHAR_005_Player_Outfit2_Right_Walk_v01.png",
-  "characters/player/outfits/CHAR_005_Player_Outfit2_Up_Walk_v01.png",
   "characters/player/portraits/CHAR_001_Player_Portrait_v01.png",
   "effects/interaction/FX_001_InteractPulse_v01.png",
   "effects/interaction/FX_005_LowNeed_v01.png",
@@ -139,6 +142,7 @@ const MISC_ASSETS: string[] = [
   "ui/panels/UI_005_DialogBox_Preview_v01.png",
   "ui/panels/UI_005_DialogBox_v01.png",
   "ui/panels/UI_009_ShopPanel_v01.png",
+  "ui/title/UI_000_TitleBanner_v01.png",
 ];
 
 const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
@@ -182,27 +186,22 @@ export class BootScene extends Phaser.Scene {
     // Props
     for (const p of Object.values(propsCatalog)) this.load.image(propTextureKey(p.key), p.texturePath);
 
-    // Player: 4-direction walk + idle strips
-    for (const d of DIRS) {
-      const D = cap(d);
-      this.load.spritesheet(`${PLAYER_SPRITE_KEY}_walk_${d}`, `characters/player/walk/CHAR_001_Player_${D}_Walk_v01.png`, { frameWidth: 16, frameHeight: 24 });
-      this.load.spritesheet(`${PLAYER_SPRITE_KEY}_idle_${d}`, `characters/player/idle/CHAR_003_Player_${D}_Idle_v01.png`, { frameWidth: 16, frameHeight: 24 });
-    }
-
-    // Outfit2 variant: same walk strips; the idle texture reuses the walk file (anim uses frame 0 only)
-    for (const d of DIRS) {
-      const file = `characters/player/outfits/CHAR_005_Player_Outfit2_${cap(d)}_Walk_v01.png`;
-      this.load.spritesheet(`${OUTFIT2_SPRITE_KEY}_walk_${d}`, file, { frameWidth: 16, frameHeight: 24 });
-      this.load.spritesheet(`${OUTFIT2_SPRITE_KEY}_idle_${d}`, file, { frameWidth: 16, frameHeight: 24 });
+    // Player: every hair x outfit variant, 4-direction walk + idle strips
+    for (const sk of PLAYER_VARIANTS) {
+      for (const d of DIRS) {
+        const base = `characters/player/hair_variants/${sk}_${cap(d)}`;
+        this.load.spritesheet(`${sk}_walk_${d}`, `${base}_Walk_v01.png`, CHAR_FRAME);
+        this.load.spritesheet(`${sk}_idle_${d}`, `${base}_Idle_v01.png`, CHAR_FRAME);
+      }
     }
 
     // NPCs: 4-direction walk, Down idle only; portraits for dialogue UI
     for (const n of NPC_SPRITES) {
       const dir = `characters/npcs/${n.folder}/${n.spriteKey}`;
       for (const d of DIRS) {
-        this.load.spritesheet(`${n.spriteKey}_walk_${d}`, `${dir}_${cap(d)}_Walk_v01.png`, { frameWidth: 16, frameHeight: 24 });
+        this.load.spritesheet(`${n.spriteKey}_walk_${d}`, `${dir}_${cap(d)}_Walk_v01.png`, CHAR_FRAME);
       }
-      this.load.spritesheet(`${n.spriteKey}_idle_down`, `${dir}_Down_Idle_v01.png`, { frameWidth: 16, frameHeight: 24 });
+      this.load.spritesheet(`${n.spriteKey}_idle_down`, `${dir}_Down_Idle_v01.png`, CHAR_FRAME);
       for (const mood of ["Neutral", "Happy", "Sad"]) {
         this.load.image(`${n.spriteKey}_Portrait_${mood}`, `${dir}_Portrait_${mood}_v01.png`);
       }
@@ -217,6 +216,8 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    // The title banner is painted key art, not pixel art: smooth it when scaled (everything else stays nearest).
+    this.textures.get("UI_000_TitleBanner")?.setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.createAnimations();
     this.game.events.emit("assets-ready");
     if (this.nextScene) this.scene.start(this.nextScene, this.nextData);
@@ -233,20 +234,13 @@ export class BootScene extends Phaser.Scene {
         repeat: -1,
       });
     };
-    const chars = [PLAYER_SPRITE_KEY, ...NPC_SPRITES.map((n) => n.spriteKey)];
+    const chars = [...PLAYER_VARIANTS, ...NPC_SPRITES.map((n) => n.spriteKey)];
     for (const sk of chars) {
       for (const d of DIRS) {
         mk(walkAnimKey(sk, d), `${sk}_walk_${d}`, 8);
         // NPCs only ship a Down idle strip; reuse it for every facing.
         const idleTex = this.textures.exists(`${sk}_idle_${d}`) ? `${sk}_idle_${d}` : `${sk}_idle_down`;
         mk(idleAnimKey(sk, d), idleTex, 2);
-      }
-    }
-    for (const d of DIRS) {
-      mk(walkAnimKey(OUTFIT2_SPRITE_KEY, d), `${OUTFIT2_SPRITE_KEY}_walk_${d}`, 8);
-      const key = idleAnimKey(OUTFIT2_SPRITE_KEY, d);
-      if (!this.anims.exists(key) && this.textures.exists(`${OUTFIT2_SPRITE_KEY}_idle_${d}`)) {
-        this.anims.create({ key, frames: this.anims.generateFrameNumbers(`${OUTFIT2_SPRITE_KEY}_idle_${d}`, { frames: [0] }), frameRate: 1, repeat: -1 });
       }
     }
     if (!this.anims.exists("water")) {

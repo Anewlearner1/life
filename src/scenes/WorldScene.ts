@@ -135,7 +135,8 @@ export class WorldScene extends Phaser.Scene {
 
   /** Sprite family for the player's chosen outfit. */
   private playerKey(): string {
-    return playerSpriteKeyFor(this.bridge.getState().player.appearance.outfitId);
+    const { outfitId, hairId } = this.bridge.getState().player.appearance;
+    return playerSpriteKeyFor(outfitId, hairId);
   }
 
   get currentMapId(): string {

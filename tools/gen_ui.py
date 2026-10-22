@@ -1,43 +1,351 @@
-"""UI, minigame and effect pixel art (HUD, buttons, panels, icons, rhythm, FX).
+"""UI, minigame and effect pixel art (HUD, buttons, panels, icons, rhythm, FX) - art direction v2.
 
 Run: python3 tools/gen_ui.py   -> writes PNGs under assets/ (see assets/SPEC.md).
 
-Icons are hand-drawn character grids: '.' = empty, every other char is a key of
-the shared palette P in tools/pixel.py. Icons are centred in 16x16 and get a 1px
-outline (k by default, blue B for light buttons). Panels are 24x24 nine-slices
-with 8px borders. Effects are horizontal strips built with pixel.strip().
-Art direction follows assets/reference/ArtDirection_ConceptSheet_v01.png.
+Everything is redrawn on a clean pixel grid, matching the look of the concept sheet
+(assets/reference/ArtDirection_ConceptSheet_v01.png, sections 05-08): navy-blue framed panels with
+cream interiors and softly rounded corners, glossy blue speed buttons, round coloured arrow cues,
+chunky outlined judge words, red heart / orange bread / blue-pink smiley need icons, gold $ coin.
+Colours below are sampled from the concept (see UP). File names and pixel sizes are unchanged.
+
+Toolkit (also imported by gen_extras.py): grid(), shade_cells(), outline_img(), rrect_panel(),
+nine_stretch(), disc_cells(), heart_cells(), ...
 """
 import math
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from pixel import *  # noqa: F401,F403  (P, from_rows, strip, save, ICON)
+from PIL import Image  # noqa: E402
+from pixel import P, from_rows, save, ASSETS, ICON  # noqa: E402,F401
 
 EMPTY = "."
-OUTLINE = "k"
 
 
-# ----------------------------------------------------------------- core helpers
-
-def centred(rows, size=ICON):
-    """Put the tight bounding box of a char grid in the middle of a size x size canvas."""
-    cells = {(x, y): ch for y, row in enumerate(rows) for x, ch in enumerate(row) if ch != EMPTY}
-    xs = [x for x, _ in cells]
-    ys = [y for _, y in cells]
-    x0, y0 = min(xs), min(ys)
-    bw, bh = max(xs) - x0 + 1, max(ys) - y0 + 1
-    assert bw <= size - 2 and bh <= size - 2, f"sprite {bw}x{bh} leaves no room for outline"
-    ox, oy = (size - bw) // 2 - x0, (size - bh) // 2 - y0
-    canvas = blank(size)
-    for (x, y), ch in cells.items():
-        canvas[y + oy][x + ox] = ch
-    return canvas
+def H(s, a=255):
+    s = s.lstrip("#")
+    return (int(s[0:2], 16), int(s[2:4], 16), int(s[4:6], 16), a)
 
 
-def add_outline(canvas, color=OUTLINE):
-    """1px outline on empty cells that touch (4-neighbour) a filled cell."""
+# ---------------------------------------------------------------- palette (sampled from the concept sheet)
+UP = {
+    "out": H("#1a2d4a"),      # navy outline
+    "outw": H("#4a2a1e"),     # warm dark outline (bread, coin, bag...)
+    "navy": H("#2a4862"),     # panel frame navy
+    "navy2": H("#1e3b70"),
+    "navyd": H("#142d5e"),
+    "blue": H("#3675af"),
+    "blue2": H("#5187c5"),
+    "azure": H("#1d99de"),
+    "sky": H("#73cef5"),
+    "sky2": H("#8ddaf6"),
+    "ice": H("#cde1f3"),
+    "ice2": H("#e1effa"),
+    "teal": H("#0ea6c9"),
+    "teald": H("#0d89ae"),
+    "tealL": H("#63cae1"),
+    "cream": H("#fdf7e8"),
+    "creamh": H("#fffdf4"),
+    "creams": H("#ecdcb8"),
+    "creamd": H("#d9c79c"),
+    "white": H("#f8fafa"),
+    "snow": H("#eff6f7"),
+    "mist": H("#cad9e3"),
+    "fog": H("#a0c0d7"),
+    "fogd": H("#80a4bf"),
+    "gray": H("#999991"),
+    "grayl": H("#c9c2be"),
+    "grayd": H("#6b6c6c"),
+    "grayk": H("#535354"),
+    "gold": H("#fdc72d"),
+    "goldl": H("#fde88a"),
+    "goldd": H("#ce9134"),
+    "orange": H("#e8872f"),
+    "orangel": H("#f5b25e"),
+    "oranged": H("#b4571f"),
+    "red": H("#d63a2c"),
+    "redl": H("#f0705a"),
+    "redd": H("#8f2220"),
+    "pink": H("#ec80ac"),
+    "pinkl": H("#f7aecd"),
+    "pinkd": H("#c24f86"),
+    "green": H("#3fb066"),
+    "greenl": H("#7fdc9a"),
+    "greend": H("#136f43"),
+    "lime": H("#9fbf43"),
+    "limel": H("#d2ea8a"),
+    "purple": H("#7a3fd0"),
+    "purplel": H("#b080f4"),
+    "purpled": H("#52209d"),
+    "brown": H("#9d6949"),
+    "brownl": H("#c9936a"),
+    "brownd": H("#5f3a2c"),
+    "skin": H("#f3c9a0"),
+    "skind": H("#d5a07a"),
+    "hair": H("#9d5a36"),
+    "hairl": H("#c07a4c"),
+    "leaf": H("#7ba14c"),
+    "leafd": H("#2f5c32"),
+    "ink": H("#14263f"),
+    "greeno": H("#0c3a22"),
+    "redo": H("#4a0f12"),
+}
+
+
+def new(w, h):
+    return Image.new("RGBA", (w, h), (0, 0, 0, 0))
+
+
+def grid(rows, legend, w=None, h=None, ox=0, oy=0):
+    """Char grid -> RGBA image. '.' is empty; legend maps char -> UP key (or an rgba tuple)."""
+    w = w or max(len(r) for r in rows)
+    h = h or len(rows)
+    im = new(w, h)
+    px = im.load()
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch == ".":
+                continue
+            c = legend[ch]
+            px[x + ox, y + oy] = UP[c] if isinstance(c, str) else c
+    return im
+
+
+def put(im, x, y, c):
+    if 0 <= x < im.width and 0 <= y < im.height:
+        im.putpixel((x, y), UP[c] if isinstance(c, str) else c)
+
+
+def cells_of(im):
+    px = im.load()
+    return {(x, y) for y in range(im.height) for x in range(im.width) if px[x, y][3] > 0}
+
+
+def paste(dst, src, x, y):
+    dst.alpha_composite(src, (x, y))
+    return dst
+
+
+def outline_img(im, color="out", diag=False):
+    """1px outline on empty pixels that touch a filled one (4-neighbour, optionally 8)."""
+    col = UP[color] if isinstance(color, str) else color
+    px = im.load()
+    w, h = im.size
+    ring = []
+    nb = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    if diag:
+        nb += [(-1, -1), (1, -1), (-1, 1), (1, 1)]
+    for y in range(h):
+        for x in range(w):
+            if px[x, y][3]:
+                continue
+            for dx, dy in nb:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < w and 0 <= ny < h and px[nx, ny][3]:
+                    ring.append((x, y))
+                    break
+    for x, y in ring:
+        px[x, y] = col
+    return im
+
+
+# ---------------------------------------------------------------- shapes
+def disc_cells(cx, cy, r):
+    return {(x, y) for y in range(int(cy - r - 2), int(cy + r + 3)) for x in range(int(cx - r - 2), int(cx + r + 3))
+            if (x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 <= r * r}
+
+
+def ellipse_cells(cx, cy, rx, ry):
+    return {(x, y) for y in range(int(cy - ry - 2), int(cy + ry + 3)) for x in range(int(cx - rx - 2), int(cx + rx + 3))
+            if ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1}
+
+
+def rect_cells(x0, y0, w, h):
+    return {(x, y) for y in range(y0, y0 + h) for x in range(x0, x0 + w)}
+
+
+def rr_inside(x, y, w, h, r):
+    """Is pixel (x, y) inside a w x h rounded rectangle with corner radius r?"""
+    cx = min(max(x + 0.5, r), w - r)
+    cy = min(max(y + 0.5, r), h - r)
+    return (x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 <= r * r + 0.15
+
+
+def rr_cells(x0, y0, w, h, r):
+    return {(x0 + x, y0 + y) for y in range(h) for x in range(w) if rr_inside(x, y, w, h, r)}
+
+
+def cells_from_rows(rows, ch="X", ox=0, oy=0):
+    return {(x + ox, y + oy) for y, row in enumerate(rows) for x, c in enumerate(row) if c == ch}
+
+
+def shade_cells(im, cells, base, light, dark, deep=False):
+    """Fill cells with base colour; top/left rim pixels light, bottom/right rim pixels dark."""
+    for (x, y) in cells:
+        lit = (x - 1, y) not in cells or (x, y - 1) not in cells
+        shd = (x + 1, y) not in cells or (x, y + 1) not in cells
+        if deep and (x + 1, y + 1) not in cells:
+            shd = True
+        c = base
+        if shd and not lit:
+            c = dark
+        elif lit and not shd:
+            c = light
+        put(im, x, y, c)
+    return im
+
+
+def fill_cells(im, cells, c):
+    for (x, y) in cells:
+        put(im, x, y, c)
+    return im
+
+
+def vgrad(c0, c1, t):
+    a, b = UP[c0] if isinstance(c0, str) else c0, UP[c1] if isinstance(c1, str) else c1
+    return tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3)) + (255,)
+
+
+HEART13 = [
+    "..XXX...XXX..",
+    ".XXXXX.XXXXX.",
+    "XXXXXXXXXXXXX",
+    "XXXXXXXXXXXXX",
+    "XXXXXXXXXXXXX",
+    ".XXXXXXXXXXX.",
+    "..XXXXXXXXX..",
+    "...XXXXXXX...",
+    "....XXXXX....",
+    ".....XXX.....",
+    "......X......",
+]
+HEART11 = [
+    ".XXX...XXX.",
+    "XXXXX.XXXXX",
+    "XXXXXXXXXXX",
+    "XXXXXXXXXXX",
+    ".XXXXXXXXX.",
+    "..XXXXXXX..",
+    "...XXXXX...",
+    "....XXX....",
+    ".....X.....",
+]
+HEART9 = [
+    ".XX...XX.",
+    "XXXX.XXXX",
+    "XXXXXXXXX",
+    "XXXXXXXXX",
+    ".XXXXXXX.",
+    "..XXXXX..",
+    "...XXX...",
+    "....X....",
+]
+HEART7 = [
+    ".XX.XX.",
+    "XXXXXXX",
+    "XXXXXXX",
+    ".XXXXX.",
+    "..XXX..",
+    "...X...",
+]
+
+
+def heart_img(rows, base="red", light="redl", dark="redd", outline="outw", size=16, hl=True, gloss=None):
+    cells = cells_from_rows(rows)
+    w, h = max(x for x, _ in cells) + 1, max(y for _, y in cells) + 1
+    ox, oy = (size - w) // 2, (size - h) // 2 + (0 if h >= 10 else 0)
+    cells = {(x + ox, y + oy) for x, y in cells}
+    im = new(size, size)
+    shade_cells(im, cells, base, light, dark, deep=True)
+    if hl:
+        hx, hy = ox + 2, oy + 1
+        for dx, dy in (gloss or ((0, 0), (-1, 1), (0, 1))):
+            if (hx + dx, hy + dy) in cells:
+                put(im, hx + dx, hy + dy, "white")
+    return outline_img(im, outline)
+
+
+# ---------------------------------------------------------------- panels
+def layered_panel(w, h, r, layers):
+    """Rounded multi-ring panel. layers: [(inset, colour | (top_left, bottom_right) | fn(x, y))] outside-in."""
+    im = new(w, h)
+    px = im.load()
+    for inset, col in layers:
+        rr = max(r - inset, 0.5)
+        iw, ih = w - 2 * inset, h - 2 * inset
+        for y in range(ih):
+            for x in range(iw):
+                if not rr_inside(x, y, iw, ih, rr):
+                    continue
+                gx, gy = x + inset, y + inset
+                if callable(col):
+                    c = col(gx, gy)
+                elif isinstance(col, tuple) and len(col) == 2 and isinstance(col[0], str):
+                    tl, br = col
+                    c = br if (gx - inset >= iw - 1 - 0 or gy - inset >= ih - 1) else tl
+                else:
+                    c = col
+                px[gx, gy] = UP[c] if isinstance(c, str) else c
+    return im
+
+
+def frame24(frame="navy", line="sky", interior="cream", thick=3):
+    """24x24 nine-slice panel (8px borders): navy frame, light inner line, cream interior."""
+    size = 24
+    cream_fn = lambda gx, gy: UP["cream"]  # noqa: E731
+    layers = [(0, "out"), (1, frame), (1 + thick, line), (2 + thick, "out" if False else interior)]
+    im = layered_panel(size, size, 5, layers)
+    px = im.load()
+    # soft top highlight on the frame, darker bottom edge
+    for x in range(3, size - 3):
+        px[x, 1] = UP["blue2"] if frame == "navy" else px[x, 1]
+        px[x, size - 2] = UP["navyd"]
+    for y in range(3, size - 3):
+        px[1, y] = UP["blue"] if frame == "navy" else px[1, y]
+        px[size - 2, y] = UP["navyd"]
+    # interior inner shade (top + left row) to give the cream a recessed feel
+    ix0, ix1 = 2 + thick, size - 3 - thick
+    for i in range(ix0, ix1 + 1):
+        px[i, ix0] = UP["creams"]
+        px[ix0, i] = UP["creams"]
+    return im
+
+
+def dialog24():
+    """24x24 dialogue box: thin navy outline, cream interior, soft rounded corners (as the concept)."""
+    size = 24
+    layers = [(0, "out"), (1, "creamh"), (2, "cream")]
+    im = layered_panel(size, size, 5, layers)
+    px = im.load()
+    for x in range(3, size - 3):
+        px[x, size - 2] = UP["creams"]
+        px[x, size - 3] = UP["creams"]
+    for y in range(3, size - 3):
+        px[size - 2, y] = UP["creams"]
+    return im
+
+
+def nine_stretch(src, W, H, b=8):
+    """Nine-slice stretch of an RGBA image with fixed b-pixel borders (nearest-neighbour)."""
+    sw, sh = src.size
+    out = new(W, H)
+    sp, op = src.load(), out.load()
+
+    def m(i, D, S):
+        if i < b:
+            return i
+        if i >= D - b:
+            return S - (D - i)
+        return b + (i - b) * (S - 2 * b) // (D - 2 * b)
+
+    for y in range(H):
+        for x in range(W):
+            op[x, y] = sp[m(x, W, sw), m(y, H, sh)]
+    return out
+
+
+# ---------------------------------------------------------------- legacy char-grid helpers (gen_extras MINI-006 still uses these)
+def add_outline(canvas, color="k"):
     h, w = len(canvas), len(canvas[0])
     ring = []
     for y in range(h):
@@ -53,8 +361,8 @@ def add_outline(canvas, color=OUTLINE):
     return canvas
 
 
-def blank(size=ICON):
-    return [[EMPTY] * size for _ in range(size)]
+def blank_wh(w, h):
+    return [[EMPTY] * w for _ in range(h)]
 
 
 def to_image(canvas):
@@ -65,816 +373,845 @@ def to_image(canvas):
     return from_rows(rows)
 
 
-def icon(rows, outline=OUTLINE):
-    canvas = add_outline(centred(rows), outline)
-    return to_image(canvas)
+# ================================================================= HUD (16x16)
+def need_energy():
+    """Red heart (stamina)."""
+    return heart_img(HEART13, "red", "redl", "redd", "outw")
 
 
-def paint(cells, ch, size=ICON):
-    """Absolute-coordinate grid with `ch` at each (x, y) in cells."""
-    g = blank(size)
-    for x, y in cells:
-        g[y][x] = ch
-    return ["".join(r) for r in g]
+def need_fullness():
+    """Orange bread loaf (hunger)."""
+    im = new(16, 16)
+    body = ellipse_cells(8, 8.6, 6.5, 4.4) | rect_cells(3, 8, 10, 3)
+    body = {(x, y) for (x, y) in body if 3 <= y <= 12}
+    shade_cells(im, body, "orange", "orangel", "oranged", deep=True)
+    # scoring slashes
+    for sx in (4, 7, 10):
+        for k, (dx, dy) in enumerate(((0, 0), (1, 0), (1, 1), (2, 1))):
+            x, y = sx + dx, 5 + dy
+            if (x, y) in body:
+                put(im, x, y, "goldl")
+        for dx, dy in ((0, 1), (1, 2)):
+            if (sx + dx, 5 + dy) in body:
+                put(im, sx + dx, 5 + dy, "oranged")
+    return outline_img(im, "outw")
 
 
-def shift(canvas, dy):
-    h = len(canvas)
-    out = blank(len(canvas[0]))
-    for y in range(h):
-        if 0 <= y + dy < h:
-            out[y + dy] = list(canvas[y])
-    return out
+def need_mood():
+    """Blue smiley with pink cheeks (mood)."""
+    im = new(16, 16)
+    body = disc_cells(8, 8, 6.4)
+    shade_cells(im, body, "blue", "sky", "navy2", deep=True)
+    for x, y in ((5, 6), (5, 7), (10, 6), (10, 7)):
+        put(im, x, y, "ink")
+    for x, y in ((3, 8), (4, 8), (11, 8), (12, 8)):
+        put(im, x, y, "pink")
+    for x, y in ((5, 10), (6, 11), (7, 11), (8, 11), (9, 11), (10, 10)):
+        put(im, x, y, "white")
+    for x, y in ((4, 3), (5, 2), (4, 4)):
+        put(im, x, y, "sky2")
+    return outline_img(im, "out")
 
 
-def recolor_rows(rows, mapping):
-    return ["".join(mapping.get(ch, ch) for ch in r) for r in rows]
-
-
-def disc_rows(d, fn):
-    """d x d grid of a filled disc; fn(x, y) returns the char for inside pixels."""
-    r = d / 2
-    rows = []
-    for y in range(d):
-        line = ""
-        for x in range(d):
-            inside = (x + 0.5 - r) ** 2 + (y + 0.5 - r) ** 2 <= r * r
-            line += fn(x, y) if inside else EMPTY
-        rows.append(line)
-    return rows
-
-
-def nine_rows(depth, interior, size=24):
-    """Nine-slice grid: `depth` gives the colour of each border ring (outside in), rest is interior."""
-    n = size
-    rows = []
-    for y in range(n):
-        line = ""
-        for x in range(n):
-            if x in (0, n - 1) and y in (0, n - 1):
-                line += "_"
-                continue
-            d = min(x, y, n - 1 - x, n - 1 - y)
-            line += depth[d] if d < len(depth) else interior
-        rows.append(line)
-    return rows
-
-
-def stretch(rows, W, H, b=8):
-    """Nine-slice stretch of a char grid with fixed b-pixel borders."""
-    sw, sh = len(rows[0]), len(rows)
-
-    def src(i, D, S):
-        if i < b:
-            return i
-        if i >= D - b:
-            return S - (D - i)
-        return b + (i - b) * (S - 2 * b) // (D - 2 * b)
-
-    return ["".join(rows[src(y, H, sh)][src(x, W, sw)] for x in range(W)) for y in range(H)]
-
-
-# ----------------------------------------------------------------- HUD (16x16)
-
-# Energy: red/orange heart-like icon (art direction update).
-ENERGY_SHAPE = [
-    "..hhhhh..hhhhh..",
-    ".hHHhhhhhhhhhhh.",
-    ".hhhhhhhhhhhhhh.",
-    "..hhhhhhhhhhhh..",
-    "..hhhhhhhhhhhh..",
-    "...hhhhhhhhhh...",
-    "....hhhhhhhh....",
-    ".....hhhhhh.....",
-    "......hhhh......",
-    ".......hh.......",
-]
-
-# Fullness: drumstick (orange meat, white bone).
-DRUM = [
-    "....ooooo.......",
-    "...yyoooon......",
-    "..yyoooooon.....",
-    "..yooooooon.....",
-    "..oooooooon.....",
-    "..oooooooon.....",
-    "..ooooooonn.....",
-    "...oonnnnn......",
-    "....nnnnnww.....",
-    "..........ww....",
-    "...........ww...",
-    "............www.",
-    ".............wG.",
-]
-
-# Mood: blue smiley with pink cheeks.
-MOOD = [
-    ".....bbbbbb.....",
-    "...bcbbbbbbbb...",
-    "..bcbbbbbbbbbb..",
-    "..bcbkbbbbkbbb..",
-    "..bbbkbbbbkbbb..",
-    "..brbbbbbbbbrb..",
-    "..bbkbbbbbbkbb..",
-    "..bbbkkkkkkbbb..",
-    "..bbbbbbbbbbbb..",
-    "...bbbbbbbbbb...",
-    ".....bbbbbb.....",
-]
-
-# Gold coin with a '$' (dark brown glyph for contrast on yellow).
-COIN = [
-    ".....wyyyyY.....",
-    "...wyyyyyyyyY...",
-    "..wyyyyyyyyyYY..",
-    "..wyyyyyyyyyyY..",
-    "..yyyyyyyyyyyY..",
-    "..yyyyyyyyyyyY..",
-    "..yyyyyyyyyyyY..",
-    "..yyyyyyyyyyYY..",
-    "..yyyyyyyyyYYY..",
-    "...yyyyyYYYYY...",
-    ".....YYYYYY.....",
-]
-DOLLAR = [  # 5 wide x 7 tall, drawn on the coin face
-    "..#..",
-    ".####",
-    "#.#..",
-    ".###.",
-    "..#.#",
-    "####.",
-    "..#..",
-]
-
-CLOCK = [
-    ".....wwwwww.....",
-    "...wwwwwwwwwG...",
-    "..wwwwwkwwwwwG..",
-    "..wwwwwkwwwwwG..",
-    "..wwwwwkwwwwwG..",
-    "..wwwwwkkkkwwG..",
-    "..wwwwwwwwwwGG..",
-    "..wwwwwwwwwGGG..",
-    "..wwwwwwwwGGGG..",
-    "...GGGGGGGGGG...",
-    ".....GGGGGG.....",
-]
-
-CAL = [
-    ".....K....K.....",
-    ".....K....K.....",
-    "..rrrrrrrrrrrr..",
-    "..RRRRRRRRRRRR..",
-    "..wwwwwwwwwwww..",
-    "..wwwwwwwwwwww..",
-    "..wwgwwgwwgwww..",
-    "..wwwwwwwwwwww..",
-    "..wwwwwwwwwwww..",
-    "..wwgwwgwwgwww..",
-    "..GGGGGGGGGGGG..",
+DOLLAR = [
+    "..X..",
+    ".XXXX",
+    "X.X..",
+    ".XXX.",
+    "..XX.",
+    "..X.X",
+    "XXXX.",
+    "..X..",
 ]
 
 
-def panel_frame(w, h, outer="k", ring="B", inner="w"):
-    rows = []
-    for y in range(h):
-        line = ""
-        for x in range(w):
-            if (x, y) in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
-                c = "_"
-            elif x in (0, w - 1) or y in (0, h - 1):
-                c = outer
-            elif x in (1, w - 2) or y in (1, h - 2):
-                c = ring
-            else:
-                c = inner
-            line += c
-        rows.append(line)
-    return from_rows(rows)
+def coin(size=16, d=13.6):
+    im = new(size, size)
+    c = size / 2
+    body = disc_cells(c, c, d / 2)
+    shade_cells(im, body, "gold", "goldl", "goldd", deep=True)
+    gx, gy = int(c) - 2, int(c) - 4
+    for (x, y) in cells_from_rows(DOLLAR):
+        put(im, gx + x, gy + y, "white")
+    return outline_img(im, "outw")
+
+
+def clock_icon():
+    """Alarm clock: red body, white face, bells and feet."""
+    im = new(16, 16)
+    body = disc_cells(8, 9, 6.2)
+    shade_cells(im, body, "red", "redl", "redd", deep=True)
+    fill_cells(im, disc_cells(8, 9, 4.3), "cream")
+    for (x, y) in disc_cells(8, 9, 4.3):
+        if (x + y) > 18:
+            put(im, x, y, "creams")
+    # bells
+    for bx in (2, 11):
+        fill_cells(im, rect_cells(bx, 1, 3, 2), "gold")
+        put(im, bx, 1, "goldl")
+        put(im, bx + 2, 2, "goldd")
+    # feet
+    for x, y in ((4, 15), (11, 15)):
+        put(im, x, y, "redd")
+    # hands + ticks
+    for y in range(6, 10):
+        put(im, 8, y, "ink")
+    for x in (9, 10):
+        put(im, x, 9, "ink")
+    put(im, 8, 9, "red")
+    put(im, 8, 6 - 0, "ink")
+    for x, y in ((8, 5), (11, 9), (8, 12), (5, 9)):
+        if (x, y) in disc_cells(8, 9, 4.3):
+            put(im, x, y, "grayl")
+    return outline_img(im, "outw")
+
+
+def calendar_icon():
+    im = new(16, 16)
+    page = rect_cells(2, 3, 12, 11)
+    shade_cells(im, page, "cream", "white", "creams")
+    fill_cells(im, rect_cells(2, 3, 12, 3), "red")
+    for x in range(2, 14):
+        put(im, x, 3, "redl")
+    for x in range(2, 14):
+        put(im, x, 5, "redd")
+    for x in (4, 11):
+        for y in (1, 2, 3):
+            put(im, x, y, "grayk" if y < 3 else "white")
+    for gy in (8, 11):
+        for gx in (4, 7, 10):
+            fill_cells(im, rect_cells(gx, gy, 2, 2), "blue" if (gx, gy) != (10, 11) else "red")
+    return outline_img(im, "out")
+
+
+def clock_frame():
+    """64x20 clock / date panel: pale-blue gradient with a navy outline (concept 'time & date' panel)."""
+    W, Hh = 64, 20
+    layers = [
+        (0, "out"),
+        (1, lambda gx, gy: UP["white"] if (gy == 1 or gx == 1) else UP["navy2"] if False else UP["mist"]),
+        (2, lambda gx, gy: vgrad("ice2", "ice", (gy - 2) / (Hh - 4))),
+    ]
+    im = layered_panel(W, Hh, 4, layers)
+    px = im.load()
+    for x in range(3, W - 3):
+        px[x, Hh - 2] = UP["fog"]
+    return im
 
 
 def needbar_frame():
-    rows = []
-    for y in range(8):
-        rows.append("".join("k" if (y in (0, 7) or x in (0, 47)) else "_" for x in range(48)))
-    return from_rows(rows)
-
-
-# ----------------------------------------------------------------- time control (16x16)
-
-def _body_rows():
-    g = blank(16)
-    for y in range(2, 12):
-        for x in range(2, 14):
-            if (x, y) in ((2, 2), (13, 2), (2, 11), (13, 11)):
+    """48x8 gauge frame (interior transparent; the fill is drawn by code underneath/above)."""
+    W, Hh = 48, 8
+    im = new(W, Hh)
+    px = im.load()
+    for y in range(Hh):
+        for x in range(W):
+            if not rr_inside(x, y, W, Hh, 3):
                 continue
-            g[y][x] = "G" if (y == 11 or x == 13) else "w"
-    return ["".join(r) for r in g]
+            edge = x in (0, W - 1) or y in (0, Hh - 1) or not rr_inside(x - 1, y - 1, W - 2, Hh - 2, 2.2) if (0 < x < W - 1 and 0 < y < Hh - 1) else True
+            if edge:
+                px[x, y] = UP["out"]
+    return im
 
 
-def time_button(glyph_cells, glyph_color):
-    g = [list(r) for r in _body_rows()]
-    for x, y in glyph_cells:
-        g[y][x] = glyph_color
-    return icon(["".join(r) for r in g], outline="B")
+def needbar_fill():
+    """1x6 vertical gradient (white -> grey) so the per-need tint gets a glossy top and darker base."""
+    im = new(1, 6)
+    for y, v in enumerate((255, 255, 238, 222, 204, 186)):
+        im.putpixel((0, y), (v, v, v, 255))
+    return im
 
 
-def pause_cells():
-    return [(x, y) for y in range(5, 11) for x in (5, 6, 9, 10)]
+# ================================================================= time controls (16x16), glossy blue
+def time_button(kind):
+    """Glossy blue rounded button (14x14 body + outline) with a white glyph."""
+    im = new(16, 16)
+    px = im.load()
+    for y in range(14):
+        for x in range(14):
+            if not rr_inside(x, y, 14, 14, 4):
+                continue
+            t = y / 13
+            px[x + 1, y + 1] = vgrad("sky", "azure", t * 2) if t < 0.5 else vgrad("azure", "navy2", (t - 0.5) * 2)
+    for y in range(2, 6):                       # gloss band
+        for x in range(3, 13):
+            if rr_inside(x - 2, y - 2, 10, 5, 2.5):
+                a = px[x, y]
+                px[x, y] = tuple(min(255, int(a[i] + (255 - a[i]) * 0.32)) for i in range(3)) + (255,)
+    glyph = new(16, 16)
+    g = glyph.load()
+    if kind == "pause":
+        for y in range(4, 12):
+            for x in (5, 6, 9, 10):
+                g[x, y] = UP["white"]
+    elif kind == "play":
+        for i in range(6):
+            for y in range(4 + i, 12 - i):
+                if 4 + i < 12 - i:
+                    g[5 + i, y] = UP["white"]
+    else:  # fast: two triangles
+        for off in (3, 8):
+            for i in range(4):
+                for y in range(5 + i, 11 - i):
+                    if 5 + i < 11 - i:
+                        g[off + i, y] = UP["white"]
+    sh = new(16, 16)
+    sp = sh.load()
+    for (x, y) in cells_of(glyph):
+        if y + 1 < 16:
+            sp[x, y + 1] = UP["navy2"]
+    paste(im, sh, 0, 0)
+    paste(im, glyph, 0, 0)
+    return outline_img(im, "out")
 
 
-def play_cells():
-    return [(x, y) for y in range(4, 13) for x in range(6, 6 + 5 - abs(y - 8))]
+# ================================================================= buttons (48x16, nine-slice 4px)
+def button_image(role):
+    W, Hh = 48, 16
+    if role == "normal":
+        layers = [(0, "out"),
+                  (1, lambda gx, gy: UP["white"] if gy <= 2 else UP["mist"] if gy >= Hh - 3 else UP["snow"]),
+                  (2, lambda gx, gy: UP["white"] if gy <= 3 else UP["mist"] if gy >= Hh - 4 else UP["snow"])]
+        im = layered_panel(W, Hh, 4, layers)
+        px = im.load()
+        for x in range(2, W - 2):
+            px[x, Hh - 2] = UP["fog"]
+        return im
+    if role == "pressed":
+        layers = [(0, "out"),
+                  (1, lambda gx, gy: UP["tealL"] if gy <= 2 else UP["teald"] if gy >= Hh - 3 else UP["teal"]),
+                  (2, lambda gx, gy: UP["teal"] if gy < Hh - 4 else UP["teald"])]
+        return layered_panel(W, Hh, 4, layers)
+    if role == "selected":
+        layers = [(0, "out"),
+                  (1, "azure"),
+                  (2, lambda gx, gy: UP["white"] if gy <= 3 else UP["ice"] if gy >= Hh - 4 else UP["ice2"])]
+        return layered_panel(W, Hh, 4, layers)
+    layers = [(0, "fogd"), (1, lambda gx, gy: UP["fog"])]  # disabled
+    im = layered_panel(W, Hh, 4, layers)
+    px = im.load()
+    for x in range(2, W - 2):
+        px[x, 1] = H("#b4cde0")
+    return im
 
 
-def fast_cells():
-    cells = []
-    for y in range(5, 12):
-        w = 4 - abs(y - 8)
-        cells += [(x, y) for x in range(4, 4 + w)]
-        cells += [(x, y) for x in range(9, 9 + w)]
-    return cells
-
-
-# ----------------------------------------------------------------- buttons (48x16)
-
-# Role -> palette key. Outline is blue (B) for light buttons, per concept sheet.
-BUTTON_ROLES = {
-    "normal":   {"k": "B", "h": "w", "b": "w", "l": "G", "e": "B"},
-    "pressed":  {"k": "B", "h": "c", "b": "b", "l": "B", "e": "B"},
-    "disabled": {"k": "g", "h": "G", "b": "G", "l": "g", "e": "g"},
-    "selected": {"k": "B", "h": "w", "b": "c", "l": "b", "e": "B"},
-}
-
-
-def button_image(role, pressed_shift=False):
-    m = BUTTON_ROLES[role]
-    base = (
-        ["_" + "k" * 46 + "_", "k" + "h" * 46 + "k"]
-        + ["k" + "b" * 46 + "k"] * 11
-        + ["k" + "l" * 46 + "k", "k" + "e" * 46 + "k", "_" + "k" * 46 + "_"]
-    )
-    rows = recolor_rows(base, m)
-    if pressed_shift:  # pressed: content moves down 1px, bottom edge drops away
-        rows = ["_" * 48] + rows[:15]
-    return from_rows(rows)
-
-
-# ----------------------------------------------------------------- panels (24x24 nine-slice)
-
-DIALOG_DEPTH = "kBbBBBBk"   # outer k, navy band, light-blue inner line
-SHOP_DEPTH = "kBcBBBBk"     # alt: cyan inner line
-RESULT_DEPTH = "kBbBBBBk"
-MINI_PANEL_DEPTH = "kBbBBBBk"
+# ================================================================= panels
+DIALOG_PREVIEW_TEXT = ("gray", (14, 14, 114), (14, 24, 94), (14, 34, 60))
 
 
 def dialog_preview():
-    rows = [list(r) for r in stretch(nine_rows(DIALOG_DEPTH, "w"), 160, 48)]
-    for y0, length in ((16, 112), (22, 80), (28, 48)):
-        for y in (y0, y0 + 1):
-            for x in range(24, 24 + length):
-                rows[y][x] = "K"
-    return from_rows(["".join(r) for r in rows])
+    W, Hh = 160, 48
+    im = nine_stretch(dialog24(), W, Hh)
+    for (x, y, w) in ((12, 12, 130), (12, 22, 108), (12, 32, 64)):
+        for yy in (y, y + 1):
+            for xx in range(x, x + w):
+                put(im, xx, yy, "navy")
+    # tail + advance mark
+    for i in range(4):
+        for xx in range(i, 8 - i):
+            put(im, 142 + xx - 1, 39 + i + 1, "out") if False else None
+    for dx, dy in ((0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (1, 1), (2, 1), (3, 1), (2, 2)):
+        put(im, 144 + dx, 36 + dy, "teal")
+    return im
 
 
-# ----------------------------------------------------------------- tabs / icons (16x16)
-
-TAB_CHAR = [
-    "......NNNN......",
-    ".....NNNNNN.....",
-    ".....NssssN.....",
-    ".....NsKsKN.....",
-    ".....SssssS.....",
-    "......SSSS......",
-    ".......ss.......",
-    "..bbbbbbbbbbbb..",
-    "..bbbbbbbbbbbb..",
-    "..bbbbbbbbbbbb..",
-    "..BBBBBBBBBBBB..",
-]
-
-TAB_BAG = [
-    "......KKKK......",
-    "....K......K....",
-    "....K......K....",
-    "..nnnnnnnnnnnn..",
-    "..nnnnnnnnnnNN..",
-    "..nnnnuuuunnNN..",
-    "..nnnnuuuunnNN..",
-    "..nnnnnnnnnnNN..",
-    "..nnnnnnnnnnNN..",
-    "...NNNNNNNNNN...",
-]
-
-TAB_MAP = [
-    "..uuuunuuunuuu..",
-    "..uuuunuuunuuu..",
-    "..uuuunurunuuu..",
-    "..uuuunurunuuu..",
-    "..uuuunuRunuuu..",
-    "..uuuunuuunuuu..",
-    "..uuuunuuunuuu..",
-    "..uuuunuuunuuu..",
-    "..nnnnnnnnnnnn..",
-]
-
-# Cup (rows 3..10 of WORK) is reused by the Work tab (with steam) and nothing else.
-WORK = [
-    ".....G..G.......",
-    "......G..G......",
-    ".....G..G.......",
-    "...wwwwwwwww....",
-    "....nnnnnnn.....",
-    "...wwwwwwwwGww..",
-    "...wwwwwwwwG..w.",
-    "...wwwwwwwwG..w.",
-    "....wwwwwwG.ww..",
-    ".....GGGGG......",
-    "..gggggggggggg..",
-]
+# ================================================================= tab / notice icons
+def tab_character():
+    im = new(16, 16)
+    # shoulders / shirt
+    shirt = {(x, y) for y in range(11, 15) for x in range(3, 13) if (y > 11 or 4 <= x <= 11)}
+    shade_cells(im, shirt, "blue", "sky", "navy2")
+    # head
+    head = ellipse_cells(8, 6.2, 4.2, 4.4)
+    shade_cells(im, head, "skin", "creamh", "skind")
+    # hair
+    hair = {(x, y) for (x, y) in head if y <= 4 or (y == 5 and (x <= 4 or x >= 11))} | {(4, 4), (11, 4)}
+    hair = {(x, y) for (x, y) in hair if 1 <= y}
+    shade_cells(im, hair, "hair", "hairl", "brownd")
+    put(im, 6, 7, "ink")
+    put(im, 10, 7, "ink")
+    put(im, 8, 9, "pinkd")
+    return outline_img(im, "outw")
 
 
-def heart_rows(variant):
-    shape = [
-        ".." + "h" * 5 + ".." + "h" * 5 + "..",
-        "." + "hHH" + "h" * 11 + ".",
-        "." + "h" * 14 + ".",
-        ".." + "h" * 12 + "..",
-        ".." + "h" * 12 + "..",
-        "..." + "h" * 10 + "...",
-        "...." + "h" * 8 + "....",
-        "....." + "h" * 6 + ".....",
-        "......" + "h" * 4 + "......",
-        "......." + "h" * 2 + ".......",
-    ]
-    out = []
-    for y, row in enumerate(shape):
-        line = ""
-        for x, ch in enumerate(row):
-            if ch == "H":
-                c = "w"
-            elif ch == "h":
-                low = y >= 6
-                if variant == "full":
-                    c = "R" if low else "r"
-                elif variant == "pink":
-                    c = "r" if low else "m"
-                elif variant == "half":
-                    c = ("r" if x < 8 else "G") if not low else ("R" if x < 8 else "g")
-                else:  # empty
-                    c = "g" if low else "G"
-            else:
-                c = EMPTY
-            line += c
-        out.append(line)
-    return out
+def tab_bag():
+    """Brown backpack (concept)."""
+    im = new(16, 16)
+    # handle
+    for x, y in ((6, 1), (7, 1), (8, 1), (9, 1), (5, 2), (10, 2)):
+        put(im, x, y, "brownd")
+    body = rr_cells(3, 2, 10, 13, 3)
+    shade_cells(im, body, "brown", "brownl", "brownd", deep=True)
+    pocket = rr_cells(4, 8, 8, 5, 2)
+    shade_cells(im, pocket, "brownl", H("#dcae84"), "brown")
+    for x in range(4, 12):
+        put(im, x, 8, "brownd")
+    # buckle
+    fill_cells(im, rect_cells(7, 7, 2, 3), "cream")
+    put(im, 7, 9, "goldd")
+    put(im, 8, 9, "goldd")
+    # top flap seam
+    for x in range(4, 12):
+        put(im, x, 5, "brownd") if x not in (7, 8) else None
+    return outline_img(im, "outw")
 
 
-def energy_rows():
-    """Red/orange heart-like Energy icon: orange upper lobes, red lower body, pale highlight."""
-    rows = heart_rows("full")
-    return [("".join("o" if (ch == "r" and y < 6) else ("y" if ch == "w" else ch) for ch in row))
-            for y, row in enumerate(rows)]
+def tab_map():
+    """Folded map: green land, blue river, red marker."""
+    im = new(16, 16)
+    cols = ["leaf", "lime", "leaf"]
+    for i, (x0, x1) in enumerate(((1, 5), (6, 10), (11, 14))):
+        top = 3 + (1 if i == 1 else 0)
+        bot = 12 + (1 if i == 1 else 0)
+        for y in range(top, bot + 1):
+            for x in range(x0, x1 + 1):
+                c = cols[i]
+                if y == top:
+                    c = "limel"
+                elif y == bot:
+                    c = "leafd"
+                put(im, x, y, c)
+        if i != 2:
+            for y in range(top, bot + 1):
+                put(im, x1, y, "leafd")
+    # river
+    for x, y in ((3, 4), (3, 5), (4, 6), (4, 7), (4, 8), (3, 9), (3, 10), (8, 5), (8, 6), (9, 7), (9, 8), (9, 9), (8, 10)):
+        put(im, x, y, "sky")
+    # marker
+    for x, y in ((7, 8), (8, 8), (7, 9), (8, 9)):
+        put(im, x, y, "red")
+    put(im, 7, 8, "pinkl")
+    return outline_img(im, "out")
 
 
-def coin_rows():
-    """Gold coin with a dark-brown '$' painted on the face."""
-    g = [list(r) for r in COIN]
-    for r, row in enumerate(DOLLAR):
-        for c, ch in enumerate(row):
-            if ch == "#":
-                g[3 + r][4 + c] = "N"
-    return ["".join(r) for r in g]
+def tab_work():
+    """Brown briefcase with a cyan clasp (concept)."""
+    im = new(16, 16)
+    for x, y in ((5, 2), (6, 2), (7, 2), (8, 2), (9, 2), (10, 2), (5, 3), (10, 3), (5, 4), (10, 4)):
+        put(im, x, y, "brownd")
+    body = rr_cells(1, 4, 14, 10, 2)
+    shade_cells(im, body, "brown", "brownl", "brownd", deep=True)
+    for x in range(2, 14):
+        put(im, x, 8, "brownd")
+        put(im, x, 9, "brownl") if False else None
+    fill_cells(im, rect_cells(7, 7, 2, 4), "cream")
+    put(im, 7, 10, "tealL")
+    put(im, 8, 10, "tealL")
+    put(im, 7, 7, "white")
+    return outline_img(im, "outw")
 
 
-WARNING_TRI_H = 13
+def tab_relationship():
+    return heart_img(HEART13, "red", "redl", "redd", "outw")
 
 
-def warning_rows():
-    rows = [["."] * 16 for _ in range(WARNING_TRI_H)]
-    for y in range(WARNING_TRI_H):
-        half = max(0, round((y + 1) * 6 / WARNING_TRI_H))
-        left, right = 6 - half, 7 + half
-        for x in range(left, right + 1):
-            rows[y][x] = "Y" if (x == right or y == WARNING_TRI_H - 1) else "y"
-    for y in list(range(4, 9)) + [10, 11]:
-        for x in (6, 7):
-            rows[y][x] = "k"
-    return ["".join(r) for r in rows]
-
-
-def info_rows():
-    def f(x, y):
-        if x in (5, 6) and (2 <= y <= 3 or 5 <= y <= 9):
-            return "w"
-        if x <= 2 and y <= 3:
-            return "c"
-        if x + y >= 17:
-            return "B"
-        return "b"
-    return disc_rows(12, f)
-
-
-def saveok_rows():
-    check = {(3, 6), (4, 7), (5, 8), (6, 7), (7, 6), (8, 5), (9, 4)}
-    thick = check | {(x, y + 1) for x, y in check}
-
-    def f(x, y):
-        if (x, y) in thick:
-            return "w"
-        if x + y >= 17:
-            return "E"
-        return "e"
-    return disc_rows(12, f)
-
-
-UNLOCK = [
-    ".....GGGGGG.....",
-    ".....G....G.....",
-    ".....G....G.....",
-    ".....G..........",
-    "...yyyyyyyyyy...",
-    "...yyyyyyyyyY...",
-    "...yyyykkyyyY...",
-    "...yyyykkyyyY...",
-    "...yyyyyyyyyY...",
-    "...YYYYYYYYYY...",
-]
-
-
-def gear_rows():
-    rows = []
+def tab_settings():
+    im = new(16, 16)
+    cells = set()
     for y in range(16):
-        line = ""
         for x in range(16):
             dx, dy = x + 0.5 - 8, y + 0.5 - 8
             d = math.hypot(dx, dy)
-            tooth = False
-            for k in range(8):
-                ang = k * math.pi / 4
-                ux, uy = math.cos(ang), math.sin(ang)
-                along = dx * ux + dy * uy
-                perp = abs(-dx * uy + dy * ux)
-                if 3.2 <= along <= 6.6 and perp <= 1.25:
-                    tooth = True
-            if d <= 1.9:
-                c = EMPTY
-            elif d <= 4.7:
-                c = "w" if dx + dy < -2.5 else ("g" if dx + dy > 2.5 else "G")
-            elif tooth:
-                c = "G"
-            else:
-                c = EMPTY
-            line += c
-        rows.append(line)
-    return rows
+            ang = math.atan2(dy, dx)
+            tooth = (math.cos(ang * 8) > 0.1)
+            if d <= 5.3 or (d <= 7.0 and tooth):
+                cells.add((x, y))
+    cells -= disc_cells(8, 8, 2.4)
+    shade_cells(im, cells, "fog", "snow", "fogd", deep=True)
+    for (x, y) in disc_cells(8, 8, 2.4):
+        put(im, x, y, "ink")
+    return outline_img(im, "out")
 
 
-def bubble_rows(glyph):
-    g = blank(16)
-    for y in range(2, 11):
-        for x in range(1, 14):
-            if (x, y) in ((1, 2), (13, 2), (1, 10), (13, 10)):
-                continue
-            g[y][x] = "G" if y == 10 else "w"
-    for x, y in ((3, 11), (4, 11), (5, 11), (3, 12), (4, 12), (3, 13)):
-        g[y][x] = "w"
-    for (x, y), ch in glyph.items():
-        g[y][x] = ch
-    return ["".join(r) for r in g]
+def notice_warning():
+    im = new(16, 16)
+    tri = set()
+    for y in range(2, 14):
+        half = (y - 2) * 0.55 + 0.5
+        for x in range(16):
+            if abs(x + 0.5 - 8) <= half:
+                tri.add((x, y))
+    shade_cells(im, tri, "gold", "goldl", "goldd", deep=False)
+    for y in range(6, 10):
+        put(im, 7, y, "ink")
+        put(im, 8, y, "ink")
+    put(im, 7, 11, "ink")
+    put(im, 8, 11, "ink")
+    return outline_img(im, "outw")
+
+
+def notice_info():
+    im = new(16, 16)
+    shade_cells(im, disc_cells(8, 8, 6.4), "azure", "sky", "navy2", deep=True)
+    put(im, 7, 4, "white")
+    put(im, 8, 4, "white")
+    for y in range(7, 12):
+        put(im, 7, y, "white")
+        put(im, 8, y, "white")
+    put(im, 6, 7, "white")
+    put(im, 6, 11, "white")
+    put(im, 9, 11, "white")
+    return outline_img(im, "out")
+
+
+def notice_saveok():
+    im = new(16, 16)
+    shade_cells(im, disc_cells(8, 8, 6.4), "green", "greenl", "greend", deep=True)
+    for x, y in ((4, 8), (5, 9), (6, 10), (7, 9), (8, 8), (9, 7), (10, 6), (11, 5)):
+        put(im, x, y, "white")
+        put(im, x, y + 1, "white")
+    return outline_img(im, "out")
+
+
+def padlock(open_=False, body="gold", light="goldl", dark="goldd"):
+    im = new(16, 16)
+    shackle = [(5, 3), (6, 2), (7, 2), (8, 2), (9, 2), (10, 3), (5, 4), (5, 5), (10, 4), (10, 5)] if not open_ else \
+              [(8, 1), (9, 1), (10, 1), (11, 2), (11, 3), (11, 4), (5, 4), (5, 5)]
+    for x, y in shackle:
+        put(im, x, y, "grayl")
+        put(im, x + 1 if (x, y) in ((10, 3), (10, 4), (10, 5), (11, 2), (11, 3), (11, 4)) and False else x, y, "grayl")
+    bodyc = rr_cells(3, 6, 10, 8, 2)
+    shade_cells(im, bodyc, body, light, dark, deep=True)
+    put(im, 8, 9, "ink")
+    put(im, 8, 10, "ink")
+    put(im, 7, 9, "ink")
+    put(im, 7, 10, "ink")
+    put(im, 8, 11, "ink")
+    return outline_img(im, "outw")
+
+
+def unlock_icon():
+    return padlock(open_=True)
+
+
+# ================================================================= save / load / hearts / audio
+def floppy(error=False):
+    im = new(16, 16)
+    body = rect_cells(2, 2, 12, 12) - {(13, 2), (12, 2), (13, 3)}
+    shade_cells(im, body, "azure", "sky", "navy2", deep=True)
+    fill_cells(im, rect_cells(5, 2, 6, 4), "mist")      # shutter
+    fill_cells(im, rect_cells(8, 3, 2, 2), "grayk")
+    fill_cells(im, rect_cells(4, 8, 8, 6), "white")      # label
+    for x in range(5, 11):
+        put(im, x, 10, "mist")
+        put(im, x, 12, "mist")
+    if error:
+        for i in range(5):
+            put(im, 5 + i, 8 + i, "red")
+            put(im, 9 - i, 8 + i, "red")
+    return outline_img(im, "out")
+
+
+def load_icon():
+    im = new(16, 16)
+    tray = rr_cells(1, 10, 14, 5, 2)
+    shade_cells(im, tray, "sky", "sky2", "azure")
+    fill_cells(im, rect_cells(4, 11, 8, 2), "navy2")
+    for y in range(1, 6):
+        for x in (6, 7, 8, 9):
+            put(im, x, y, "sky2")
+    for i in range(5):
+        for x in range(3 + i, 13 - i):
+            put(im, x, 6 + i - 0, "sky2") if i < 4 else None
+    return outline_img(im, "out")
+
+
+def heart_state(kind):
+    if kind == "full":
+        return heart_img(HEART13, "red", "redl", "redd", "outw")
+    if kind == "empty":
+        return heart_img(HEART13, "gray", "grayl", "grayd", "grayk", hl=False)
+    # half: left red, right grey
+    full = heart_img(HEART13, "red", "redl", "redd", "outw")
+    empty = heart_img(HEART13, "gray", "grayl", "grayd", "grayk", hl=False)
+    out = empty.copy()
+    for y in range(16):
+        for x in range(8):
+            out.putpixel((x, y), full.getpixel((x, y)))
+    for y in range(3, 14):
+        put(out, 8, y, "outw") if out.getpixel((8, y))[3] else None
+    return out
 
 
 def interact_bubble():
-    g = {}
-    for y in range(3, 7):
-        for x in (7, 8):
-            g[(x, y)] = "r"
-    for y in (8, 9):
-        for x in (7, 8):
-            g[(x, y)] = "r"
-    return icon(bubble_rows(g))
+    im = new(16, 16)
+    body = disc_cells(8, 7.2, 6.3)
+    shade_cells(im, body, "ice2", "white", "ice", deep=True)
+    for x, y in ((4, 13), (5, 13), (4, 12), (5, 12), (3, 14), (4, 14)):
+        put(im, x, y, "ice2")
+    for y in range(3, 9):
+        put(im, 7, y, "azure")
+        put(im, 8, y, "azure")
+    put(im, 7, 10, "azure")
+    put(im, 8, 10, "azure")
+    put(im, 7, 11 - 0, "azure") if False else None
+    return outline_img(im, "out")
 
 
 def talk_bubble():
-    g = {}
-    for y in (5, 6):
-        for x in (4, 5, 7, 8, 10, 11):
-            g[(x, y)] = "K"
-    return icon(bubble_rows(g))
+    im = new(16, 16)
+    body = rr_cells(1, 2, 14, 10, 3)
+    shade_cells(im, body, "white", "creamh", "ice")
+    for x, y in ((4, 12), (5, 12), (4, 13), (3, 14), (4, 14)):
+        put(im, x, y, "white")
+    put(im, 3, 14, "white")
+    for x in (5, 8, 11):
+        put(im, x, 7, "navy")
+        put(im, x + 1, 7, "navy")
+    return outline_img(im, "out")
 
 
-def speaker_rows(on):
-    c = blank(16)
-    for y in range(5, 9):
-        for x in range(2, 5):
-            c[y][x] = "G"
-    for x, (y0, y1) in zip((5, 6, 7), ((4, 9), (3, 10), (2, 11))):
-        for y in range(y0, y1 + 1):
-            c[y][x] = "g" if x == 7 else "G"
+def speaker(on=True):
+    im = new(16, 16)
+    cone = {(x, y) for y in range(5, 12) for x in range(2, 5)} | \
+           {(x, y) for y in range(2, 15) for x in range(5, 8) if abs(y - 8) <= (x - 4) * 2 + 0.5}
+    shade_cells(im, cone, "fog", "snow", "fogd")
     if on:
-        for y in (5, 6, 7, 8):
-            c[y][10] = "c"
-        for y in range(3, 11):
-            c[y][12] = "c"
+        for x, y in ((9, 6), (9, 7), (9, 8), (9, 9), (10, 5), (10, 10), (11, 4), (11, 11), (12, 3), (12, 12), (12, 5), (12, 10)):
+            put(im, x, y, "sky")
+        put(im, 11, 6, "sky")
+        put(im, 11, 9, "sky")
+        put(im, 11, 7, "sky")
+        put(im, 11, 8, "sky")
     else:
         for i in range(5):
-            c[4 + i][9 + i] = "r"
-            c[4 + i][13 - i] = "r"
-    return ["".join(r) for r in c]
+            put(im, 9 + i, 5 + i, "red")
+            put(im, 13 - i, 5 + i, "red")
+    return outline_img(im, "out")
 
 
-def floppy_rows(error=False):
-    g = [["b"] * 12 for _ in range(12)]
-    for y in range(0, 4):
-        for x in range(2, 9):
-            g[y][x] = "G"
-    for y in range(0, 3):
-        for x in (6, 7):
-            g[y][x] = "K"
-    for y in range(6, 11):
-        for x in range(2, 10):
-            g[y][x] = "w"
-    for x in range(12):
-        g[11][x] = "B"
-    for y in range(12):
-        g[y][11] = "B"
-    if error:
-        for i in range(5):
-            g[6 + i][3 + i] = "r"
-            g[6 + i][7 - i] = "r"
-    return ["".join(r) for r in g]
-
-
-LOAD_ROWS = [
-    ".....cccc.....",
-    ".....cccc.....",
-    ".....cccc.....",
-    ".....cccc.....",
-    ".....cccc.....",
-    "..cccccccccc..",
-    "...cccccccc...",
-    "....cccccc....",
-    "..............",
-    "bbbbbbbbbbbbbb",
-    "bbbbbbbbbbbbbb",
+# ================================================================= rhythm cues / judge / track
+ARROW_UP = [
+    "....XX....",
+    "...XXXX...",
+    "..XXXXXX..",
+    ".XXXXXXXX.",
+    "XXXXXXXXXX",
+    "...XXXX...",
+    "...XXXX...",
+    "...XXXX...",
 ]
 
 
-# ----------------------------------------------------------------- rhythm cues / judge
-
-ARROW_UP = [(5, 2), (6, 2), (4, 3), (5, 3), (6, 3), (7, 3), (3, 4), (4, 4), (5, 4), (6, 4), (7, 4), (8, 4),
-            (2, 5), (3, 5), (4, 5), (5, 5), (6, 5), (7, 5), (8, 5), (9, 5),
-            (5, 6), (6, 6), (5, 7), (6, 7), (5, 8), (6, 8), (5, 9), (6, 9)]
-
-
-def _rotate(cells, turns):
-    """Rotate arrow pixels on the 12x12 disc: turns quarter-turns clockwise."""
-    out = cells
-    for _ in range(turns):
-        out = [(11 - y, x) for x, y in out]
-    return out
-
-
-def rhythm_cue(body, shade, turns):
-    arrow = set(_rotate(ARROW_UP, turns))
-
-    def f(x, y):
-        if (x, y) in arrow:
-            return "w"
-        if x + y >= 17:
-            return shade
-        return body
-    return icon(disc_rows(12, f))
+def rhythm_cue(base, light, dark, turns):
+    im = new(16, 16)
+    body = disc_cells(8, 8, 6.9)
+    shade_cells(im, body, base, light, dark, deep=True)
+    # inner glossy highlight (upper-left)
+    for (x, y) in ((4, 3), (5, 3), (6, 2), (3, 4), (3, 5)):
+        put(im, x, y, light)
+    arrow = cells_from_rows(ARROW_UP)
+    ar = new(16, 16)
+    for (x, y) in arrow:
+        put(ar, x + 3, y + 4, "white")
+    ar = ar.rotate(-90 * turns)
+    sh = new(16, 16)
+    for (x, y) in cells_of(ar):
+        put(sh, x + (1 if turns in (0, 1, 2, 3) else 0), y + 1, dark)
+    paste(im, sh, 0, 0)
+    paste(im, ar, 0, 0)
+    return outline_img(im, "ink")
 
 
-FONT3x5 = {
-    "P": ["111", "101", "111", "100", "100"],
-    "E": ["111", "100", "110", "100", "111"],
-    "R": ["110", "101", "110", "101", "101"],
-    "F": ["111", "100", "110", "100", "100"],
-    "C": ["011", "100", "100", "100", "011"],
-    "T": ["111", "010", "010", "010", "010"],
-    "G": ["011", "100", "101", "101", "011"],
-    "O": ["111", "101", "101", "101", "111"],
-    "D": ["110", "101", "101", "101", "110"],
-    "M": ["10001", "11011", "10101", "10001", "10001"],
-    "I": ["111", "010", "010", "010", "111"],
-    "S": ["011", "100", "010", "001", "110"],
+FONT = {
+    "P": ["1110", "1001", "1001", "1110", "1000", "1000", "1000"],
+    "E": ["1111", "1000", "1000", "1110", "1000", "1000", "1111"],
+    "R": ["1110", "1001", "1001", "1110", "1010", "1001", "1001"],
+    "F": ["1111", "1000", "1000", "1110", "1000", "1000", "1000"],
+    "C": ["0111", "1000", "1000", "1000", "1000", "1000", "0111"],
+    "T": ["1111", "0110", "0110", "0110", "0110", "0110", "0110"],
+    "G": ["0111", "1000", "1000", "1011", "1001", "1001", "0111"],
+    "O": ["0110", "1001", "1001", "1001", "1001", "1001", "0110"],
+    "D": ["1110", "1001", "1001", "1001", "1001", "1001", "1110"],
+    "M": ["10001", "11011", "10101", "10001", "10001", "10001", "10001"],
+    "I": ["111", "010", "010", "010", "010", "010", "111"],
+    "S": ["0111", "1000", "1000", "0110", "0001", "0001", "1110"],
 }
 
+FONT5 = {   # chunkier 5x7 face for the short words (GOOD / MISS)
+    "G": ["01110", "11001", "11000", "11011", "11001", "11001", "01110"],
+    "O": ["01110", "11011", "11011", "11011", "11011", "11011", "01110"],
+    "D": ["11110", "11011", "11011", "11011", "11011", "11011", "11110"],
+    "M": ["11011", "11111", "11111", "11111", "11011", "11011", "11011"],
+    "I": ["1111", "0110", "0110", "0110", "0110", "0110", "1111"],
+    "S": ["01111", "11000", "11000", "01110", "00011", "00011", "11110"],
+}
 
-JUDGE_W, JUDGE_H = 40, 12   # wide enough for PERFECT with 2px letter gaps
+JUDGE_W, JUDGE_H = 40, 12
 
 
-def judge_word(text, fill, bottom):
-    canvas = blank_wh(JUDGE_W, JUDGE_H)
-    gap = 2                                    # 2px gap between glyphs (outline keeps letters apart)
-    total = sum(len(FONT3x5[ch][0]) for ch in text) + gap * (len(text) - 1)
-    x = (JUDGE_W - total) // 2
-    y0 = 3
-    cells = {}
+def judge_word(text, top, mid, bot, outline, bold):
+    im = new(JUDGE_W, JUDGE_H)
+    glyphs = []
     for ch in text:
-        for ry, row in enumerate(FONT3x5[ch]):
+        glyphs.append(FONT5[ch] if bold else FONT[ch])
+    gap = 1
+    total = sum(len(g[0]) for g in glyphs) + gap * (len(glyphs) - 1)
+    x = (JUDGE_W - total) // 2
+    y0 = 2
+    for g in glyphs:
+        for ry, row in enumerate(g):
             for rx, bit in enumerate(row):
                 if bit == "1":
-                    cells[(x + rx, y0 + ry)] = fill if ry < 4 else bottom
-        x += len(FONT3x5[ch][0]) + gap
-    for (x, y), c in cells.items():
-        canvas[y][x] = c
-    add_outline(canvas)
-    return to_image(canvas)
-
-
-def blank_wh(w, h):
-    return [[EMPTY] * w for _ in range(h)]
+                    c = top if ry <= 1 else (bot if ry >= 5 else mid)
+                    put(im, x + rx, y0 + ry, c)
+        x += len(g[0]) + gap
+    outline_img(im, outline)
+    # drop shadow: one extra row under the outline
+    px = im.load()
+    for yy in range(JUDGE_H - 2, -1, -1):
+        for xx in range(JUDGE_W):
+            if px[xx, yy][3] and px[xx, yy][:3] == UP[outline][:3] and not px[xx, yy + 1][3]:
+                px[xx, yy + 1] = UP[outline]
+    return im
 
 
 def hitzone():
-    rows = []
+    im = new(24, 24)
+    px = im.load()
     for y in range(24):
-        line = ""
         for x in range(24):
             d = math.hypot(x + 0.5 - 12, y + 0.5 - 12)
-            if d < 2.0:
-                c = "y"
-            elif 8.5 <= d < 10.5:
-                c = "w"
-            elif 7.5 <= d < 8.5 or 10.5 <= d < 11.5:
-                c = "k"
-            else:
-                c = "_"
-            line += c
-        rows.append(line)
-    return from_rows(rows)
+            if 9.0 <= d < 11.0:
+                px[x, y] = UP["sky2"]
+            elif 7.9 <= d < 9.0 or 11.0 <= d < 12.0:
+                px[x, y] = UP["out"]
+    # glossy tick marks (N E S W) like the concept's glowing gem lane
+    for i in range(-1, 2):
+        for k in (3, 4):
+            px[12 + i, k] = UP["white"] if i == 0 else UP["sky"]
+            px[12 + i, 23 - k] = UP["white"] if i == 0 else UP["sky"]
+            px[k, 12 + i] = UP["white"] if i == 0 else UP["sky"]
+            px[23 - k, 12 + i] = UP["white"] if i == 0 else UP["sky"]
+    for x, y in ((11, 12), (12, 12), (11, 11), (12, 11)):
+        px[x, y] = UP["sky2"] if (x + y) % 2 else UP["white"]
+    return im
 
 
 def track():
-    rows = []
-    for y in range(24):
-        line = ""
-        for x in range(128):
-            if y in (0, 23):
-                c = "k"
-            elif y in (1, 22):
-                c = "g"
-            elif y in (11, 12):
-                c = "G"
-            elif x % 16 == 8 and 4 <= y <= 19:
-                c = "g"
+    """128x24 lane: navy panel with glowing cyan grid, centre line and edge rails."""
+    W, Hh = 128, 24
+    im = new(W, Hh)
+    px = im.load()
+    for y in range(Hh):
+        for x in range(W):
+            if y in (0, Hh - 1):
+                c = UP["ink"]
+            elif y in (1, Hh - 2):
+                c = H("#498aa8")
+            elif y in (2, Hh - 3):
+                c = UP["navy2"]
             else:
-                c = "K"
-            line += c
-        rows.append(line)
-    return from_rows(rows)
+                t = abs(y - 11.5) / 9.5
+                c = vgrad("navy2", "navyd", min(1, t))
+                if x % 16 == 8:
+                    c = vgrad("blue", "navy2", t)           # grid rungs
+                if (x % 16) in (7, 9) and 4 <= y <= 19:
+                    c = vgrad("navy2", H("#22578e"), 1 - t)
+                if y in (11, 12):
+                    c = UP["sky2"] if y == 11 else UP["sky"]  # glowing centre line
+                elif y in (10, 13):
+                    c = H("#3a73a8")
+            px[x, y] = c
+    # rounded end caps (clip the four corners)
+    for x, y in ((0, 0), (W - 1, 0), (0, Hh - 1), (W - 1, Hh - 1)):
+        px[x, y] = (0, 0, 0, 0)
+    return im
 
 
-# ----------------------------------------------------------------- effects
-
-def interact_pulse_frame(dy):
-    c = blank(16)
-    for y in list(range(5, 11)) + [12, 13]:
+# ================================================================= effects (16x16 frames)
+def exclaim_frame(dy):
+    im = new(16, 16)
+    for y in range(3, 10):
         for x in (7, 8):
-            c[y][x] = "r"
-    add_outline(c)
-    return to_image(shift(c, dy))
+            put(im, x, y, "gold")
+        put(im, 7, y, "goldl")
+        put(im, 8, y, "gold")
+    for y in range(8, 10):
+        put(im, 8, y, "orange")
+    for x in (7, 8):
+        for y in (12, 13):
+            put(im, x, y, "gold")
+    put(im, 8, 13, "orange")
+    put(im, 7, 12, "goldl")
+    outline_img(im, "outw")
+    # sparkle accents
+    for x, y in ((3, 7), (12, 6)):
+        put(im, x, y, "goldl")
+    out = new(16, 16)
+    out.paste(im, (0, dy))
+    return out
 
 
 def coin_pop_frame(rx):
-    c = blank(16)
-    for y in range(16):
-        for x in range(16):
-            px, py = x + 0.5 - 8, y + 0.5 - 8
-            if (px / rx) ** 2 + (py / 5.0) ** 2 <= 1.0:
-                c[y][x] = "Y" if px > 0 else "y"
-                if rx >= 5 and px < -2 and py < -1:
-                    c[y][x] = "w"
-    add_outline(c)
-    return to_image(c)
+    im = new(16, 16)
+    cells = ellipse_cells(8, 8, rx, 6.2)
+    shade_cells(im, cells, "gold", "goldl", "goldd", deep=True)
+    if rx >= 4:
+        gx, gy = 8 - 2, 5
+        for (x, y) in cells_from_rows(DOLLAR):
+            if (gx + x, gy + y) in cells:
+                put(im, gx + x + 1, gy + y + 1, "goldd") if (gx + x + 1, gy + y + 1) in cells else None
+        for (x, y) in cells_from_rows(DOLLAR):
+            if (gx + x, gy + y) in cells:
+                put(im, gx + x, gy + y, "white")
+    return outline_img(im, "outw")
 
 
-def sparkle_frame(arm, centre="w", ray=None, diag=None, edge=None, inner=None):
-    """Cross sparkle. `inner` colours the first ray pixel, `edge` the outermost one."""
-    c = blank(16)
+def sparkle_frame(arm, centre="white", ray="gold", edge="orange", inner="goldl", diag=None):
+    im = new(16, 16)
     cx = cy = 8
     if diag:
         for dx, dy in ((1, 1), (-1, 1), (1, -1), (-1, -1)):
-            c[cy + dy][cx + dx] = diag
-    if ray:
-        for i in range(1, arm + 1):
-            col = edge if (edge and i == arm and arm > 1) else (inner if (inner and i == 1) else ray)
-            for dx, dy in ((i, 0), (-i, 0), (0, i), (0, -i)):
-                c[cy + dy][cx + dx] = col
-    if centre:
-        c[cy][cx] = centre
-    return to_image(c)
+            put(im, cx + dx, cy + dy, diag)
+    for i in range(1, arm + 1):
+        col = edge if (i == arm and arm > 1) else (inner if i == 1 else ray)
+        for dx, dy in ((i, 0), (-i, 0), (0, i), (0, -i)):
+            put(im, cx + dx, cy + dy, col)
+    if arm >= 4:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            put(im, cx + dx * 2 + dy, cy + dy * 2 + dx, ray) if False else None
+    put(im, cx, cy, centre)
+    return im
 
 
-def lowneed_frame(body):
-    c = blank(16)
-    for y in range(16):
-        for x in range(16):
-            if (x + 0.5 - 8) ** 2 + (y + 0.5 - 8) ** 2 <= 36:
-                c[y][x] = body
+STAR = [
+    "......XX......",
+    "......XX......",
+    ".....XXXX.....",
+    "XXXXXXXXXXXXXX",
+    ".XXXXXXXXXXXX.",
+    "..XXXXXXXXXX..",
+    "...XXXXXXXX...",
+    "...XXXXXXXX...",
+    "..XXXX..XXXX..",
+    "..XXX....XXX..",
+]
+
+
+def star_frame():
+    im = new(16, 16)
+    cells = cells_from_rows(STAR, "X", 1, 3)
+    shade_cells(im, cells, "gold", "goldl", "orange", deep=True)
+    put(im, 7, 8, "white")
+    put(im, 8, 8, "white")
+    put(im, 7, 9, "white")
+    return outline_img(im, "outw")
+
+
+def lowneed_frame(body, light, dark):
+    im = new(16, 16)
+    shade_cells(im, disc_cells(8, 8, 6.4), body, light, dark, deep=True)
     for y in list(range(4, 9)) + [10, 11]:
         for x in (7, 8):
-            c[y][x] = "w"
-    add_outline(c)
-    return to_image(c)
+            put(im, x, y, "white")
+    return outline_img(im, "ink")
 
 
-# ----------------------------------------------------------------- build
+# ================================================================= title banner (key art, untouched)
+def title_banner():
+    src = Image.open(ASSETS / "reference" / "ArtDirection_ConceptSheet_v01.png").convert("RGBA")
+    return src.crop((0, 0, 1024, 190))
 
+
+# ================================================================= build
 def build():
     out = []
 
-    def put(img, rel):
+    def put_(img, rel):
         out.append(save(img, rel))
 
     # HUD
-    put(icon(energy_rows()), "ui/hud/UI_001_Need_Energy_v01.png")
-    put(icon(DRUM), "ui/hud/UI_001_Need_Fullness_v01.png")
-    put(icon(MOOD), "ui/hud/UI_001_Need_Mood_v01.png")
-    put(icon(coin_rows()), "ui/hud/UI_002_Money_v01.png")
-    put(icon(CLOCK), "ui/hud/UI_003_Clock_v01.png")
-    put(icon(CAL), "ui/hud/UI_003_Calendar_v01.png")
-    put(panel_frame(64, 20, outer="k", ring="B", inner="w"), "ui/hud/UI_003_ClockFrame_v01.png")
-    put(needbar_frame(), "ui/hud/UI_001_NeedBar_Frame_v01.png")
-    put(from_rows(["w"] * 6), "ui/hud/UI_001_NeedBar_Fill_v01.png")
+    put_(need_energy(), "ui/hud/UI_001_Need_Energy_v01.png")
+    put_(need_fullness(), "ui/hud/UI_001_Need_Fullness_v01.png")
+    put_(need_mood(), "ui/hud/UI_001_Need_Mood_v01.png")
+    put_(coin(), "ui/hud/UI_002_Money_v01.png")
+    put_(clock_icon(), "ui/hud/UI_003_Clock_v01.png")
+    put_(calendar_icon(), "ui/hud/UI_003_Calendar_v01.png")
+    put_(clock_frame(), "ui/hud/UI_003_ClockFrame_v01.png")
+    put_(needbar_frame(), "ui/hud/UI_001_NeedBar_Frame_v01.png")
+    put_(needbar_fill(), "ui/hud/UI_001_NeedBar_Fill_v01.png")
 
     # Buttons
-    put(time_button(pause_cells(), "B"), "ui/buttons/UI_004_TimeControl_Pause_v01.png")
-    put(time_button(play_cells(), "e"), "ui/buttons/UI_004_TimeControl_Normal_v01.png")
-    put(time_button(fast_cells(), "e"), "ui/buttons/UI_004_TimeControl_Fast_v01.png")
-    put(button_image("normal"), "ui/buttons/UI_006_Button_Normal_v01.png")
-    put(button_image("pressed", pressed_shift=True), "ui/buttons/UI_006_Button_Pressed_v01.png")
-    put(button_image("disabled"), "ui/buttons/UI_006_Button_Disabled_v01.png")
-    put(button_image("selected"), "ui/buttons/UI_006_Button_Selected_v01.png")
+    put_(time_button("pause"), "ui/buttons/UI_004_TimeControl_Pause_v01.png")
+    put_(time_button("play"), "ui/buttons/UI_004_TimeControl_Normal_v01.png")
+    put_(time_button("fast"), "ui/buttons/UI_004_TimeControl_Fast_v01.png")
+    for role, name in (("normal", "Normal"), ("pressed", "Pressed"), ("disabled", "Disabled"), ("selected", "Selected")):
+        put_(button_image(role), f"ui/buttons/UI_006_Button_{name}_v01.png")
 
     # Panels
-    put(from_rows(nine_rows(DIALOG_DEPTH, "w")), "ui/panels/UI_005_DialogBox_v01.png")
-    put(dialog_preview(), "ui/panels/UI_005_DialogBox_Preview_v01.png")
-    put(from_rows(nine_rows(SHOP_DEPTH, "w")), "ui/panels/UI_009_ShopPanel_v01.png")
+    put_(dialog24(), "ui/panels/UI_005_DialogBox_v01.png")
+    put_(dialog_preview(), "ui/panels/UI_005_DialogBox_Preview_v01.png")
+    put_(frame24("navy", "sky", "cream"), "ui/panels/UI_009_ShopPanel_v01.png")
 
     # Tabs
-    put(icon(TAB_CHAR), "ui/icons/UI_007_Tab_Character_v01.png")
-    put(icon(TAB_BAG), "ui/icons/UI_007_Tab_Bag_v01.png")
-    put(icon(recolor_rows(TAB_MAP, {"u": "l", "n": "e"})), "ui/icons/UI_007_Tab_Map_v01.png")
-    put(icon(WORK), "ui/icons/UI_007_Tab_Work_v01.png")
-    put(icon(heart_rows("pink")), "ui/icons/UI_007_Tab_Relationship_v01.png")
-    put(icon(gear_rows()), "ui/icons/UI_007_Tab_Settings_v01.png")
+    put_(tab_character(), "ui/icons/UI_007_Tab_Character_v01.png")
+    put_(tab_bag(), "ui/icons/UI_007_Tab_Bag_v01.png")
+    put_(tab_map(), "ui/icons/UI_007_Tab_Map_v01.png")
+    put_(tab_work(), "ui/icons/UI_007_Tab_Work_v01.png")
+    put_(tab_relationship(), "ui/icons/UI_007_Tab_Relationship_v01.png")
+    put_(tab_settings(), "ui/icons/UI_007_Tab_Settings_v01.png")
 
     # Notices
-    put(icon(warning_rows()), "ui/icons/UI_008_Notice_Warning_v01.png")
-    put(icon(info_rows()), "ui/icons/UI_008_Notice_Info_v01.png")
-    put(icon(UNLOCK), "ui/icons/UI_008_Notice_Unlock_v01.png")
-    put(icon(saveok_rows()), "ui/icons/UI_008_Notice_SaveOk_v01.png")
+    put_(notice_warning(), "ui/icons/UI_008_Notice_Warning_v01.png")
+    put_(notice_info(), "ui/icons/UI_008_Notice_Info_v01.png")
+    put_(unlock_icon(), "ui/icons/UI_008_Notice_Unlock_v01.png")
+    put_(notice_saveok(), "ui/icons/UI_008_Notice_SaveOk_v01.png")
 
     # Save / load
-    put(icon(floppy_rows()), "ui/icons/UI_012_Save_v01.png")
-    put(icon(LOAD_ROWS), "ui/icons/UI_012_Load_v01.png")
-    put(icon(floppy_rows(error=True)), "ui/icons/UI_012_SaveError_v01.png")
+    put_(floppy(), "ui/icons/UI_012_Save_v01.png")
+    put_(load_icon(), "ui/icons/UI_012_Load_v01.png")
+    put_(floppy(error=True), "ui/icons/UI_012_SaveError_v01.png")
 
     # Hearts
-    put(icon(heart_rows("full")), "ui/icons/UI_011_Heart_Full_v01.png")
-    put(icon(heart_rows("half")), "ui/icons/UI_011_Heart_Half_v01.png")
-    put(icon(heart_rows("empty")), "ui/icons/UI_011_Heart_Empty_v01.png")
+    for k, n in (("full", "Full"), ("half", "Half"), ("empty", "Empty")):
+        put_(heart_state(k), f"ui/icons/UI_011_Heart_{n}_v01.png")
 
     # Object hints
-    put(interact_bubble(), "ui/icons/OBJ_001_Interact_v01.png")
-    put(talk_bubble(), "ui/icons/OBJ_001_Talk_v01.png")
+    put_(interact_bubble(), "ui/icons/OBJ_001_Interact_v01.png")
+    put_(talk_bubble(), "ui/icons/OBJ_001_Talk_v01.png")
 
     # Audio
-    put(icon(speaker_rows(True)), "ui/icons/AUDIO_001_Volume_On_v01.png")
-    put(icon(speaker_rows(False)), "ui/icons/AUDIO_001_Volume_Off_v01.png")
+    put_(speaker(True), "ui/icons/AUDIO_001_Volume_On_v01.png")
+    put_(speaker(False), "ui/icons/AUDIO_001_Volume_Off_v01.png")
 
     # Minigames (rhythm)
-    put(from_rows(nine_rows(MINI_PANEL_DEPTH, "w")), "minigames/rhythm/MINI_001_Panel_v01.png")
-    put(rhythm_cue("e", "E", 0), "minigames/rhythm/MINI_002_RhythmCue_Tap_v01.png")
-    put(rhythm_cue("b", "B", 1), "minigames/rhythm/MINI_002_RhythmCue_Hold_v01.png")
-    put(track(), "minigames/rhythm/MINI_003_Track_v01.png")
-    put(hitzone(), "minigames/rhythm/MINI_003_HitZone_v01.png")
-    put(judge_word("PERFECT", "y", "o"), "minigames/rhythm/MINI_004_Judge_Perfect_v01.png")
-    put(judge_word("GOOD", "l", "e"), "minigames/rhythm/MINI_004_Judge_Good_v01.png")
-    put(judge_word("MISS", "r", "R"), "minigames/rhythm/MINI_004_Judge_Miss_v01.png")
-    put(from_rows(nine_rows(RESULT_DEPTH, "w")), "minigames/rhythm/MINI_005_ResultPanel_v01.png")
+    put_(frame24("navy", "sky2", "cream"), "minigames/rhythm/MINI_001_Panel_v01.png")
+    put_(rhythm_cue("green", "greenl", "greend", 0), "minigames/rhythm/MINI_002_RhythmCue_Tap_v01.png")
+    put_(rhythm_cue("blue", "sky", "navy2", 1), "minigames/rhythm/MINI_002_RhythmCue_Hold_v01.png")
+    put_(track(), "minigames/rhythm/MINI_003_Track_v01.png")
+    put_(hitzone(), "minigames/rhythm/MINI_003_HitZone_v01.png")
+    put_(judge_word("PERFECT", "goldl", "gold", "orange", "outw", False), "minigames/rhythm/MINI_004_Judge_Perfect_v01.png")
+    put_(judge_word("GOOD", "limel", "greenl", "green", "greeno", True), "minigames/rhythm/MINI_004_Judge_Good_v01.png")
+    put_(judge_word("MISS", "redl", "red", "redd", "redo", True), "minigames/rhythm/MINI_004_Judge_Miss_v01.png")
+    put_(frame24("navy2", "sky", "cream", thick=4), "minigames/rhythm/MINI_005_ResultPanel_v01.png")
 
     # Effects
-    put(strip([interact_pulse_frame(dy) for dy in (0, -2, -3, -1)]),
-        "effects/interaction/FX_001_InteractPulse_v01.png")
-    put(strip([coin_pop_frame(rx) for rx in (5, 3, 1.2, 3)]),
-        "effects/rewards/FX_002_CoinPop_v01.png")
-    base_heart = add_outline(centred(heart_rows("full")))
-    put(strip([to_image(shift(base_heart, dy)) for dy in (2, 1, 0, -1)]),
-        "effects/rewards/FX_003_HeartUp_v01.png")
-    # small -> large -> medium -> fade; every frame has a visible cross
-    put(strip([sparkle_frame(2, "w", "y", None, "Y", "w"),
-               sparkle_frame(5, "w", "y", "y", "Y", "w"),
-               sparkle_frame(3, "w", "y", "Y", "Y"),
-               sparkle_frame(2, None, "Y", None)]),
-        "effects/unlocks/FX_004_Sparkle_v01.png")
-    put(strip([lowneed_frame("r"), lowneed_frame("R")]),
-        "effects/interaction/FX_005_LowNeed_v01.png")
+    strip = lambda frames: _strip(frames)  # noqa: E731
+    put_(strip([exclaim_frame(dy) for dy in (0, -2, -3, -1)]), "effects/interaction/FX_001_InteractPulse_v01.png")
+    put_(strip([coin_pop_frame(rx) for rx in (5.5, 3.6, 1.4, 3.6)]), "effects/rewards/FX_002_CoinPop_v01.png")
+    base_heart = heart_img(HEART11, "red", "redl", "redd", "outw")
+    frames = []
+    for dy in (2, 1, 0, -1):
+        f = new(16, 16)
+        f.paste(base_heart, (0, dy))
+        frames.append(f)
+    put_(strip(frames), "effects/rewards/FX_003_HeartUp_v01.png")
+    put_(strip([sparkle_frame(2), sparkle_frame(5, diag="goldl"), star_frame(), sparkle_frame(2, centre="goldl", ray="goldd", edge="goldd", inner="goldd")]),
+         "effects/unlocks/FX_004_Sparkle_v01.png")
+    put_(strip([lowneed_frame("red", "redl", "redd"), lowneed_frame("redd", "red", H("#5c1414"))]), "effects/interaction/FX_005_LowNeed_v01.png")
+
+    # Title banner (concept key art, cropped, not repainted)
+    put_(title_banner(), "ui/title/UI_000_TitleBanner_v01.png")
     return out
+
+
+def _strip(frames):
+    w, h = frames[0].size
+    sheet = new(w * len(frames), h)
+    for i, f in enumerate(frames):
+        sheet.paste(f, (i * w, 0))
+    return sheet
 
 
 if __name__ == "__main__":
