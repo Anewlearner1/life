@@ -1,0 +1,12 @@
+{
+  "tile_size": 16,
+  "columns": 6,
+  "tiles": {
+    "0": "grassa",
+    "1": "grassb",
+    "2": "dirt",
+    "3": "sidewalk",
+    "4": "floorwood",
+    "5": "floortile"
+  }
+}
