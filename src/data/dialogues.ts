@@ -1,6 +1,8 @@
 import type { DialogueSet } from "../game/types";
 
-// Each NPC: 6 lines, escalating minAffection (0, 10, 20, 35, 50, 75).
+// Each NPC: 9 lines, escalating minAffection (0, 10, 20, 35, 45, 50, 60, 75, 85).
+// Romanceable NPCs (npc_002, npc_006, npc_007) add 2 partner-talk lines at 90.
+// Lines within a set MUST stay sorted by minAffection ascending (checked in src/tests/content.test.ts).
 // affectionDelta is left unset: RelationshipSystem grants affection.
 export const dialogues: Record<string, DialogueSet> = {
   dlg_npc_001: {
@@ -10,8 +12,11 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_001_02", text: "又見面了！我們店的拿鐵很受歡迎喔。", minAffection: 10 },
       { id: "dlg_npc_001_03", text: "你工作時很認真，我都看在眼裡呢。", minAffection: 20 },
       { id: "dlg_npc_001_04", text: "要不要試試我新研發的手沖咖啡？", minAffection: 35 },
+      { id: "dlg_npc_001_07", text: "你點的咖啡，我總是特別用心去沖。", minAffection: 45 },
       { id: "dlg_npc_001_05", text: "有你在店裡，感覺氣氛都變好了。", minAffection: 50 },
+      { id: "dlg_npc_001_08", text: "每次看到你進門，我都會多準備一杯。", minAffection: 60 },
       { id: "dlg_npc_001_06", text: "謝謝你一直來支持這家小店。", minAffection: 75 },
+      { id: "dlg_npc_001_09", text: "能和你一起把這家店顧下去，我很感激。", minAffection: 85 },
     ],
   },
   dlg_npc_002: {
@@ -21,8 +26,13 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_002_02", text: "常來光顧，我幫你記住熟客價。", minAffection: 10 },
       { id: "dlg_npc_002_03", text: "最近進了一批好蘋果，要不要看看？", minAffection: 20 },
       { id: "dlg_npc_002_04", text: "你看起來很累，要多吃點東西啊。", minAffection: 35 },
+      { id: "dlg_npc_002_07", text: "聽說隔壁街要開新店，你有聽說嗎？", minAffection: 45 },
       { id: "dlg_npc_002_05", text: "下次來我請你喝飲料，別跟我客氣。", minAffection: 50 },
+      { id: "dlg_npc_002_08", text: "你每次來，我都忍不住想多聊幾句。", minAffection: 60 },
       { id: "dlg_npc_002_06", text: "有你這個朋友，我每天都很開心。", minAffection: 75 },
+      { id: "dlg_npc_002_09", text: "我這人嘴碎，但對你的心意可是認真的。", minAffection: 85 },
+      { id: "dlg_npc_002_10", text: "今晚打烊後，要不要陪我去吃宵夜？", minAffection: 90, minStage: "partner" },
+      { id: "dlg_npc_002_11", text: "有你在身邊，連算帳都變得開心了呢。", minAffection: 90, minStage: "partner" },
     ],
   },
   dlg_npc_003: {
@@ -32,8 +42,11 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_003_02", text: "有空來我家喝茶吧，我泡的茶很香。", minAffection: 10 },
       { id: "dlg_npc_003_03", text: "要不要一起去公園走走？我每天都跑步。", minAffection: 20 },
       { id: "dlg_npc_003_04", text: "有事儘管說，鄰居就是要互相照應。", minAffection: 35 },
+      { id: "dlg_npc_003_07", text: "年輕人有衝勁，我看了就高興。", minAffection: 45 },
       { id: "dlg_npc_003_05", text: "你做事很有一套，我很佩服。", minAffection: 50 },
+      { id: "dlg_npc_003_08", text: "你要是搬走，我可是會捨不得的。", minAffection: 60 },
       { id: "dlg_npc_003_06", text: "能當你的鄰居，真是我的福氣。", minAffection: 75 },
+      { id: "dlg_npc_003_09", text: "遇到困難就來找我，這句話我是說真的。", minAffection: 85 },
     ],
   },
   dlg_npc_004: {
@@ -43,8 +56,11 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_004_02", text: "我最近在趕期末報告，好累喔。", minAffection: 10 },
       { id: "dlg_npc_004_03", text: "你覺得我該選哪個研究主題呢？", minAffection: 20 },
       { id: "dlg_npc_004_04", text: "跟你聊天，心情就放鬆多了。", minAffection: 35 },
+      { id: "dlg_npc_004_07", text: "你知道嗎？校園後面的貓咪超可愛！", minAffection: 45 },
       { id: "dlg_npc_004_05", text: "我夢想有一天能開一間自己的書店。", minAffection: 50 },
+      { id: "dlg_npc_004_08", text: "跟你在一起，連熬夜都不覺得累了。", minAffection: 60 },
       { id: "dlg_npc_004_06", text: "謝謝你陪我熬過這段日子。", minAffection: 75 },
+      { id: "dlg_npc_004_09", text: "以後我的書店開張，第一個請你來！", minAffection: 85 },
     ],
   },
   dlg_npc_005: {
@@ -54,8 +70,11 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_005_02", text: "今年的番茄收成不錯，嚐嚐看吧。", minAffection: 10 },
       { id: "dlg_npc_005_03", text: "種田最怕的就是老天爺不作美。", minAffection: 20 },
       { id: "dlg_npc_005_04", text: "你做事很踏實，像我年輕的時候。", minAffection: 35 },
+      { id: "dlg_npc_005_07", text: "慢慢來，種田跟做人一樣，急不得。", minAffection: 45 },
       { id: "dlg_npc_005_05", text: "等秋收了，帶你去看滿田的稻穗。", minAffection: 50 },
+      { id: "dlg_npc_005_08", text: "你來幫忙的那天，我特別開心。", minAffection: 60 },
       { id: "dlg_npc_005_06", text: "在這裡，你就像是我們家的人。", minAffection: 75 },
+      { id: "dlg_npc_005_09", text: "我看人很準，你是個值得託付的人。", minAffection: 85 },
     ],
   },
   dlg_npc_006: {
@@ -65,8 +84,13 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_006_02", text: "你也常來這裡放鬆啊？我懂那種感覺。", minAffection: 10 },
       { id: "dlg_npc_006_03", text: "上班真的很累，但有咖啡就撐得住。", minAffection: 20 },
       { id: "dlg_npc_006_04", text: "有時很羨慕你，不用被時間綁住。", minAffection: 35 },
+      { id: "dlg_npc_006_07", text: "我的報表又被退回了，人生真難。", minAffection: 45 },
       { id: "dlg_npc_006_05", text: "下班後一起吃個飯吧，我請客。", minAffection: 50 },
+      { id: "dlg_npc_006_08", text: "跟你聊天，我的壓力好像少了一半。", minAffection: 60 },
       { id: "dlg_npc_006_06", text: "有你當朋友，上班也沒那麼無聊了。", minAffection: 75 },
+      { id: "dlg_npc_006_09", text: "下班後想到能見到你，我就有力氣了。", minAffection: 85 },
+      { id: "dlg_npc_006_10", text: "以後不管多忙，每天都要跟你說晚安。", minAffection: 90, minStage: "partner" },
+      { id: "dlg_npc_006_11", text: "我的人生計畫表裡，終於有你的位置了。", minAffection: 90, minStage: "partner" },
     ],
   },
   dlg_npc_007: {
@@ -76,8 +100,13 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_007_02", text: "今天光線很好，我正在畫這片天空。", minAffection: 10 },
       { id: "dlg_npc_007_03", text: "你覺得這幅畫怎麼樣？說實話就好。", minAffection: 20 },
       { id: "dlg_npc_007_04", text: "跟你聊天的時候，靈感好像特別多。", minAffection: 35 },
+      { id: "dlg_npc_007_07", text: "你的眼神很安靜，像是在看見什麼。", minAffection: 45 },
       { id: "dlg_npc_007_05", text: "我很少跟別人分享作品，但你不一樣。", minAffection: 50 },
+      { id: "dlg_npc_007_08", text: "我開始會把你畫進我的畫裡了。", minAffection: 60 },
       { id: "dlg_npc_007_06", text: "能遇見你，是我這段時間最美好的事。", minAffection: 75 },
+      { id: "dlg_npc_007_09", text: "你是我唯一願意讓他看草稿的人。", minAffection: 85 },
+      { id: "dlg_npc_007_10", text: "有你在，我的每一幅畫都有了溫度。", minAffection: 90, minStage: "partner" },
+      { id: "dlg_npc_007_11", text: "以後的展覽，我想第一個帶你去看。", minAffection: 90, minStage: "partner" },
     ],
   },
   dlg_npc_008: {
@@ -87,8 +116,11 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_008_02", text: "每天跑來跑去，這一區我全都熟。", minAffection: 10 },
       { id: "dlg_npc_008_03", text: "你最近有寄信給誰嗎？我幫你送。", minAffection: 20 },
       { id: "dlg_npc_008_04", text: "聽說你最近很忙？別太累了啊。", minAffection: 35 },
+      { id: "dlg_npc_008_07", text: "街上的八卦，我可是第一手消息喔。", minAffection: 45 },
       { id: "dlg_npc_008_05", text: "每次見到你，都是我一天最期待的時刻。", minAffection: 50 },
+      { id: "dlg_npc_008_08", text: "你今天心情不錯，我一看就知道。", minAffection: 60 },
       { id: "dlg_npc_008_06", text: "以後你的每封信，我都親手送到。", minAffection: 75 },
+      { id: "dlg_npc_008_09", text: "遇到你，我的郵差工作就多了點樂趣。", minAffection: 85 },
     ],
   },
 };

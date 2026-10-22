@@ -66,3 +66,17 @@ describe("RelationshipSystem", () => {
     expect(getRel(s, ARTIST).lastTalkMinute).toBeUndefined();
   });
 });
+
+describe("partner-only dialogue", () => {
+  it("skips minStage lines until the stage is reached", () => {
+    const content = makeContent();
+    const state = newGame(content);
+    const set = content.dialogues[content.npcs[ARTIST].dialogueSetId];
+    set.lines.push({ id: "partner_only", text: "只對伴侶說", minAffection: 90, minStage: "partner" });
+    content.events = {};
+    state.relationships[ARTIST] = { npcId: ARTIST, affection: 95, stage: "close", completedEventIds: [] };
+    expect(talkTo(state, content, ARTIST).line.id).not.toBe("partner_only");
+    state.relationships[ARTIST].stage = "partner";
+    expect(talkTo(state, content, ARTIST).line.id).toBe("partner_only");
+  });
+});

@@ -20,7 +20,7 @@ export const npcs: Record<string, NPCDefinition> = {
     occupation: "雜貨店老闆",
     scheduleId: "sch_npc_002",
     dialogueSetId: "dlg_npc_002",
-    romanceable: false,
+    romanceable: true,
   },
   npc_003: {
     id: "npc_003",
@@ -60,7 +60,7 @@ export const npcs: Record<string, NPCDefinition> = {
     occupation: "公司職員",
     scheduleId: "sch_npc_006",
     dialogueSetId: "dlg_npc_006",
-    romanceable: false,
+    romanceable: true,
   },
   npc_007: {
     id: "npc_007",

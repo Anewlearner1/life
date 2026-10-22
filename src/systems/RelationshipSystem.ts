@@ -32,7 +32,9 @@ export function talkTo(
 
   const rel = getRel(state, npcId);
   const lines = content.dialogues[content.npcs[npcId]?.dialogueSetId ?? ""]?.lines ?? [];
-  const eligible = lines.filter((l) => (l.minAffection ?? 0) <= rel.affection);
+  const eligible = lines.filter(
+    (l) => (l.minAffection ?? 0) <= rel.affection && (!l.minStage || stageRank(rel.stage) >= stageRank(l.minStage)),
+  );
   const top = Math.max(...eligible.map((l) => l.minAffection ?? 0));
   const best = eligible.filter((l) => (l.minAffection ?? 0) === top);
   const now = state.gameClock.totalMinutes;

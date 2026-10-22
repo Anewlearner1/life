@@ -54,6 +54,8 @@ export type DialogueLine = {
   text: string;
   /** Minimum affection to be eligible; defaults to 0. */
   minAffection?: number;
+  /** Only eligible at or above this relationship stage (e.g. partner-only lines). */
+  minStage?: RelationshipStage;
   affectionDelta?: number;
 };
 
