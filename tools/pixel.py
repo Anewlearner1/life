@@ -81,3 +81,22 @@ def save(img, relpath):
     path.parent.mkdir(parents=True, exist_ok=True)
     img.save(path)
     return path
+
+
+# ---------- Concept-sheet palette (art direction v2) ----------
+# 64 colors sampled from assets/reference/ArtDirection_ConceptSheet_v01.png.
+# Single-char keys; use with from_rows(rows, CP). "_" is transparent.
+CONCEPT_KEYS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+="
+
+
+def _concept_palette():
+    import json
+    with open(ASSETS / "reference" / "concept_palette.json", encoding="utf-8") as f:
+        colors = json.load(f)
+    cp = {"_": (0, 0, 0, 0)}
+    for key, rgb in zip(CONCEPT_KEYS, colors):
+        cp[key] = (*rgb, 255)
+    return cp
+
+
+CP = _concept_palette()

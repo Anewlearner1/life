@@ -1,0 +1,10 @@
+{
+  "tile_size": 16,
+  "columns": 3,
+  "tiles": {
+    "0": "soil",
+    "1": "cabbage_row",
+    "2": "wheat_row"
+  },
+  "note": "soil is walkable (tilled path between rows); cabbage_row and wheat_row are crop rows (impassable)"
+}

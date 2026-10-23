@@ -1,0 +1,11 @@
+{
+  "tile_size": 16,
+  "columns": 4,
+  "tiles": {
+    "0": "wall_a",
+    "1": "wall_b",
+    "2": "trim",
+    "3": "door_mat"
+  },
+  "note": "wall_a/wall_b/trim are impassable; door_mat is the walkable exit tile in the bottom wall"
+}
