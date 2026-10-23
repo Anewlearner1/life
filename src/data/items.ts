@@ -1,7 +1,9 @@
 import type { ItemDefinition } from "../game/types";
+import { ITEM } from "./ids";
 
 // Food: useEffect restores needs (satiety higher = less hungry). useMinutes = time spent eating.
 // Products: no useEffect. flower and gift are intended as NPC gifts (GameConfig.relationship.giftAffection).
+// ring is consumed by the proposal event (src/data/events.ts), not sold as a gift.
 export const items: Record<string, ItemDefinition> = {
   item_coffee: {
     id: "item_coffee",
@@ -66,5 +68,11 @@ export const items: Record<string, ItemDefinition> = {
     name: "禮物盒",
     price: 55,
     iconAsset: "objects/products/OBJ_004_Gift_v01.png",
+  },
+  [ITEM.ring]: {
+    id: ITEM.ring,
+    name: "婚戒",
+    price: 1200,
+    iconAsset: "objects/products/OBJ_004_Ring_v01.png",
   },
 };

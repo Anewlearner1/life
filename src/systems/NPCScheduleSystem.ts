@@ -1,6 +1,9 @@
+import { LOC } from "../data/ids";
 import type { ContentDB, GameState, ScheduleDefinition, ScheduleEntry } from "../game/types";
 
 const MINUTES_PER_DAY = 24 * 60;
+const SPOUSE_HOME_FROM = 18 * 60;
+const SPOUSE_HOME_UNTIL = 8 * 60;
 
 const covers = (e: ScheduleEntry, m: number) =>
   e.startMinute <= e.endMinute ? m >= e.startMinute && m < e.endMinute : m >= e.startMinute || m < e.endMinute;
@@ -23,7 +26,13 @@ export function updateNPCs(state: GameState, content: ContentDB): void {
   for (const def of Object.values(content.npcs)) {
     const schedule = content.schedules[def.scheduleId];
     if (!schedule) continue;
-    const entry = activeEntry(schedule, minuteOfDay);
+    let entry = activeEntry(schedule, minuteOfDay);
+    // The spouse lives at home in the evening and overnight.
+    if (state.family.spouseNpcId === def.id && (minuteOfDay >= SPOUSE_HOME_FROM || minuteOfDay < SPOUSE_HOME_UNTIL)) {
+      const home = content.locations[LOC.homeBed] ? LOC.homeBed : LOC.home;
+      const sleeping = minuteOfDay >= 22 * 60 || minuteOfDay < SPOUSE_HOME_UNTIL;
+      entry = { startMinute: SPOUSE_HOME_FROM, endMinute: SPOUSE_HOME_UNTIL, activity: sleeping ? "sleep" : "rest", locationId: home };
+    }
     const loc = content.locations[entry.locationId];
     const npc = (state.npcs[def.id] ??= {
       id: def.id,

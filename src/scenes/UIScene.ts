@@ -13,6 +13,7 @@ const STAGE_ICON = {
   acquaintance: "EVT_002_Stage_Acquaintance",
   close: "EVT_002_Stage_CloseFriend",
   partner: "EVT_002_Stage_Partner",
+  spouse: "EVT_002_Stage_Partner",
 } as const;
 
 /** HUD + toasts + dialogue + menus, drawn above WorldScene. Also drives the game clock. */

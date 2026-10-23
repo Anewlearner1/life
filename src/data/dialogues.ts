@@ -1,7 +1,8 @@
 import type { DialogueSet } from "../game/types";
 
 // Each NPC: 9 lines, escalating minAffection (0, 10, 20, 35, 45, 50, 60, 75, 85).
-// Romanceable NPCs (npc_002, npc_006, npc_007) add 2 partner-talk lines at 90.
+// Romanceable NPCs (npc_002, npc_006, npc_007) add 2 partner-talk lines at 90 (minStage partner),
+// then 3 spouse-only lines at 90 (minStage spouse). A spouse also satisfies minStage partner.
 // Lines within a set MUST stay sorted by minAffection ascending (checked in src/tests/content.test.ts).
 // affectionDelta is left unset: RelationshipSystem grants affection.
 export const dialogues: Record<string, DialogueSet> = {
@@ -33,6 +34,9 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_002_09", text: "我這人嘴碎，但對你的心意可是認真的。", minAffection: 85 },
       { id: "dlg_npc_002_10", text: "今晚打烊後，要不要陪我去吃宵夜？", minAffection: 90, minStage: "partner" },
       { id: "dlg_npc_002_11", text: "有你在身邊，連算帳都變得開心了呢。", minAffection: 90, minStage: "partner" },
+      { id: "dlg_npc_002_12", text: "回到家還有你等著，真好。", minAffection: 90, minStage: "spouse" },
+      { id: "dlg_npc_002_13", text: "我們的小家，我每天都想把它收拾得暖暖的。", minAffection: 90, minStage: "spouse" },
+      { id: "dlg_npc_002_14", text: "等孩子出生，我要把算盤也教給他呢。", minAffection: 90, minStage: "spouse" },
     ],
   },
   dlg_npc_003: {
@@ -91,6 +95,9 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_006_09", text: "下班後想到能見到你，我就有力氣了。", minAffection: 85 },
       { id: "dlg_npc_006_10", text: "以後不管多忙，每天都要跟你說晚安。", minAffection: 90, minStage: "partner" },
       { id: "dlg_npc_006_11", text: "我的人生計畫表裡，終於有你的位置了。", minAffection: 90, minStage: "partner" },
+      { id: "dlg_npc_006_12", text: "下班回家能看到你，比什麼都好。", minAffection: 90, minStage: "spouse" },
+      { id: "dlg_npc_006_13", text: "等有了寶寶，我一定比現在更準時下班。", minAffection: 90, minStage: "spouse" },
+      { id: "dlg_npc_006_14", text: "週末我們一起大掃除，再去買菜吧。", minAffection: 90, minStage: "spouse" },
     ],
   },
   dlg_npc_007: {
@@ -107,6 +114,9 @@ export const dialogues: Record<string, DialogueSet> = {
       { id: "dlg_npc_007_09", text: "你是我唯一願意讓他看草稿的人。", minAffection: 85 },
       { id: "dlg_npc_007_10", text: "有你在，我的每一幅畫都有了溫度。", minAffection: 90, minStage: "partner" },
       { id: "dlg_npc_007_11", text: "以後的展覽，我想第一個帶你去看。", minAffection: 90, minStage: "partner" },
+      { id: "dlg_npc_007_12", text: "我把畫室最亮的那面牆，留給我們的寶寶。", minAffection: 90, minStage: "spouse" },
+      { id: "dlg_npc_007_13", text: "晚飯後一起在窗邊看書，時間慢慢流過。", minAffection: 90, minStage: "spouse" },
+      { id: "dlg_npc_007_14", text: "有家人在身邊，我的畫筆也變得更溫柔了。", minAffection: 90, minStage: "spouse" },
     ],
   },
   dlg_npc_008: {

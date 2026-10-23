@@ -89,6 +89,7 @@ export const STAGE_LABEL: Record<RelationshipStage, string> = {
   acquaintance: "熟識",
   close: "親密",
   partner: "伴侶",
+  spouse: "配偶",
 };
 
 const NEED_LABEL = { stamina: "體力", satiety: "飽足", mood: "心情" } as const;
@@ -427,6 +428,14 @@ export class GameController implements WorldBridge {
         return "完成特定事件";
       case "noOtherPartner":
         return "目前沒有其他伴侶";
+      case "hasItem":
+        return `持有${this.content.items[c.itemId]?.name ?? c.itemId}`;
+      case "marriedDays":
+        return `結婚滿${c.atLeast}天`;
+      case "childrenAtMost":
+        return `孩子不超過${c.count}位`;
+      case "notPregnant":
+        return "目前沒有待產";
     }
   }
 

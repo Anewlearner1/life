@@ -2,7 +2,7 @@ import { GameConfig } from "../game/GameConfig";
 import type { ContentDB, DialogueLine, EventDefinition, GameState, Relationship, RelationshipStage } from "../game/types";
 import { availableEvents } from "./EventSystem";
 
-const STAGE_ORDER: RelationshipStage[] = ["stranger", "acquaintance", "close", "partner"];
+const STAGE_ORDER: RelationshipStage[] = ["stranger", "acquaintance", "close", "partner", "spouse"];
 export const stageRank = (s: RelationshipStage): number => STAGE_ORDER.indexOf(s);
 
 export function getRel(state: GameState, npcId: string): Relationship {
@@ -14,11 +14,20 @@ function stageFor(affection: number): RelationshipStage {
   return affection >= t.close ? "close" : affection >= t.acquaintance ? "acquaintance" : "stranger";
 }
 
-/** `partner` is only ever set by events (setStage) and is never downgraded here. */
+/** Sets a stage explicitly (events, marriage) and tracks when the partnership began. */
+export function setStage(state: GameState, npcId: string, stage: RelationshipStage): Relationship {
+  const rel = getRel(state, npcId);
+  rel.stage = stage;
+  if (stage === "partner") rel.partnerSinceMinute ??= state.gameClock.totalMinutes;
+  else if (stageRank(stage) < stageRank("partner")) delete rel.partnerSinceMinute;
+  return rel;
+}
+
+/** `partner`/`spouse` are only ever set explicitly (events, marriage) and are never downgraded here. */
 export function changeAffection(state: GameState, npcId: string, delta: number): Relationship {
   const rel = getRel(state, npcId);
   rel.affection = Math.min(100, Math.max(0, rel.affection + delta));
-  if (rel.stage !== "partner") rel.stage = stageFor(rel.affection);
+  if (rel.stage !== "partner" && rel.stage !== "spouse") rel.stage = stageFor(rel.affection);
   return rel;
 }
 

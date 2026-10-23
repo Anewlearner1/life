@@ -29,7 +29,7 @@ export type MinigameConfig = {
 };
 
 export const GameConfig = {
-  schemaVersion: 1,
+  schemaVersion: 2,
 
   time: {
     normalMinutesPerSecond: 1, // A1.2 [建議]
@@ -91,6 +91,46 @@ export const GameConfig = {
       ],
     },
   } as Record<string, MinigameConfig>,
+
+  /** Calendar & aging (PRD P-18 future systems; all [建議], tune freely). */
+  calendar: {
+    daysPerSeason: 7, // 4 seasons → 28-day year
+    seasons: ["spring", "summer", "autumn", "winter"] as const,
+    playerStartAge: 22,
+    /** Children age this many times faster than adults so a generation fits in play time. */
+    childAgingMultiplier: 6,
+    /** Age thresholds (years) for LifeStage. */
+    stages: { child: 3, teen: 12, adult: 18, elder: 60 },
+    /** Elders have a lower stamina cap. */
+    elderStaminaCap: 70,
+  },
+
+  weather: {
+    /** Daily weather odds per season (must sum to 1). */
+    odds: {
+      spring: { sunny: 0.5, cloudy: 0.3, rain: 0.2, snow: 0 },
+      summer: { sunny: 0.6, cloudy: 0.2, rain: 0.2, snow: 0 },
+      autumn: { sunny: 0.4, cloudy: 0.35, rain: 0.25, snow: 0 },
+      winter: { sunny: 0.3, cloudy: 0.3, rain: 0.1, snow: 0.3 },
+    },
+    /** Mood change per game hour spent outdoors in rain/snow. */
+    badWeatherMoodPerHour: -1,
+    /** Farm shifts are closed on snow days. */
+    farmClosedOnSnow: true,
+  },
+
+  family: {
+    ringItemId: "item_ring",
+    /** Partner for at least this many days and affection ≥ proposeAffection before proposing. */
+    minPartnerDays: 3,
+    proposeAffection: 90,
+    pregnancyDays: 7,
+    maxChildren: 3,
+    /** Heir must be at least this old (years) to take over the household. */
+    successionAge: 18,
+    /** Money the heir keeps (fraction). */
+    inheritanceRate: 1,
+  },
 
   relationship: {
     /** A5.1 thresholds [建議]. */

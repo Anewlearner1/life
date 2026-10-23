@@ -1,10 +1,32 @@
 import { GameConfig } from "../game/GameConfig";
 import type { SaveData } from "../game/types";
+import { minutesPerYear } from "../systems/CalendarSystem";
+import { hashString, rollWeather } from "../systems/WeatherSystem";
 
 type Raw = Record<string, unknown>;
 
 /** MIGRATIONS[n] upgrades a save from schema n to n+1. Add entries when bumping GameConfig.schemaVersion. */
-const MIGRATIONS: Record<number, (save: Raw) => Raw> = {};
+const MIGRATIONS: Record<number, (save: Raw) => Raw> = {
+  // v1 -> v2: family, weather, worldSeed, player.birthMinute (PRD P-18).
+  1: (save) => {
+    const gs = save.gameState;
+    if (!isObj(gs) || !isObj(gs.player) || !isObj(gs.gameClock)) return save; // assertShape rejects it later
+    const player = gs.player;
+    const total = isNum(gs.gameClock.totalMinutes) ? gs.gameClock.totalMinutes : 0;
+    const worldSeed = isNum(gs.worldSeed) ? gs.worldSeed : hashString(String(player.name ?? ""));
+    const day = Math.floor(total / (24 * 60));
+    return {
+      ...save,
+      gameState: {
+        ...gs,
+        player: { ...player, birthMinute: isNum(player.birthMinute) ? player.birthMinute : total - GameConfig.calendar.playerStartAge * minutesPerYear() },
+        family: isObj(gs.family) ? gs.family : { children: [], generation: 1, ancestors: [] },
+        weather: isObj(gs.weather) ? gs.weather : { day, kind: rollWeather(worldSeed, day) },
+        worldSeed,
+      },
+    };
+  },
+};
 
 const isObj = (v: unknown): v is Raw => typeof v === "object" && v !== null && !Array.isArray(v);
 const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);

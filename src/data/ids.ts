@@ -40,3 +40,5 @@ export const NPC_IDS = [
 export const JOB = { barista: "job_barista", farmhand: "job_farmhand" } as const;
 export const MINIGAME = { rhythmCafe: "mg_rhythm_cafe", rhythmFarm: "mg_rhythm_farm" } as const;
 export const COND = { unlockRural: "cond_unlock_rural" } as const;
+
+export const ITEM = { ring: "item_ring" } as const;

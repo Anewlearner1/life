@@ -1,5 +1,5 @@
 import type { ConditionDefinition, EventDefinition } from "../game/types";
-import { COND, LOC } from "./ids";
+import { COND, ITEM, LOC } from "./ids";
 
 export const conditions: Record<string, ConditionDefinition> = {
   [COND.unlockRural]: {
@@ -36,6 +36,53 @@ export const conditions: Record<string, ConditionDefinition> = {
     ],
   },
 
+  cond_artist_propose: {
+    id: "cond_artist_propose",
+    all: [
+      { type: "stage", npcId: "npc_007", stage: "partner" },
+      { type: "noOtherPartner", npcId: "npc_007" },
+      { type: "affection", npcId: "npc_007", atLeast: 90 },
+      { type: "hasItem", itemId: ITEM.ring },
+      { type: "eventCompleted", eventId: "ev_artist_partner_followup" },
+    ],
+  },
+  cond_artist_newlywed: {
+    id: "cond_artist_newlywed",
+    all: [
+      { type: "stage", npcId: "npc_007", stage: "spouse" },
+      { type: "marriedDays", atLeast: 1 },
+    ],
+  },
+  cond_artist_baby_1: {
+    id: "cond_artist_baby_1",
+    all: [
+      { type: "stage", npcId: "npc_007", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 0 },
+      { type: "notPregnant" },
+    ],
+  },
+  cond_artist_baby_2: {
+    id: "cond_artist_baby_2",
+    all: [
+      { type: "stage", npcId: "npc_007", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 1 },
+      { type: "notPregnant" },
+      { type: "eventCompleted", eventId: "ev_artist_baby_1" },
+    ],
+  },
+  cond_artist_baby_3: {
+    id: "cond_artist_baby_3",
+    all: [
+      { type: "stage", npcId: "npc_007", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 2 },
+      { type: "notPregnant" },
+      { type: "eventCompleted", eventId: "ev_artist_baby_2" },
+    ],
+  },
+
   // ---- romance: 李美玲 (npc_002) ----
   cond_shop_meet: {
     id: "cond_shop_meet",
@@ -65,6 +112,53 @@ export const conditions: Record<string, ConditionDefinition> = {
     ],
   },
 
+  cond_shop_propose: {
+    id: "cond_shop_propose",
+    all: [
+      { type: "stage", npcId: "npc_002", stage: "partner" },
+      { type: "noOtherPartner", npcId: "npc_002" },
+      { type: "affection", npcId: "npc_002", atLeast: 90 },
+      { type: "hasItem", itemId: ITEM.ring },
+      { type: "eventCompleted", eventId: "ev_shop_partner_followup" },
+    ],
+  },
+  cond_shop_newlywed: {
+    id: "cond_shop_newlywed",
+    all: [
+      { type: "stage", npcId: "npc_002", stage: "spouse" },
+      { type: "marriedDays", atLeast: 1 },
+    ],
+  },
+  cond_shop_baby_1: {
+    id: "cond_shop_baby_1",
+    all: [
+      { type: "stage", npcId: "npc_002", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 0 },
+      { type: "notPregnant" },
+    ],
+  },
+  cond_shop_baby_2: {
+    id: "cond_shop_baby_2",
+    all: [
+      { type: "stage", npcId: "npc_002", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 1 },
+      { type: "notPregnant" },
+      { type: "eventCompleted", eventId: "ev_shop_baby_1" },
+    ],
+  },
+  cond_shop_baby_3: {
+    id: "cond_shop_baby_3",
+    all: [
+      { type: "stage", npcId: "npc_002", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 2 },
+      { type: "notPregnant" },
+      { type: "eventCompleted", eventId: "ev_shop_baby_2" },
+    ],
+  },
+
   // ---- romance: 許偉杰 (npc_006) ----
   cond_office_meet: {
     id: "cond_office_meet",
@@ -91,6 +185,53 @@ export const conditions: Record<string, ConditionDefinition> = {
       { type: "stage", npcId: "npc_006", stage: "partner" },
       { type: "eventCompleted", eventId: "ev_office_confess" },
       { type: "day", atLeast: 1 },
+    ],
+  },
+
+  cond_office_propose: {
+    id: "cond_office_propose",
+    all: [
+      { type: "stage", npcId: "npc_006", stage: "partner" },
+      { type: "noOtherPartner", npcId: "npc_006" },
+      { type: "affection", npcId: "npc_006", atLeast: 90 },
+      { type: "hasItem", itemId: ITEM.ring },
+      { type: "eventCompleted", eventId: "ev_office_partner_followup" },
+    ],
+  },
+  cond_office_newlywed: {
+    id: "cond_office_newlywed",
+    all: [
+      { type: "stage", npcId: "npc_006", stage: "spouse" },
+      { type: "marriedDays", atLeast: 1 },
+    ],
+  },
+  cond_office_baby_1: {
+    id: "cond_office_baby_1",
+    all: [
+      { type: "stage", npcId: "npc_006", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 0 },
+      { type: "notPregnant" },
+    ],
+  },
+  cond_office_baby_2: {
+    id: "cond_office_baby_2",
+    all: [
+      { type: "stage", npcId: "npc_006", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 1 },
+      { type: "notPregnant" },
+      { type: "eventCompleted", eventId: "ev_office_baby_1" },
+    ],
+  },
+  cond_office_baby_3: {
+    id: "cond_office_baby_3",
+    all: [
+      { type: "stage", npcId: "npc_006", stage: "spouse" },
+      { type: "marriedDays", atLeast: 3 },
+      { type: "childrenAtMost", count: 2 },
+      { type: "notPregnant" },
+      { type: "eventCompleted", eventId: "ev_office_baby_2" },
     ],
   },
 
@@ -220,6 +361,89 @@ export const events: Record<string, EventDefinition> = {
     ],
   },
 
+  ev_artist_propose: {
+    id: "ev_artist_propose",
+    triggerType: "talk",
+    npcId: "npc_007",
+    conditionIds: ["cond_artist_propose"],
+    effects: [
+      { type: "consumeItem", itemId: ITEM.ring, count: 1 },
+      { type: "marry", npcId: "npc_007" },
+      { type: "need", delta: { mood: 20 } },
+      { type: "message", text: "你們結婚了！" },
+    ],
+    lines: [
+      "黃昏的畫室裡，晚霞映滿了整面牆。",
+      "你單膝跪下，把婚戒輕輕放在她的掌心。",
+      "「我想把之後的每一幅畫，都和你一起完成。」",
+      "沈若溪含著淚點頭，笑得像陽光一樣燦爛。",
+      "「好，我願意。」",
+    ],
+    timeCostMinutes: 240,
+  },
+  ev_artist_newlywed: {
+    id: "ev_artist_newlywed",
+    triggerType: "dayStart",
+    npcId: "npc_007",
+    conditionIds: ["cond_artist_newlywed"],
+    effects: [
+      { type: "need", delta: { mood: 10 } },
+      { type: "message", text: "新婚的第一天，家裡暖洋洋的。" },
+    ],
+    lines: [
+      "新婚的第一個早晨，陽光透過窗簾灑進來。",
+      "沈若溪還在睡夢中，手卻緊緊抓著你的衣角。",
+      "「原來每天醒來都能看到你，是這種感覺呀。」",
+      "你輕輕吻了吻她的額頭，今天也是溫暖的一天。",
+    ],
+  },
+  ev_artist_baby_1: {
+    id: "ev_artist_baby_1",
+    triggerType: "talk",
+    npcId: "npc_007",
+    conditionIds: ["cond_artist_baby_1"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "沈若溪拿著驗孕棒，眼睛亮晶晶的。",
+      "「我們要有寶寶了，你聽見了嗎？」",
+      "你把她擁進懷裡，心裡滿是說不出的喜悅。",
+      "「以後，這個家會更熱鬧了呢。」",
+    ],
+  },
+  ev_artist_baby_2: {
+    id: "ev_artist_baby_2",
+    triggerType: "talk",
+    npcId: "npc_007",
+    conditionIds: ["cond_artist_baby_2"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "沈若溪在窗邊畫了一幅小小的搖籃。",
+      "「這次的小傢伙，要和大寶寶好好相處喔。」",
+      "「我想把我們的家，一筆一筆畫得更溫暖。」",
+    ],
+  },
+  ev_artist_baby_3: {
+    id: "ev_artist_baby_3",
+    triggerType: "talk",
+    npcId: "npc_007",
+    conditionIds: ["cond_artist_baby_3"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "沈若溪把畫室的一角改成小小的遊戲區。",
+      "「最後這個孩子，我要畫進我們最滿意的一幅畫。」",
+      "「三個寶貝，就是我一生最好的作品。」",
+    ],
+  },
+
   // ---- 李美玲 (npc_002) ----
   ev_shop_meet: {
     id: "ev_shop_meet",
@@ -288,6 +512,90 @@ export const events: Record<string, EventDefinition> = {
     ],
   },
 
+  ev_shop_propose: {
+    id: "ev_shop_propose",
+    triggerType: "talk",
+    npcId: "npc_002",
+    conditionIds: ["cond_shop_propose"],
+    effects: [
+      { type: "consumeItem", itemId: ITEM.ring, count: 1 },
+      { type: "marry", npcId: "npc_002" },
+      { type: "need", delta: { mood: 20 } },
+      { type: "message", text: "你們結婚了！" },
+    ],
+    lines: [
+      "雜貨店打烊後，店裡只剩下收銀機的聲音。",
+      "你把戒指遞到她面前，聲音有點發抖。",
+      "「這輩子的帳，我想跟你一起算下去。」",
+      "李美玲愣了兩秒，眼眶一下子紅了。",
+      "「傻瓜，這麼大的事，你還讓我先算一下！」",
+      "「好啦，我答應你，這筆帳我認了。」",
+    ],
+    timeCostMinutes: 240,
+  },
+  ev_shop_newlywed: {
+    id: "ev_shop_newlywed",
+    triggerType: "dayStart",
+    npcId: "npc_002",
+    conditionIds: ["cond_shop_newlywed"],
+    effects: [
+      { type: "need", delta: { mood: 10 } },
+      { type: "message", text: "新婚的第一天，家裡暖洋洋的。" },
+    ],
+    lines: [
+      "新婚的早晨，雜貨店的捲門還沒拉起來。",
+      "李美玲在廚房煎蛋，香味飄滿了整間屋子。",
+      "「以後早餐我包了，你負責把碗洗乾淨。」",
+      "你笑著答應，覺得這個家比什麼都踏實。",
+    ],
+  },
+  ev_shop_baby_1: {
+    id: "ev_shop_baby_1",
+    triggerType: "talk",
+    npcId: "npc_002",
+    conditionIds: ["cond_shop_baby_1"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "李美玲拿著驗孕棒，愣在浴室門口。",
+      "「我們……要有寶寶了？」她的聲音有點發顫。",
+      "你把她緊緊抱住，心裡滿是說不出的喜悅。",
+      "「那就從今天起，我們好好存錢吧！」",
+    ],
+  },
+  ev_shop_baby_2: {
+    id: "ev_shop_baby_2",
+    triggerType: "talk",
+    npcId: "npc_002",
+    conditionIds: ["cond_shop_baby_2"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "李美玲把小嬰兒床搬到窗邊，仔細地量了又量。",
+      "「這次的小寶貝，要好好跟大寶寶相處喔。」",
+      "「家裡又要熱鬧一點了，我的算盤可要加倍忙了。」",
+    ],
+  },
+  ev_shop_baby_3: {
+    id: "ev_shop_baby_3",
+    triggerType: "talk",
+    npcId: "npc_002",
+    conditionIds: ["cond_shop_baby_3"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "李美玲把舊衣服一件件洗乾淨，整齊收進衣櫃。",
+      "「這些衣服還很新，留給最後一位小寶貝吧。」",
+      "「我們的家，再添一個小小的笑聲。」",
+    ],
+  },
+
   // ---- 許偉杰 (npc_006) ----
   ev_office_meet: {
     id: "ev_office_meet",
@@ -353,6 +661,89 @@ export const events: Record<string, EventDefinition> = {
       "許偉杰傳來一張便利商店早餐的照片。",
       "「今天也要加油，中午我請你吃飯！」",
       "你回了個笑臉，今天的上班好像輕鬆一點。",
+    ],
+  },
+
+  ev_office_propose: {
+    id: "ev_office_propose",
+    triggerType: "talk",
+    npcId: "npc_006",
+    conditionIds: ["cond_office_propose"],
+    effects: [
+      { type: "consumeItem", itemId: ITEM.ring, count: 1 },
+      { type: "marry", npcId: "npc_006" },
+      { type: "need", delta: { mood: 20 } },
+      { type: "message", text: "你們結婚了！" },
+    ],
+    lines: [
+      "下班後的公園，晚風吹得人很舒服。",
+      "許偉杰難得沒有滑手機，只是盯著你看。",
+      "「我加班加了這麼多年，最想拚的是跟你的以後。」",
+      "你把戒指遞過去，他一時忘了呼吸。",
+      "「好！我願意！這次不用加班，我保證！」",
+    ],
+    timeCostMinutes: 240,
+  },
+  ev_office_newlywed: {
+    id: "ev_office_newlywed",
+    triggerType: "dayStart",
+    npcId: "npc_006",
+    conditionIds: ["cond_office_newlywed"],
+    effects: [
+      { type: "need", delta: { mood: 10 } },
+      { type: "message", text: "新婚的第一天，家裡暖洋洋的。" },
+    ],
+    lines: [
+      "新婚的早晨，鬧鐘居然是許偉杰自己設的。",
+      "他難得沒有賴床，還煎好了兩個荷包蛋。",
+      "「以後我每天準時下班，回家吃你煮的飯。」",
+      "你笑著說好，覺得今天的陽光特別溫暖。",
+    ],
+  },
+  ev_office_baby_1: {
+    id: "ev_office_baby_1",
+    triggerType: "talk",
+    npcId: "npc_006",
+    conditionIds: ["cond_office_baby_1"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "許偉杰看著驗孕棒，手裡的咖啡灑了一地。",
+      "「我……我要當爸爸了？我沒聽錯吧？」",
+      "你笑著點頭，他一把將你抱起來轉了一圈。",
+      "「從今天起，我的加班時數全部歸零！」",
+    ],
+  },
+  ev_office_baby_2: {
+    id: "ev_office_baby_2",
+    triggerType: "talk",
+    npcId: "npc_006",
+    conditionIds: ["cond_office_baby_2"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "許偉杰在客廳組裝嬰兒床，說明書看得滿頭大汗。",
+      "「這次我一定要一次就組好，不能再拆了。」",
+      "「家裡多一個小傢伙，生活會更有活力吧。」",
+    ],
+  },
+  ev_office_baby_3: {
+    id: "ev_office_baby_3",
+    triggerType: "talk",
+    npcId: "npc_006",
+    conditionIds: ["cond_office_baby_3"],
+    effects: [
+      { type: "conceive" },
+      { type: "message", text: "家裡即將迎接新成員！" },
+    ],
+    lines: [
+      "許偉杰把全家的行事曆排得滿滿的，每格都寫著寶貝。",
+      "「三個寶貝，我的人生計畫表又要改了。」",
+      "「不過，有你們在，再累我也甘願。」",
     ],
   },
 

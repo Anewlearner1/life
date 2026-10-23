@@ -47,6 +47,12 @@ export function canStartWork(
   if (!job) return { ok: false, reason: "找不到工作" };
   const shift = shiftAt(job, state.gameClock.totalMinutes);
   if (!shift) return { ok: false, reason: "不在班表時段" };
+  if (
+    GameConfig.weather.farmClosedOnSnow && state.weather.kind === "snow" &&
+    (job.minigameId === "mg_rhythm_farm" || job.id.includes("farm"))
+  ) {
+    return { ok: false, reason: "下雪天農場休息" };
+  }
   const loc = content.locations[job.workplaceLocationId];
   const p = state.player.position;
   // Standing on or next to the door counts as being at the workplace.

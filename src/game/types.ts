@@ -36,6 +36,8 @@ export type Player = {
   needs: NeedState;
   money: number;
   currentJobId?: string;
+  /** Game minute of birth; age is derived (CalendarSystem.ageYears). */
+  birthMinute: GameMinute;
 };
 
 // ---------- content definitions (static data in src/data) ----------
@@ -78,7 +80,7 @@ export type NPC = {
   currentActivity: string;
 };
 
-export type RelationshipStage = "stranger" | "acquaintance" | "close" | "partner";
+export type RelationshipStage = "stranger" | "acquaintance" | "close" | "partner" | "spouse";
 
 export type Relationship = {
   npcId: string;
@@ -87,6 +89,8 @@ export type Relationship = {
   completedEventIds: string[];
   /** Game minute of the last affection-giving talk, for cooldown. */
   lastTalkMinute?: GameMinute;
+  /** Game minute the stage became "partner" (set by RelationshipSystem.setStage); used for minPartnerDays. */
+  partnerSinceMinute?: GameMinute;
 };
 
 export type ShiftRule = {
@@ -146,6 +150,8 @@ export type MapDefinition = {
   locationIds: string[];
   unlockConditionId?: string;
   spawn: { x: number; y: number };
+  /** Interiors: no weather, softer day/night tint. */
+  indoor?: boolean;
   /** Buildings, trees, decorations. x,y = top-left tile of the prop footprint. */
   props: MapProp[];
 };
@@ -177,7 +183,12 @@ export type Condition =
   | { type: "shiftsWorked"; atLeast: number }
   | { type: "day"; atLeast: number }
   /** True while the player has no partner other than npcId (keeps romance exclusive). */
-  | { type: "noOtherPartner"; npcId: string };
+  | { type: "noOtherPartner"; npcId: string }
+  | { type: "hasItem"; itemId: string; count?: number }
+  /** Days since marriage ≥ atLeast (false when unmarried). */
+  | { type: "marriedDays"; atLeast: number }
+  | { type: "childrenAtMost"; count: number }
+  | { type: "notPregnant" };
 
 export type ConditionDefinition = { id: string; all: Condition[] };
 
@@ -187,7 +198,12 @@ export type Effect =
   | { type: "money"; delta: number; reason: string }
   | { type: "need"; delta: Partial<NeedState> }
   | { type: "unlockMap"; mapId: string }
-  | { type: "message"; text: string };
+  | { type: "message"; text: string }
+  | { type: "consumeItem"; itemId: string; count?: number }
+  /** Marriage: sets stage "spouse" and FamilyState.spouseNpcId (FamilySystem). */
+  | { type: "marry"; npcId: string }
+  /** Starts a pregnancy; the baby is born GameConfig.family.pregnancyDays later (FamilySystem). */
+  | { type: "conceive" };
 
 export type EventTrigger = "talk" | "dayStart" | "manual" | "enterLocation";
 
@@ -210,6 +226,39 @@ export type EventState = {
   completedAtGameMinute?: GameMinute;
 };
 
+export type Season = "spring" | "summer" | "autumn" | "winter";
+export type Weather = "sunny" | "cloudy" | "rain" | "snow";
+export type LifeStage = "baby" | "child" | "teen" | "adult" | "elder";
+
+export type FamilyMember = {
+  id: string; // "child_1", ...
+  name: string;
+  birthMinute: GameMinute;
+  appearance: CharacterAppearance;
+  /** The other parent (spouse NPC id). */
+  otherParentNpcId?: string;
+};
+
+export type AncestorRecord = {
+  generation: number;
+  name: string;
+  spouseName?: string;
+  /** Day index (0-based) when they passed the household on. */
+  retiredDay: number;
+  ageAtRetirement: number;
+};
+
+export type FamilyState = {
+  spouseNpcId?: string;
+  marriedAtMinute?: GameMinute;
+  children: FamilyMember[];
+  /** 0-based day index on which the baby is born; undefined = not expecting. */
+  babyDueDay?: number;
+  /** 1 for the first character; +1 on each succession. */
+  generation: number;
+  ancestors: AncestorRecord[];
+};
+
 export type GameState = {
   schemaVersion: number;
   gameClock: GameClock;
@@ -224,6 +273,11 @@ export type GameState = {
   workSessions: WorkSession[];
   /** Last day index whose day-start processing ran (prevents double processing). */
   lastProcessedDay: number;
+  family: FamilyState;
+  /** Weather of the current day, rolled at day start (WeatherSystem). */
+  weather: { day: number; kind: Weather };
+  /** Seed for deterministic per-save randomness (weather, names). */
+  worldSeed: number;
 };
 
 export type SaveData = {

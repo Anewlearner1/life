@@ -1,8 +1,10 @@
 import { GameConfig } from "../game/GameConfig";
 import type { ContentDB, GameMinute, GameState, NeedKey, TimeMode } from "../game/types";
 import { availableEvents, checkUnlocks, fireEvent } from "./EventSystem";
-import { applyHourly, lowNeeds } from "./NeedsSystem";
+import { processFamilyDay } from "./FamilySystem";
+import { applyHourly, applyNeedDelta, lowNeeds } from "./NeedsSystem";
 import { updateNPCs } from "./NPCScheduleSystem";
+import { isIndoor, rollWeather } from "./WeatherSystem";
 
 export const MINUTES_PER_HOUR = 60;
 export const MINUTES_PER_DAY = 24 * MINUTES_PER_HOUR;
@@ -55,6 +57,8 @@ function processDayStart(state: GameState, content: ContentDB, res: AdvanceResul
   res.dayChanged = true;
   res.saveRequested = true;
   res.messages.push(`第${day + 1}天開始了`);
+  state.weather = { day, kind: rollWeather(state.worldSeed, day) };
+  res.messages.push(...processFamilyDay(state, content));
   updateNPCs(state, content);
   for (const e of availableEvents(state, content, "dayStart")) {
     const fired = fireEvent(state, content, e.id);
@@ -86,6 +90,10 @@ export function advanceGameTime(state: GameState, content: ContentDB, minutes: n
     clock.totalMinutes = boundary; // exact, so midnight detection never drifts
     left -= gap;
     applyHourly(state, 1);
+    // The hour that just ended still belongs to the previous day's weather.
+    if ((state.weather.kind === "rain" || state.weather.kind === "snow") && !isIndoor(content, state.player.position.mapId)) {
+      applyNeedDelta(state, { mood: GameConfig.weather.badWeatherMoodPerHour });
+    }
     if (clock.totalMinutes % MINUTES_PER_DAY === 0) processDayStart(state, content, res);
   }
 

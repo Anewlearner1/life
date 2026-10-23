@@ -1,7 +1,8 @@
 import type { Condition, ContentDB, EventDefinition, EventTrigger, GameState } from "../game/types";
 import { addTransaction } from "./EconomySystem";
 import { applyNeedDelta } from "./NeedsSystem";
-import { changeAffection, getRel, stageRank } from "./RelationshipSystem";
+import { changeAffection, getRel, setStage, stageRank } from "./RelationshipSystem";
+import { conceive, consumeItem, itemCount, marry } from "./FamilySystem";
 
 const MINUTES_PER_DAY = 24 * 60;
 
@@ -20,7 +21,20 @@ function check(state: GameState, c: Condition): boolean {
     case "day": // 1-based day number, as displayed ("第N天")
       return Math.floor(state.gameClock.totalMinutes / MINUTES_PER_DAY) + 1 >= c.atLeast;
     case "noOtherPartner":
-      return !Object.values(state.relationships).some((r) => r.stage === "partner" && r.npcId !== c.npcId);
+      return !Object.values(state.relationships).some(
+        (r) => (r.stage === "partner" || r.stage === "spouse") && r.npcId !== c.npcId,
+      );
+    case "hasItem":
+      return itemCount(state, c.itemId) >= (c.count ?? 1);
+    case "marriedDays": {
+      const f = state.family;
+      return f.spouseNpcId !== undefined && f.marriedAtMinute !== undefined &&
+        Math.floor((state.gameClock.totalMinutes - f.marriedAtMinute) / MINUTES_PER_DAY) >= c.atLeast;
+    }
+    case "childrenAtMost":
+      return state.family.children.length <= c.count;
+    case "notPregnant":
+      return state.family.babyDueDay === undefined;
   }
 }
 
@@ -65,7 +79,16 @@ export function fireEvent(
         changeAffection(state, fx.npcId, fx.delta);
         break;
       case "setStage":
-        getRel(state, fx.npcId).stage = fx.stage;
+        setStage(state, fx.npcId, fx.stage);
+        break;
+      case "consumeItem":
+        consumeItem(state, fx.itemId, fx.count ?? 1);
+        break;
+      case "marry":
+        marry(state, fx.npcId);
+        break;
+      case "conceive":
+        conceive(state);
         break;
       case "money":
         if (

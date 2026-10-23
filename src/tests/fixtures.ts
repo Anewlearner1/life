@@ -85,3 +85,42 @@ export function standAt(state: GameState, content: ContentDB, locationId: string
   state.player.position = { mapId: loc.mapId, x: loc.door.x, y: loc.door.y, facing: "down" };
   state.currentMapId = loc.mapId;
 }
+
+// ---------- second-phase (family / weather) fixtures; test-local, independent of src/data content ----------
+
+export const RING = "item_ring";
+export const FARM_JOB = "job_farmhand";
+export const HOME_IN = "map_home_in";
+
+/** makeContent() plus a ring, an indoor home interior with a bed, a farm job and family conditions/events. */
+export function makeFamilyContent(opts: { withBed?: boolean } = {}): ContentDB {
+  const c = makeContent();
+  const withBed = opts.withBed ?? true;
+  c.items[RING] = { id: RING, name: "Ring", price: 500, iconAsset: "r.png" };
+  if (withBed) {
+    c.maps[HOME_IN] = { id: HOME_IN, name: "Home inside", width: 10, height: 8, rows: Array(8).fill("W".repeat(10)), locationIds: [LOC.homeBed], spawn: { x: 4, y: 6 }, indoor: true, props: [] };
+    c.locations[LOC.homeBed] = { id: LOC.homeBed, mapId: HOME_IN, name: "Bed", type: "home", door: { x: 1, y: 3 }, interactionIds: [] };
+  }
+  c.jobs[FARM_JOB] = {
+    id: FARM_JOB, name: "Farmhand", workplaceLocationId: LOC.farm,
+    shiftRules: [{ startMinute: 9 * 60, endMinute: 13 * 60 }],
+    baseWage: 120, minigameId: "mg_rhythm_farm", needDelta: { stamina: -20 }, durationMinutes: 180,
+  };
+  c.conditions.c_ring = { id: "c_ring", all: [{ type: "hasItem", itemId: RING }] };
+  c.conditions.c_baby = { id: "c_baby", all: [{ type: "marriedDays", atLeast: 1 }, { type: "childrenAtMost", count: 2 }, { type: "notPregnant" }] };
+  c.events.ev_baby = { id: "ev_baby", triggerType: "manual", npcId: ARTIST, conditionIds: ["c_baby"], effects: [{ type: "conceive" }], lines: [] };
+  c.events.ev_marry = {
+    id: "ev_marry", triggerType: "manual", npcId: ARTIST, conditionIds: ["c_ring"],
+    effects: [{ type: "consumeItem", itemId: RING }, { type: "marry", npcId: ARTIST }], lines: ["I do"],
+  };
+  return c;
+}
+
+/** Makes the artist a long-standing partner with max affection and gives the player a ring. */
+export function makeMarriageReady(state: GameState): void {
+  const rel = state.relationships[ARTIST];
+  rel.stage = "partner";
+  rel.affection = 100;
+  rel.partnerSinceMinute = state.gameClock.totalMinutes - 10 * 1440;
+  state.inventory[RING] = 1;
+}
