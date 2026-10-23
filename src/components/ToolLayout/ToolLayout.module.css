@@ -1,0 +1,7 @@
+.options { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 14px; margin: 16px 0; }
+.options legend { font-weight: 600; padding: 0 6px; }
+.panes { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 800px) { .panes { grid-template-columns: 1fr 1fr; } }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; padding: 0; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
+.empty { color: var(--muted); margin: 12px 0 0; }

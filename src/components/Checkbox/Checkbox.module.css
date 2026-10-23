@@ -1,0 +1,6 @@
+.option { display: flex; align-items: flex-start; gap: 4px; padding: 2px 0; }
+.input { width: 22px; height: 22px; margin: 11px 0 0; flex: none; accent-color: var(--primary); cursor: pointer; }
+.input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.text { padding: 8px 6px; min-height: 44px; }
+.label { font-weight: 600; cursor: pointer; display: inline-block; }
+.hint { margin: 0; color: var(--muted); font-size: 0.8125rem; }

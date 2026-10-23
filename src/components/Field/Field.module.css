@@ -1,0 +1,11 @@
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.label { font-weight: 600; }
+.textarea {
+  width: 100%; min-height: 260px; resize: vertical; padding: 12px;
+  font: inherit; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Noto Sans TC", monospace; font-size: 0.95rem; line-height: 1.6;
+  color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  white-space: pre; overflow: auto;
+}
+.textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; border-color: var(--muted); }
+.textarea[readonly] { background: var(--bg); }

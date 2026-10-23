@@ -1,0 +1,4 @@
+.wrap { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.ok { color: var(--success); font-size: 0.875rem; }
+.error { color: var(--danger); font-size: 0.875rem; }
+.ok:empty, .error:empty { display: none; }
