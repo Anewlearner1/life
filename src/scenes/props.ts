@@ -72,6 +72,9 @@ export const propsCatalog: Record<string, PropDef> = {
 
   // Interior furniture. Doors of these props lie one tile in front (outside the footprint).
   bed: b("bed", "objects/furniture/BLD_006_Bed_v01.png", 1, 2, ["#", "#"], { door: { x: 0, y: 2 } }),
+  // Family furniture: texture swaps / dynamic props placed by WorldScene (not in map data). The crib image is 24px tall.
+  doublebed: b("doublebed", "objects/furniture/BLD_006_DoubleBed_v01.png", 1, 2, ["#", "#"], { door: { x: 0, y: 2 } }),
+  crib: b("crib", "objects/furniture/BLD_006_Crib_v01.png", 1, 1, ["#"]),
   table: b("table", "objects/furniture/BLD_006_Table_v01.png", 1, 1, ["#"]),
   seattable: b("seattable", "objects/furniture/BLD_006_Table_v01.png", 1, 1, ["#"], { door: { x: 0, y: -1 } }),
   chair: b("chair", "objects/furniture/BLD_006_Chair_v01.png", 1, 1, ["#"]),

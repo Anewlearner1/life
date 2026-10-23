@@ -1,9 +1,13 @@
 import Phaser from "phaser";
 import { GameConfig } from "../game/GameConfig";
-import type { Facing, MapDefinition, WorldPosition } from "../game/types";
+import type { Facing, MapDefinition, Season, Weather, WorldPosition } from "../game/types";
+import { LOC } from "../data/ids";
+import { childAge, lifeStage, playerAge, seasonOf } from "../systems/CalendarSystem";
+import { lightingAt } from "../systems/Lighting";
 import { findPath, type Tile } from "../systems/Pathfinding";
+import { clockParts } from "../systems/TimeSystem";
 import { buildCollisionGrid } from "./collision";
-import { idleAnimKey, playerSpriteKeyFor, walkAnimKey } from "./BootScene";
+import { CHILD_SPRITES, elderSpriteKeyFor, idleAnimKey, playerSpriteKeyFor, walkAnimKey } from "./BootScene";
 import { propDoorTile, propsCatalog, propTextureKey } from "./props";
 import type { InteractTarget, WorldBridge, WorldSceneData } from "./WorldBridge";
 
@@ -40,6 +44,19 @@ type NpcView = {
   facing: Facing;
 };
 
+/** A child of the household walking around the home interior. */
+type Wanderer = { key: string; sprite: Phaser.GameObjects.Sprite; tile: Tile; seg: Seg | null; wait: number; facing: Facing };
+
+// Atmosphere: depths (UI scenes sit above the whole World scene).
+const DEPTH_TINT = 90000;
+const DEPTH_FX = 90001;
+/** Ground-layer tint per season (spring = untouched); winter also gets a pale frost veil. */
+const SEASON_TINT: Record<Season, number> = { spring: 0xffffff, summer: 0xfff0d2, autumn: 0xffd4a6, winter: 0xdde8ff };
+const FROST_ALPHA = 0.2;
+/** Crib positions in the home interior (tile of the crib's base). */
+const CRIB_SLOTS: Tile[] = [{ x: 3, y: 1 }, { x: 8, y: 1 }, { x: 8, y: 3 }];
+const CHILD_TILES_PER_SECOND = 1.6;
+
 type LocHit = { id: string; door: Tile; rect: { x0: number; y0: number; x1: number; y1: number } };
 
 const dirOf = (a: Tile, b: Tile): Facing =>
@@ -65,6 +82,22 @@ export class WorldScene extends Phaser.Scene {
   private npcs = new Map<string, NpcView>();
   private zoom = 2;
 
+  // atmosphere (day/night tint, lamps, weather, seasons)
+  private tint?: Phaser.GameObjects.Rectangle;
+  private glows: { img: Phaser.GameObjects.Image; k: number }[] = [];
+  private weatherFx?: Phaser.GameObjects.Particles.ParticleEmitter;
+  private weatherSig = "";
+  private groundObjs: (Phaser.GameObjects.Image | Phaser.GameObjects.Sprite)[] = [];
+  private frost?: Phaser.GameObjects.Rectangle;
+  private seasonNow?: Season;
+  // family props in the home interior
+  private isHome = false;
+  private bedImg?: Phaser.GameObjects.Image;
+  private famSig = "";
+  private famObjs: Phaser.GameObjects.GameObject[] = [];
+  private wanderers: Wanderer[] = [];
+  private curPlayerKey = "";
+
   constructor() {
     super("World");
   }
@@ -78,10 +111,17 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.roundPixels = true;
     this.input.on("pointerdown", this.onPointer, this);
     this.scale.on("resize", this.onResize, this);
+    // Oversized so it always covers the camera; it is re-centred on the view every frame.
+    this.tint = this.add.rectangle(0, 0, 8192, 8192, 0x000000, 0).setDepth(DEPTH_TINT);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.input.off("pointerdown", this.onPointer, this);
       this.scale.off("resize", this.onResize, this);
       this.clearMap();
+      this.weatherFx?.destroy();
+      this.weatherFx = undefined;
+      this.weatherSig = "";
+      this.tint?.destroy();
+      this.tint = undefined;
     });
     const st = this.bridge.getState();
     this.loadMap(st.currentMapId, st.player.position);
@@ -99,6 +139,10 @@ export class WorldScene extends Phaser.Scene {
     this.buildGround(map);
     this.buildProps(map);
     this.buildLocHits(map);
+    this.isHome = map.locationIds.includes(LOC.homeBed);
+    this.weatherSig = "";
+    this.seasonNow = undefined;
+    this.famSig = "";
 
     const sp = pos ?? this.bridge.getState().player.position;
     const useSpawn = sp.mapId !== mapId;
@@ -112,11 +156,14 @@ export class WorldScene extends Phaser.Scene {
     this.player = this.add.sprite(0, 0, `${this.playerKey()}_idle_down`).setOrigin(0.5, 1);
     this.layerObjs.push(this.player);
     this.placeSprite(this.player, this.pTile.x * TS + TS / 2, (this.pTile.y + 1) * TS - FOOT_INSET);
+    this.curPlayerKey = this.playerKey();
     this.playChar(this.player, this.playerKey(), "idle", this.pFacing);
 
     this.applyZoom();
     this.syncNpcs(0, true);
     this.updateCamera();
+    this.updateAtmosphere();
+    this.syncFamily();
   }
 
   /** Move the player (and the map if needed) to an arbitrary position, cancelling any walk. */
@@ -135,9 +182,11 @@ export class WorldScene extends Phaser.Scene {
     this.pMoving = false;
   }
 
-  /** Sprite family for the player's chosen outfit. */
+  /** Sprite family for the player's chosen outfit; elders (age >= stages.elder) use the CHAR_007 look. */
   private playerKey(): string {
-    const { outfitId, hairId } = this.bridge.getState().player.appearance;
+    const st = this.bridge.getState();
+    const { outfitId, hairId } = st.player.appearance;
+    if (lifeStage(playerAge(st)) === "elder") return elderSpriteKeyFor(outfitId);
     return playerSpriteKeyFor(outfitId, hairId);
   }
 
@@ -166,6 +215,12 @@ export class WorldScene extends Phaser.Scene {
     this.layerObjs = [];
     for (const v of this.npcs.values()) v.sprite.destroy();
     this.npcs.clear();
+    this.glows = [];
+    this.groundObjs = [];
+    this.frost = undefined;
+    this.famObjs = [];
+    this.wanderers = [];
+    this.bedImg = undefined;
     if (this.groundKey && this.textures.exists(this.groundKey)) this.textures.remove(this.groundKey);
     this.groundKey = undefined;
   }
@@ -244,11 +299,18 @@ export class WorldScene extends Phaser.Scene {
         if (this.codeAt(x, y) === "~") waterTiles.push({ x, y });
       }
     ct.refresh();
-    this.layerObjs.push(this.add.image(0, 0, this.groundKey).setOrigin(0, 0).setDepth(-1000));
+    const ground = this.add.image(0, 0, this.groundKey).setOrigin(0, 0).setDepth(-1000);
+    this.layerObjs.push(ground);
+    this.groundObjs = [ground];
     for (const t of waterTiles) {
       const s = this.add.sprite(t.x * TS, t.y * TS, "tiles_blockers", BLOCK.water).setOrigin(0, 0).setDepth(-999);
       s.anims.play({ key: "water", startFrame: (t.x + t.y) % 2 });
       this.layerObjs.push(s);
+      this.groundObjs.push(s);
+    }
+    if (!map.indoor) {
+      this.frost = this.add.rectangle(0, 0, map.width * TS, map.height * TS, 0xeef4ff, 0).setOrigin(0, 0).setDepth(-998);
+      this.layerObjs.push(this.frost);
     }
   }
 
@@ -264,6 +326,16 @@ export class WorldScene extends Phaser.Scene {
       const doorInside = !!def.door && def.door.y < def.h;
       img.setDepth(def.ground ? -500 : (p.y + def.h - (doorInside ? 1 : 0)) * TS + (doorInside ? 1 : 0) + (def.lift ? 0.5 : 0));
       this.layerObjs.push(img);
+      if (p.key === "bed" && map.locationIds.includes(LOC.homeBed)) this.bedImg = img;
+      // Streetlamps (and the nightstand lamp) glow after dusk; the glow sits above the night tint, additive.
+      if (p.key === "lamp" || p.key === "tablelamp") {
+        const street = p.key === "lamp";
+        const gx = p.x * TS + TS / 2;
+        const gy = street ? (p.y + def.h) * TS - 32 : (p.y + def.h) * TS - (def.lift ?? 0) - 8;
+        const glow = this.add.image(gx, gy, "FX_007_LampGlow").setScale(street ? 1.6 : 0.8).setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH_FX).setAlpha(0);
+        this.layerObjs.push(glow);
+        this.glows.push({ img: glow, k: street ? 1 : 0.8 });
+      }
     }
   }
 
@@ -470,6 +542,167 @@ export class WorldScene extends Phaser.Scene {
     this.updatePlayer(delta);
     this.syncNpcs(delta, false);
     this.updateCamera();
+    const key = this.playerKey();
+    if (key !== this.curPlayerKey) {
+      this.curPlayerKey = key; // the player grew old
+      this.playChar(this.player, key, this.pMoving ? "walk" : "idle", this.pFacing);
+    }
+    this.updateAtmosphere();
+    this.syncFamily();
+    this.stepWanderers(delta);
+  }
+
+  // ------------------------------------------------------------------ atmosphere
+  /** Day/night tint, lamp glow, season colour on the ground, rain/snow particles. */
+  private updateAtmosphere(): void {
+    if (!this.tint || !this.map) return;
+    const st = this.bridge.getState();
+    const clock = clockParts(st.gameClock.totalMinutes);
+    const indoor = this.map.indoor === true;
+    const weather: Weather = st.weather.kind;
+    const L = lightingAt(clock.minuteOfDay, weather, indoor);
+    const wv = this.cameras.main.worldView;
+    this.tint.setPosition(wv.centerX, wv.centerY).setFillStyle(L.color, L.alpha);
+    const glowAlpha = L.lampsOn ? Math.min(1, L.alpha * 2.2) : 0;
+    for (const g of this.glows) g.img.setAlpha(glowAlpha * g.k).setVisible(glowAlpha > 0.02);
+
+    const season = seasonOf(clock.day);
+    if (season !== this.seasonNow) {
+      this.seasonNow = season;
+      for (const o of this.groundObjs) o.setTint(SEASON_TINT[season]);
+      this.frost?.setFillStyle(0xeef4ff, season === "winter" ? FROST_ALPHA : 0);
+    }
+    this.syncWeather(indoor ? "none" : weather);
+  }
+
+  private syncWeather(kind: Weather | "none"): void {
+    const want = kind === "rain" || kind === "snow" ? kind : "none";
+    const wv = this.cameras.main.worldView;
+    const sig = `${want}|${wv.width}|${wv.height}`;
+    if (sig !== this.weatherSig) {
+      this.weatherSig = sig;
+      this.weatherFx?.destroy();
+      this.weatherFx = undefined;
+      if (want === "none") return;
+      const rain = want === "rain";
+      const speed = rain ? 300 : 55;
+      const fx = this.add.particles(wv.x, wv.y, rain ? "FX_006_RainDrop" : "FX_006_SnowFlake", {
+        x: { min: -16, max: wv.width + 16 },
+        y: -12,
+        speedX: rain ? -40 : { min: -14, max: 14 },
+        speedY: rain ? { min: speed * 0.85, max: speed * 1.15 } : { min: speed * 0.7, max: speed * 1.3 },
+        lifespan: Math.ceil(((wv.height + 24) / (speed * 0.85)) * 1000),
+        frequency: rain ? 9 : 55,
+        alpha: rain ? 0.8 : 0.95,
+        scale: rain ? 1 : { min: 1, max: 1.6 },
+        ...(rain ? {} : { frame: [0, 1] }),
+      });
+      fx.setDepth(DEPTH_FX);
+      fx.fastForward(Math.min(4000, (wv.height / (speed * 0.85)) * 1000));
+      this.weatherFx = fx;
+    }
+    this.weatherFx?.setPosition(wv.x, wv.y);
+  }
+
+  /** Wedding hearts above the player and the partner (FX_008). */
+  playHearts(npcId?: string): void {
+    const npc = npcId ? this.npcs.get(npcId)?.sprite : undefined;
+    const x = npc ? (this.player.x + npc.x) / 2 : this.player.x;
+    const y = Math.min(this.player.y, npc?.y ?? this.player.y) - 36;
+    const fx = this.add.sprite(x, y, "FX_008_Hearts_Wedding", 0).setScale(3).setDepth(DEPTH_FX + 1);
+    if (this.anims.exists("fx-hearts-wedding")) fx.play("fx-hearts-wedding");
+    this.tweens.add({ targets: fx, y: y - 14, duration: 3400, ease: "Sine.easeOut" });
+    this.tweens.add({ targets: fx, alpha: 0, delay: 2600, duration: 800, onComplete: () => fx.destroy() });
+  }
+
+  // ------------------------------------------------------------------ family props (home interior)
+  /** Rebuilds the double bed / cribs / child sprites whenever the household changes. */
+  private syncFamily(): void {
+    if (!this.isHome || !this.map) return;
+    const st = this.bridge.getState();
+    const now = st.gameClock.totalMinutes;
+    const kids = st.family.children.map((c, i) => ({ c, i, baby: lifeStage(childAge(c, now)) === "baby" }));
+    const married = st.family.spouseNpcId !== undefined;
+    const sig = `${married}|${kids.map((k) => `${k.c.id}${k.baby ? "b" : ""}`).join(",")}`;
+    if (sig === this.famSig) return;
+    this.famSig = sig;
+    for (const o of this.famObjs) o.destroy();
+    this.famObjs = [];
+    this.wanderers = [];
+    this.bedImg?.setTexture(married ? "prop_doublebed" : "prop_bed");
+    this.grid = buildCollisionGrid(this.map, propsCatalog);
+
+    let slot = 0;
+    for (const k of kids) {
+      if (k.baby) {
+        const t = CRIB_SLOTS[slot++ % CRIB_SLOTS.length];
+        const crib = this.add.image(t.x * TS, (t.y + 1) * TS, "prop_crib").setOrigin(0, 1).setDepth((t.y + 1) * TS);
+        this.grid[t.y][t.x] = true;
+        this.famObjs.push(crib);
+        this.layerObjs.push(crib);
+      } else {
+        const key = CHILD_SPRITES[k.i % CHILD_SPRITES.length];
+        const tile = this.freeHomeTile();
+        if (!tile) continue;
+        const sprite = this.add.sprite(0, 0, `${key}_idle_down`).setOrigin(0.5, 1);
+        this.placeSprite(sprite, tile.x * TS + TS / 2, (tile.y + 1) * TS - FOOT_INSET);
+        this.playChar(sprite, key, "idle", "down");
+        this.wanderers.push({ key, sprite, tile, seg: null, wait: 500 + Math.random() * 2000, facing: "down" });
+        this.famObjs.push(sprite);
+        this.layerObjs.push(sprite);
+      }
+    }
+  }
+
+  private tileTaken(t: Tile): boolean {
+    const occupied = (a: Tile) => a.x === t.x && a.y === t.y;
+    if (occupied(this.pTile) || (this.pSeg && occupied(this.pSeg.to))) return true;
+    if (this.wanderers.some((w) => occupied(w.tile) || (w.seg && occupied(w.seg.to)))) return true;
+    for (const v of this.npcs.values()) if (occupied(v.tile) || (v.seg && occupied(v.seg.to))) return true;
+    return false;
+  }
+
+  private freeHomeTile(): Tile | null {
+    const cands: Tile[] = [];
+    for (let y = 2; y < this.map.height - 2; y++)
+      for (let x = 1; x < this.map.width - 1; x++) {
+        const t = { x, y };
+        if (this.walkable(t) && this.codeAt(x, y) !== "m" && !this.tileTaken(t)) cands.push(t);
+      }
+    return cands.length ? cands[Math.floor(Math.random() * cands.length)] : null;
+  }
+
+  /** Children amble around the room: pause, step to a free neighbouring tile, pause... */
+  private stepWanderers(delta: number): void {
+    for (const w of this.wanderers) {
+      if (w.seg) {
+        const seg = w.seg;
+        seg.t = Math.min(1, seg.t + (delta / 1000) * CHILD_TILES_PER_SECOND);
+        if (seg.t >= 1) {
+          w.tile = seg.to;
+          w.seg = null;
+          w.wait = 700 + Math.random() * 2800;
+          this.playChar(w.sprite, w.key, "idle", w.facing);
+        }
+      } else {
+        w.wait -= delta;
+        if (w.wait <= 0) {
+          const dirs: Tile[] = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }].sort(() => Math.random() - 0.5);
+          const next = dirs
+            .map((d) => ({ x: w.tile.x + d.x, y: w.tile.y + d.y }))
+            .find((t) => t.y >= 2 && this.walkable(t) && this.codeAt(t.x, t.y) !== "m" && !this.tileTaken(t));
+          if (next) {
+            w.seg = { from: { ...w.tile }, to: next, t: 0 };
+            w.facing = dirOf(w.tile, next);
+            this.playChar(w.sprite, w.key, "walk", w.facing);
+          } else w.wait = 600;
+        }
+      }
+      const seg = w.seg;
+      const fx = seg ? seg.from.x + (seg.to.x - seg.from.x) * seg.t : w.tile.x;
+      const fy = seg ? seg.from.y + (seg.to.y - seg.from.y) * seg.t : w.tile.y;
+      this.placeSprite(w.sprite, fx * TS + TS / 2, (fy + 1) * TS - FOOT_INSET);
+    }
   }
 
   private finishWalk(): void {

@@ -1,7 +1,8 @@
 import Phaser from "phaser";
-import { formatClock } from "../systems/TimeSystem";
+import { clockParts } from "../systems/TimeSystem";
+import { formatDate, playerAge, seasonOf } from "../systems/CalendarSystem";
 import type { GameController } from "../game/GameController";
-import type { NeedKey, TimeMode } from "../game/types";
+import type { NeedKey, TimeMode, Weather } from "../game/types";
 import { GameConfig } from "../game/GameConfig";
 import { COLOR, makeText, TOUCH } from "./theme";
 import { Button, makePanel } from "./widgets";
@@ -17,14 +18,30 @@ const MODES: { mode: TimeMode; icon: string }[] = [
   { mode: "fast", icon: "UI_004_TimeControl_Fast" },
 ];
 
+const WEATHER_ICON: Record<Weather, string> = {
+  sunny: "UI_014_Weather_Sunny",
+  cloudy: "UI_014_Weather_Cloudy",
+  rain: "UI_014_Weather_Rain",
+  snow: "UI_014_Weather_Snow",
+};
+const WEATHER_LABEL: Record<Weather, string> = { sunny: "晴", cloudy: "多雲", rain: "雨", snow: "雪" };
+const SEASON_ICON = (s: string) => `UI_015_Season_${s[0].toUpperCase()}${s.slice(1)}`;
+const pad2 = (n: number) => String(n).padStart(2, "0");
+const HUD_H = 126;
+
 type Bar = { key: NeedKey; fill: Phaser.GameObjects.Image; innerW: number; tint: number };
 
-/** Top HUD (needs, money, clock, time controls) + bottom-right save/bag buttons. */
+/** Top HUD (needs, money, time, date/season/weather/age, time controls) + bottom-right save/bag/family buttons. */
 export class Hud {
   private root?: Phaser.GameObjects.Container;
   private bars: Bar[] = [];
   private money?: Phaser.GameObjects.Text;
   private clock?: Phaser.GameObjects.Text;
+  private date?: Phaser.GameObjects.Text;
+  private age?: Phaser.GameObjects.Text;
+  private weatherLabel?: Phaser.GameObjects.Text;
+  private seasonIcon?: Phaser.GameObjects.Image;
+  private weatherIcon?: Phaser.GameObjects.Image;
   private modeBtns: Button[] = [];
   /** Bottom of the HUD in canvas px (toasts start below). */
   bottom = 0;
@@ -34,7 +51,7 @@ export class Hud {
   constructor(
     private scene: Phaser.Scene,
     private controller: GameController,
-    private handlers: { onBag: () => void },
+    private handlers: { onBag: () => void; onFamily: () => void },
   ) {}
 
   layout(): void {
@@ -50,7 +67,7 @@ export class Hud {
 
     // translucent strip behind the HUD for readability over the map
     const strip = this.scene.add.graphics();
-    strip.fillStyle(COLOR.inkHex, 0.72).fillRect(0, 0, hudW, 100);
+    strip.fillStyle(COLOR.inkHex, 0.72).fillRect(0, 0, hudW, HUD_H);
     root.add(strip);
 
     // Row 1: need bars
@@ -75,6 +92,15 @@ export class Hud {
     this.money = makeText(this.scene, pad + 32, y2 + 22, "", { size: 18, bold: true, color: COLOR.gold, oy: 0.5 });
     this.clock = makeText(this.scene, pad + 32 + 62, y2 + 22, "", { size: 16, bold: true, color: COLOR.paper, oy: 0.5 });
     root.add([coin, this.money, this.clock]);
+
+    // Row 3: season icon + year/season/day | weather icon + label | player age
+    const y3 = y2 + 44 + 8 + 12;
+    this.seasonIcon = this.scene.add.image(pad + 12, y3, "UI_015_Season_Spring").setScale(1.5);
+    this.date = makeText(this.scene, pad + 30, y3, "", { size: 14, bold: true, color: COLOR.paper, oy: 0.5 });
+    this.weatherIcon = this.scene.add.image(0, y3, "UI_014_Weather_Sunny").setScale(1.5);
+    this.weatherLabel = makeText(this.scene, 0, y3, "", { size: 14, bold: true, color: COLOR.paper, oy: 0.5 });
+    this.age = makeText(this.scene, hudW - pad, y3, "", { size: 14, bold: true, color: COLOR.gold, ox: 1, oy: 0.5 });
+    root.add([this.seasonIcon, this.date, this.weatherIcon, this.weatherLabel, this.age]);
     const bw = TOUCH;
     const bx0 = hudW - pad - bw * 3 - 4 * 2;
     MODES.forEach((m, i) => {
@@ -105,8 +131,15 @@ export class Hud {
       name: "bag",
       onClick: this.handlers.onBag,
     });
-    root.add([save.container, bag.container]);
-    this.bottom = pad + 32 + 8 + bw + pad;
+    const family = new Button(this.scene, W - pad - 48 * 3 - 12, by, {
+      w: 48,
+      h: 48,
+      icon: "UI_007_Tab_Family",
+      name: "family",
+      onClick: this.handlers.onFamily,
+    });
+    root.add([save.container, bag.container, family.container]);
+    this.bottom = HUD_H;
     this.centerX = hudW / 2;
     this.width = hudW;
     this.update();
@@ -124,7 +157,17 @@ export class Hud {
       b.fill.setTint(low ? (blink ? 0xe43b44 : 0x9e2835) : b.tint);
     }
     this.money?.setText(String(st.player.money));
-    this.clock?.setText(formatClock(st.gameClock.totalMinutes));
+    const cp = clockParts(st.gameClock.totalMinutes);
+    this.clock?.setText(`${pad2(cp.hour)}:${pad2(cp.minute)}`);
+    const season = seasonOf(cp.day);
+    this.seasonIcon?.setTexture(SEASON_ICON(season));
+    this.date?.setText(formatDate(st.gameClock.totalMinutes));
+    if (this.date && this.weatherIcon && this.weatherLabel) {
+      const wx = this.date.x + this.date.width + 14;
+      this.weatherIcon.setTexture(WEATHER_ICON[st.weather.kind]).setPosition(wx + 12, this.date.y);
+      this.weatherLabel.setText(WEATHER_LABEL[st.weather.kind]).setPosition(wx + 28, this.date.y);
+    }
+    this.age?.setText(`${Math.floor(playerAge(st))}歲`);
     this.modeBtns.forEach((btn, i) => btn.setSelected(st.gameClock.mode === MODES[i].mode));
   }
 

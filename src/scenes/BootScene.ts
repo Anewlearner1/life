@@ -36,6 +36,12 @@ export const playerSpriteKeyFor = (outfitId: string, hairId = "hair_spiky"): str
 const PLAYER_VARIANTS = Object.keys(HAIR_STYLES).flatMap((h) => Object.keys(OUTFIT_STYLES).map((o) => playerSpriteKeyFor(o, h)));
 export const DIRS: Facing[] = ["down", "left", "right", "up"];
 
+/** Children (CHAR_006 A/B/C; all four idle directions ship) and the elder player look (CHAR_007). */
+export const CHILD_SPRITES = ["CHAR_006_Child_A", "CHAR_006_Child_B", "CHAR_006_Child_C"];
+const ELDER_STYLES: Record<string, string> = { outfit1: "Default", outfit2: "Outfit2" };
+export const elderSpriteKeyFor = (outfitId: string): string => `CHAR_007_Player_Elder_${ELDER_STYLES[outfitId] ?? "Default"}`;
+const ELDER_VARIANTS = Object.keys(OUTFIT_STYLES).map((o) => elderSpriteKeyFor(o));
+
 export const NPC_SPRITES: { id: string; spriteKey: string; folder: string }[] = [
   { id: "npc_001", spriteKey: "NPC_001_CafeOwner", folder: "npc_001" },
   { id: "npc_002", spriteKey: "NPC_002_Shopkeeper", folder: "npc_002" },
@@ -56,6 +62,10 @@ const MISC_ASSETS: string[] = [
   "effects/rewards/FX_002_CoinPop_v01.png",
   "effects/rewards/FX_003_HeartUp_v01.png",
   "effects/unlocks/FX_004_Sparkle_v01.png",
+  "effects/weather/FX_006_RainDrop_v01.png",
+  "effects/weather/FX_006_SnowFlake_v01.png",
+  "effects/weather/FX_007_LampGlow_v01.png",
+  "effects/weather/FX_008_Hearts_Wedding_v01.png",
   "minigames/rhythm/MINI_001_Panel_v01.png",
   "minigames/rhythm/MINI_002_RhythmCue_Crop_Cabbage_v01.png",
   "minigames/rhythm/MINI_002_RhythmCue_Crop_Carrot_v01.png",
@@ -83,6 +93,7 @@ const MISC_ASSETS: string[] = [
   "objects/products/OBJ_004_Book_v01.png",
   "objects/products/OBJ_004_Flower_v01.png",
   "objects/products/OBJ_004_Gift_v01.png",
+  "objects/products/OBJ_004_Ring_v01.png",
   "objects/products/OBJ_004_Shirt_v01.png",
   "objects/work_tools/MINI_006_Apron_v01.png",
   "objects/work_tools/MINI_006_Cup_v01.png",
@@ -107,6 +118,16 @@ const MISC_ASSETS: string[] = [
   "ui/hud/UI_003_Calendar_v01.png",
   "ui/hud/UI_003_ClockFrame_v01.png",
   "ui/hud/UI_003_Clock_v01.png",
+  "ui/hud/UI_007_Tab_Family_v01.png",
+  "ui/hud/UI_014_Weather_Cloudy_v01.png",
+  "ui/hud/UI_014_Weather_Rain_v01.png",
+  "ui/hud/UI_014_Weather_Snow_v01.png",
+  "ui/hud/UI_014_Weather_Sunny_v01.png",
+  "ui/hud/UI_015_Season_Autumn_v01.png",
+  "ui/hud/UI_015_Season_Spring_v01.png",
+  "ui/hud/UI_015_Season_Summer_v01.png",
+  "ui/hud/UI_015_Season_Winter_v01.png",
+  "ui/hud/UI_016_Ring_v01.png",
   "ui/icons/AUDIO_001_Volume_Off_v01.png",
   "ui/icons/AUDIO_001_Volume_On_v01.png",
   "ui/icons/EVT_002_StageBar_v01.png",
@@ -149,6 +170,13 @@ const MISC_ASSETS: string[] = [
   "ui/panels/UI_009_ShopPanel_v01.png",
   "ui/title/UI_000_TitleBanner_v01.png",
 ];
+
+/** FX_* files are 16x16 spritesheets unless listed here: frame size, or null for a plain image. */
+const FX_FRAME: Record<string, { w: number; h: number } | null> = {
+  FX_006_RainDrop: null,
+  FX_006_SnowFlake: { w: 4, h: 4 },
+  FX_007_LampGlow: null,
+};
 
 const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 
@@ -202,6 +230,23 @@ export class BootScene extends Phaser.Scene {
       }
     }
 
+    // Elder player look + the three child looks (portraits for the family panel)
+    for (const sk of ELDER_VARIANTS) {
+      for (const d of DIRS) {
+        const base = `characters/player/elder/${sk}_${cap(d)}`;
+        this.load.spritesheet(`${sk}_walk_${d}`, `${base}_Walk_v01.png`, CHAR_FRAME);
+        this.load.spritesheet(`${sk}_idle_${d}`, `${base}_Idle_v01.png`, CHAR_FRAME);
+      }
+    }
+    for (const sk of CHILD_SPRITES) {
+      for (const d of DIRS) {
+        const base = `characters/children/${sk}_${cap(d)}`;
+        this.load.spritesheet(`${sk}_walk_${d}`, `${base}_Walk_v01.png`, CHAR_FRAME);
+        this.load.spritesheet(`${sk}_idle_${d}`, `${base}_Idle_v01.png`, CHAR_FRAME);
+      }
+      this.load.image(`${sk}_Portrait`, `characters/children/${sk}_Portrait_v01.png`);
+    }
+
     // NPCs: 4-direction walk, Down idle only; portraits for dialogue UI
     for (const n of NPC_SPRITES) {
       const dir = `characters/npcs/${n.folder}/${n.spriteKey}`;
@@ -217,8 +262,10 @@ export class BootScene extends Phaser.Scene {
     // Everything else
     for (const path of MISC_ASSETS) {
       const key = path.slice(path.lastIndexOf("/") + 1).replace(/_v01\.png$/, "");
-      if (key.startsWith("FX_")) this.load.spritesheet(key, path, { frameWidth: 16, frameHeight: 16 });
-      else this.load.image(key, path);
+      if (key.startsWith("FX_") && FX_FRAME[key] !== null) {
+        const f = FX_FRAME[key] ?? { w: 16, h: 16 };
+        this.load.spritesheet(key, path, { frameWidth: f.w, frameHeight: f.h });
+      } else this.load.image(key, path);
     }
   }
 
@@ -241,7 +288,7 @@ export class BootScene extends Phaser.Scene {
         repeat: -1,
       });
     };
-    const chars = [...PLAYER_VARIANTS, ...NPC_SPRITES.map((n) => n.spriteKey)];
+    const chars = [...PLAYER_VARIANTS, ...ELDER_VARIANTS, ...CHILD_SPRITES, ...NPC_SPRITES.map((n) => n.spriteKey)];
     for (const sk of chars) {
       for (const d of DIRS) {
         mk(walkAnimKey(sk, d), `${sk}_walk_${d}`, 8);
@@ -250,6 +297,7 @@ export class BootScene extends Phaser.Scene {
         mk(idleAnimKey(sk, d), idleTex, 2);
       }
     }
+    mk("fx-hearts-wedding", "FX_008_Hearts_Wedding", 6);
     if (!this.anims.exists("water")) {
       this.anims.create({
         key: "water",

@@ -7,14 +7,14 @@ const NIGHT = 0x0b1030;
 const CLEAR = 0xffffff;
 /** Keyframes over the day (minute of day); linear interpolation between them, wrapping at midnight. */
 const KEYS: Key[] = [
-  { m: 0, color: NIGHT, alpha: 0.45 },
-  { m: 4 * 60, color: NIGHT, alpha: 0.45 },
+  { m: 0, color: NIGHT, alpha: 0.6 },
+  { m: 4 * 60, color: NIGHT, alpha: 0.6 },
   { m: 5 * 60, color: 0xff9a5a, alpha: 0.22 }, // dawn
   { m: 7 * 60, color: CLEAR, alpha: 0 },
   { m: 17 * 60, color: CLEAR, alpha: 0 },
-  { m: 18 * 60, color: 0xff8a40, alpha: 0.25 }, // dusk
-  { m: 20 * 60, color: NIGHT, alpha: 0.45 },
-  { m: 24 * 60, color: NIGHT, alpha: 0.45 },
+  { m: 18 * 60, color: 0xff8a40, alpha: 0.3 }, // dusk
+  { m: 20 * 60, color: NIGHT, alpha: 0.6 },
+  { m: 24 * 60, color: NIGHT, alpha: 0.6 },
 ];
 
 const GREY = 0x6e7681;

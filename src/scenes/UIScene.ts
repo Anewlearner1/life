@@ -1,10 +1,13 @@
 import Phaser from "phaser";
 import { GameConfig } from "../game/GameConfig";
 import { STAGE_LABEL, iconKey, type DialogueSpec, type GameController, type OpenRequest } from "../game/GameController";
+import { canPropose, canSucceed } from "../systems/FamilySystem";
+import { childAge, lifeStage, playerAge, STAGE_LABEL as LIFE_STAGE_LABEL } from "../systems/CalendarSystem";
+import { CHILD_SPRITES } from "./BootScene";
 import { getRel } from "../systems/RelationshipSystem";
 import { DialoguePanel } from "../ui/DialoguePanel";
 import { Hud } from "../ui/Hud";
-import { ModalMenu, type MenuSpec } from "../ui/ModalMenu";
+import { ModalMenu, type MenuSpec, type RowSpec } from "../ui/ModalMenu";
 import { showBanner, Toasts } from "../ui/Toasts";
 
 const NEED_LABEL = { stamina: "體力", satiety: "飽足", mood: "心情" } as const;
@@ -35,7 +38,10 @@ export class UIScene extends Phaser.Scene {
 
   create(): void {
     const c = this.controller;
-    this.hud = new Hud(this, c, { onBag: () => this.openMenu({ panel: "shop", tab: "bag" }) });
+    this.hud = new Hud(this, c, {
+      onBag: () => this.openMenu({ panel: "shop", tab: "bag" }),
+      onFamily: () => this.openMenu({ panel: "family" }),
+    });
     this.toasts = new Toasts(this);
     this.layout();
 
@@ -208,6 +214,12 @@ export class UIScene extends Phaser.Scene {
           };
         });
         break;
+      case "family":
+        this.show(() => this.familyMenu());
+        break;
+      case "succeed":
+        this.show(() => this.succeedMenu(req.heirId));
+        break;
       case "locked":
         this.show(() => ({
           title: c.content.locations[req.locationId]?.name ?? "出口",
@@ -220,18 +232,100 @@ export class UIScene extends Phaser.Scene {
     }
   }
 
+  private childPortrait(index: number): string {
+    return `${CHILD_SPRITES[index % CHILD_SPRITES.length]}_Portrait`;
+  }
+
+  /** 家庭 panel: spouse, children (or expected baby), generation + ancestors, succession button. */
+  private familyMenu(): MenuSpec {
+    const c = this.controller;
+    const st = c.getState();
+    const f = st.family;
+    const now = st.gameClock.totalMinutes;
+    const spouse = f.spouseNpcId ? c.content.npcs[f.spouseNpcId] : undefined;
+    const portrait = spouse ? `${spouse.spriteKey}_Portrait_Happy` : undefined;
+    const marriedDays = f.marriedAtMinute !== undefined ? Math.floor((now - f.marriedAtMinute) / 1440) : 0;
+    const body = [`第 ${f.generation} 代　${st.player.name}（${Math.floor(playerAge(st))}歲）`];
+    body.push(
+      f.ancestors.length
+        ? "祖先：" + f.ancestors.slice(-4).map((a) => `第${a.generation}代 ${a.name}（${Math.round(a.ageAtRetirement)}歲）`).join("、")
+        : "祖先：尚無",
+    );
+    const rows: RowSpec[] = f.children.map((ch, i) => {
+      const age = childAge(ch, now);
+      return {
+        portrait: this.childPortrait(i),
+        title: ch.name,
+        sub: `${Math.floor(age)}歲 · ${LIFE_STAGE_LABEL[lifeStage(age)]}`,
+      };
+    });
+    if (f.babyDueDay !== undefined) {
+      const left = Math.max(0, f.babyDueDay - Math.floor(now / 1440));
+      rows.push({ icon: "UI_011_Heart_Full", title: "寶寶", sub: `預產：${left}天後` });
+    }
+    const chk = canSucceed(st);
+    const heir = chk.heirId ? f.children.find((ch) => ch.id === chk.heirId) : undefined;
+    return {
+      title: spouse?.name ?? "家庭",
+      subtitle: spouse ? `配偶　結婚 ${marriedDays} 天` : "尚未結婚",
+      portrait: portrait && this.textures.exists(portrait) ? portrait : undefined,
+      icon: "UI_007_Tab_Family",
+      body,
+      rows,
+      emptyText: "還沒有孩子。",
+      buttons: [
+        {
+          label: chk.ok && heir ? `傳承給 ${heir.name}` : `傳承（需有年滿 ${GameConfig.family.successionAge} 歲的孩子）`,
+          name: "succeed",
+          enabled: chk.ok,
+          onClick: () => chk.heirId && this.openMenu({ panel: "succeed", heirId: chk.heirId }),
+        },
+        { label: "關閉", name: "close", onClick: () => this.closeMenu() },
+      ],
+    };
+  }
+
+  private succeedMenu(heirId: string): MenuSpec {
+    const c = this.controller;
+    const st = c.getState();
+    const idx = st.family.children.findIndex((ch) => ch.id === heirId);
+    const heir = st.family.children[idx];
+    return {
+      title: `傳承給 ${heir?.name ?? "孩子"}？`,
+      subtitle: heir ? `${Math.floor(childAge(heir, st.gameClock.totalMinutes))}歲` : undefined,
+      portrait: idx >= 0 ? this.childPortrait(idx) : undefined,
+      body: [
+        "你將把家交給孩子，由他繼續這個故事。",
+        "你會成為家族的祖先；配偶回到朋友的身分，其他居民的好感度也會重新開始。",
+      ],
+      buttons: [
+        {
+          label: "確認傳承",
+          name: "confirm_succeed",
+          onClick: () => {
+            this.closeMenu();
+            c.succeedTo(heirId);
+          },
+        },
+        { label: "再想想", name: "back", onClick: () => this.openMenu({ panel: "family" }) },
+      ],
+    };
+  }
+
   private npcMenu(npcId: string): MenuSpec {
     const c = this.controller;
     const def = c.content.npcs[npcId];
     const rel = getRel(c.getState(), npcId);
     const portrait = `${def?.spriteKey}_Portrait_Neutral`;
     const gifts = c.giftables();
+    const canWed = rel.stage === "partner" ? canPropose(c.getState(), c.content, npcId) : undefined;
     return {
       title: def?.name ?? npcId,
       subtitle: `${def?.occupation ?? ""} · ${STAGE_LABEL[rel.stage]}`,
       portrait: this.textures.exists(portrait) ? portrait : undefined,
       icon: STAGE_ICON[rel.stage],
       affection: rel.affection,
+      note: canWed && !canWed.ok ? `求婚條件：${canWed.reason ?? ""}` : undefined,
       buttons: [
         {
           label: "聊天",
@@ -248,6 +342,20 @@ export class UIScene extends Phaser.Scene {
           enabled: gifts.length > 0,
           onClick: () => this.openMenu({ panel: "gift", npcId }),
         },
+        ...(canWed
+          ? [
+              {
+                label: "求婚",
+                name: "propose",
+                icon: "UI_016_Ring",
+                enabled: canWed.ok,
+                onClick: () => {
+                  this.closeMenu();
+                  c.proposeTo(npcId);
+                },
+              },
+            ]
+          : []),
         { label: "關閉", name: "close", onClick: () => this.closeMenu() },
       ],
     };
@@ -316,4 +424,5 @@ export class UIScene extends Phaser.Scene {
   }
 }
 
-const GIFT_HINT = (id: string) => (id === "item_flower" || id === "item_gift" ? "可以送給 NPC" : "");
+const GIFT_HINT = (id: string) =>
+  id === "item_flower" || id === "item_gift" ? "可以送給 NPC" : id === GameConfig.family.ringItemId ? "向伴侶求婚用" : "";

@@ -20,6 +20,8 @@ import type { InteractTarget, WorldBridge } from "../scenes/WorldBridge";
 import type { WorldScene } from "../scenes/WorldScene";
 import { buyItem, useItem } from "../systems/EconomySystem";
 import { availableEvents, fireEvent } from "../systems/EventSystem";
+import { canPropose, canSucceed, propose, succeed } from "../systems/FamilySystem";
+import { updateNPCs } from "../systems/NPCScheduleSystem";
 import { canStartWork, completeWork, nextShift, shiftAt } from "../systems/JobSystem";
 import { applyHourly, applyNeedDelta } from "../systems/NeedsSystem";
 import { changeAffection, getRel, talkTo } from "../systems/RelationshipSystem";
@@ -53,7 +55,9 @@ export type OpenRequest =
   | { panel: "home"; locationId: string }
   | { panel: "rest"; locationId: string }
   | { panel: "work"; locationId: string }
-  | { panel: "locked"; locationId: string; hint: string };
+  | { panel: "locked"; locationId: string; hint: string }
+  | { panel: "family" }
+  | { panel: "succeed"; heirId: string };
 
 type EventMap = {
   toast: [string, ToastKind];
@@ -304,6 +308,7 @@ export class GameController implements WorldBridge {
       return false;
     }
     for (const m of r.messages) this.toast(m, "ok");
+    if (ev.effects.some((f) => f.type === "marry")) this.world?.playHearts(ev.npcId);
     if (r.lines.length) {
       this.showDialogue({ speakerId: ev.npcId, name: "旁白", lines: r.lines, mood: "Happy", onDone });
     } else onDone?.();
@@ -358,6 +363,57 @@ export class GameController implements WorldBridge {
       mood: "Happy",
       onDone: () => this.events.emit("open", { panel: "npc", npcId }),
     });
+    return true;
+  }
+
+  /** 求婚: fires the NPC's proposal talk event when its conditions hold, else the plain FamilySystem proposal. */
+  proposeTo(npcId: string): boolean {
+    const st = this.getState();
+    const chk = canPropose(st, this.content, npcId);
+    const back = () => this.events.emit("open", { panel: "npc", npcId });
+    if (!chk.ok) {
+      this.toast(chk.reason ?? "現在不能求婚", "warn");
+      back();
+      return false;
+    }
+    const ev = Object.values(this.content.events).find(
+      (e) => e.triggerType === "talk" && e.npcId === npcId && e.effects.some((f) => f.type === "marry"),
+    );
+    const playable = !!ev && availableEvents(st, this.content, "talk", { npcId }).some((e) => e.id === ev.id);
+    if (ev && playable) {
+      this.playEvent(ev.id, back); // plays the wedding hearts itself
+    } else {
+      const r = propose(st, this.content, npcId);
+      if (!r.ok) {
+        this.toast(r.reason ?? "求婚失敗", "warn");
+        back();
+        return false;
+      }
+      for (const m of r.messages) this.toast(m, "ok");
+      this.showDialogue({
+        speakerId: npcId,
+        name: "旁白",
+        lines: ["你取出戒指，單膝跪下……", ...r.lines],
+        mood: "Happy",
+        onDone: back,
+      });
+      this.world?.playHearts(npcId);
+    }
+    void this.save(false);
+    return true;
+  }
+
+  /** 傳承: the heir becomes the player and the world reloads at home. */
+  succeedTo(heirId: string): boolean {
+    const st = this.getState();
+    if (!canSucceed(st).ok) return false;
+    const msgs = succeed(st, this.content, heirId);
+    if (!msgs.length) return false;
+    updateNPCs(st, this.content);
+    this.world?.loadMap(st.currentMapId, st.player.position);
+    this.toast(msgs[0], "info");
+    this.toast(`第${st.family.generation}代開始了`, "unlock");
+    void this.save(false);
     return true;
   }
 

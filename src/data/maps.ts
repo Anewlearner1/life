@@ -251,7 +251,7 @@ function buildInterior(
   g.rect(w - 1, 1, w - 1, h - 1, "v");
   g.rect(1, h - 1, w - 2, h - 1, "v");
   g.set(doorX, h - 1, "m");
-  return { id, name, width: w, height: h, rows: g.rows(), locationIds, spawn: { x: doorX, y: h - 2 }, props };
+  return { id, name, width: w, height: h, rows: g.rows(), locationIds, spawn: { x: doorX, y: h - 2 }, indoor: true, props };
 }
 
 // map_home_in (10 x 8): bed + nightstand lamp on the left, shelves and a small dining set on the right.

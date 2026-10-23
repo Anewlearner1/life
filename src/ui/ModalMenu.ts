@@ -6,6 +6,8 @@ export type MenuButton = { label: string; onClick: () => void; enabled?: boolean
 
 export type RowSpec = {
   icon?: string;
+  /** Texture key of a 48x48 portrait drawn at the row start (taller rows). */
+  portrait?: string;
   title: string;
   sub?: string;
   button?: MenuButton;
@@ -142,12 +144,15 @@ export class ModalMenu {
       }
       // shrink rows if the card would not fit the screen
       const fixed = y + 12 + spec.buttons.length * 56 + PAD;
-      const rowH = Math.max(TOUCH + 4, Math.min(58, Math.floor((H - 24 - fixed) / Math.max(1, spec.rows.length))));
+      const minRow = spec.rows.some((r) => r.portrait) ? 54 : TOUCH + 4;
+      const rowH = Math.max(minRow, Math.min(58, Math.floor((H - 24 - fixed) / Math.max(1, spec.rows.length))));
       for (const r of spec.rows) {
         const bw = r.button ? 104 : 0;
-        const textX = PAD + (r.icon ? 40 : 0);
-        const textW = iw - (r.icon ? 40 : 0) - bw - 8;
-        if (r.icon) kids.push(sc.add.image(PAD + 16, y + rowH / 2 - 2, r.icon).setScale(2));
+        const lead = r.portrait ? 56 : r.icon ? 40 : 0;
+        const textX = PAD + lead;
+        const textW = iw - lead - bw - 8;
+        if (r.portrait) kids.push(sc.add.image(PAD, y + (rowH - 48) / 2 - 2, r.portrait).setOrigin(0, 0));
+        else if (r.icon) kids.push(sc.add.image(PAD + 16, y + rowH / 2 - 2, r.icon).setScale(2));
         const hasSub = !!r.sub;
         const t = makeText(sc, textX, y + (hasSub ? 5 : rowH / 2 - 2), r.title, { size: 16, bold: true, oy: hasSub ? 0 : 0.5, wrap: textW });
         kids.push(t);
