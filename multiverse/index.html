@@ -586,8 +586,17 @@ function observe(auto = false) {
 }
 
 let flickerTimer = null;
+let revealTimers = [];
+function cancelReveal() {
+  clearInterval(flickerTimer);
+  revealTimers.forEach(clearTimeout);
+  revealTimers = [];
+  revealing = false;
+  $('orb').classList.remove('spin');
+}
 function startReveal(u, auto) {
   revealing = true;
+  revealTimers = [];
   const hi = u.tier >= 3;
   const step = auto && !hi ? 35 : 100;
   const orb = $('orb');
@@ -597,12 +606,12 @@ function startReveal(u, auto) {
   flickerTimer = setInterval(() => {
     rows.forEach(r => { if (!r.dataset.set) setConst(r, Math.exp(randn() * SIG)); });
   }, 45);
-  CONSTS.forEach((c, i) => setTimeout(() => {
+  CONSTS.forEach((c, i) => revealTimers.push(setTimeout(() => {
     const r = $('row-' + c.k);
     setConst(r, u.v[c.k]); r.dataset.set = '1';
     beep(260 + i * 60, 0.05, 'square', 0.02);
-  }, step * (i + 1)));
-  setTimeout(() => finishReveal(u), step * 5 + (hi ? 500 : 0));
+  }, step * (i + 1))));
+  revealTimers.push(setTimeout(() => finishReveal(u), step * 5 + (hi ? 500 : 0)));
 }
 
 function setConst(row, x) {
@@ -787,7 +796,8 @@ function bigBang() {
   S.stats.bangs++;
   if (S.su.mem) { S.up.auto = 1; S.up.curate = 1; }
   S.energy = maxEnergy();
-  candidate = null; revealing = false; dirtySlots = true; dirtyCodex = true; cardBuilt = false;
+  cancelReveal();
+  candidate = null; dirtySlots = true; dirtyCodex = true; cardBuilt = false;
   $('card').innerHTML = '<div class="placeholder">新的宇宙誕生了。按下「觀測新宇宙」繼續。</div>';
   toast(`大爆炸！奇點 +${g}，目前全部產出 ×${singMult().toFixed(2)}`);
   flash('#ffb020'); beep(160, 0.5, 'sawtooth', 0.05); beep(880, 0.4, 'triangle', 0.05, 0.25);
@@ -1084,6 +1094,7 @@ function buildSetPane() {
       if (typeof d !== 'object' || d === null || typeof d.cp !== 'number') throw new Error('bad');
       if (!confirm('匯入會覆蓋目前的進度，確定嗎？')) return;
       S = normalize(d); S.last = now();
+      cancelReveal();
       candidate = null; dirtySlots = true; dirtyCodex = true; cardBuilt = false;
       $('card').innerHTML = '<div class="placeholder">存檔已匯入。按下「觀測新宇宙」繼續。</div>';
       toast('匯入成功'); render(); save();
@@ -1256,7 +1267,7 @@ if (location.hash.includes('debug')) {
     get S() { return S; }, set S(v) { S = v; },
     observe, keep, keepAt, recycle, buy, buySing, bigBang, levelUp, tick, generate, uOut, totalRate, bangGain,
     spawnStar, collectStar, checkAch, singAvail,
-    get candidate() { return candidate; }, UPS, SUPS, TIERS, ANOMS, ACH,
+    get candidate() { return candidate; }, get revealing() { return revealing; }, UPS, SUPS, TIERS, ANOMS, ACH,
   };
 }
 })();
