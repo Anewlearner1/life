@@ -36,23 +36,32 @@ button:disabled{opacity:.45;cursor:not-allowed}
 button.primary{background:linear-gradient(180deg,#5b7cff,#3f5be0);border-color:#6f8cff;font-weight:600}
 button.good{background:linear-gradient(180deg,#2fa57b,#1f7d5b);border-color:#4cd0a1;font-weight:600}
 button.warn{background:linear-gradient(180deg,#d98d1c,#a5680b);border-color:#ffb020;font-weight:600}
-button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.danger{background:#4a1d28;border-color:#a8445a}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:10px}
 .brand h1{margin:0;font-size:20px;letter-spacing:.04em}
 .brand .sub{color:var(--dim);font-size:12px}
+.brand .sub b{color:var(--warn);font-weight:600}
 .stats{display:flex;gap:10px;flex-wrap:wrap}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 14px;min-width:110px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 14px;min-width:104px}
 .stat .lbl{display:block;color:var(--dim);font-size:11px}
 .stat b{font-size:20px;font-variant-numeric:tabular-nums}
 .stat .mini{color:var(--dim);font-size:12px;margin-left:2px}
 .tools{display:flex;gap:8px;align-items:center}
+#buffs{display:flex;gap:8px;flex-wrap:wrap;min-height:6px;margin-bottom:8px}
+.buff{background:#2a2250;border:1px solid #6a4fd8;border-radius:999px;padding:1px 12px;font-size:12px;color:#d8ccff}
+.buff.luck{background:#142e2a;border-color:#2fa57b;color:#aaf0d4}
 
 .grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
 .col{display:flex;flex-direction:column;gap:14px;min-width:0}
 .panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:16px;padding:14px}
 .panel h2{margin:0 0 10px;font-size:15px;display:flex;justify-content:space-between;align-items:baseline}
 .panel h2 small{color:var(--dim);font-weight:400}
+
+#hint{border:1px solid #3d57c9;background:#0f1738;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+#hint ol{margin:4px 0 8px;padding-left:20px;color:var(--dim)}
+#hint ol b{color:var(--text)}
 
 /* observation */
 .stage{display:flex;justify-content:center;padding:6px 0 2px}
@@ -61,7 +70,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   width:104px;height:104px;border-radius:50%;
   background:radial-gradient(circle at 32% 30%,#fff9,transparent 22%),radial-gradient(circle at 50% 50%,#3a4378,#141a3a 70%);
   box-shadow:0 0 28px 4px var(--tc),inset -10px -12px 24px #0008;
-  transition:box-shadow .3s, transform .3s;
+  transition:box-shadow .3s;
 }
 #orb.spin{animation:orbspin .22s linear infinite}
 #orb.pop{animation:orbpop .5s ease-out}
@@ -97,6 +106,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 #gaugeMsg.hot{color:var(--warn);font-weight:700}
 .actions{display:flex;gap:8px;margin-top:10px}
 .actions button{flex:1}
+.pickhint{font-size:12px;color:var(--dim);margin-top:6px;min-height:18px}
 .placeholder{color:var(--dim);text-align:center;padding:18px 0}
 
 .energy{margin-top:12px}
@@ -109,26 +119,37 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* slots */
 #slotGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.slot{border:1px solid var(--tc);border-radius:12px;padding:8px 10px;background:#0b1028;box-shadow:inset 0 0 18px color-mix(in srgb,var(--tc) 18%,transparent);display:flex;flex-direction:column;gap:4px;min-width:0}
+.slot{border:1px solid var(--tc);border-radius:12px;padding:8px 10px;background:#0b1028;box-shadow:inset 0 0 18px color-mix(in srgb,var(--tc) 18%,transparent);display:flex;flex-direction:column;gap:4px;min-width:0;position:relative}
 .slot.empty{border:1px dashed var(--line);box-shadow:none;color:var(--dim);align-items:center;justify-content:center;min-height:96px;font-size:13px}
+.slot.target{cursor:pointer;border-style:dashed}
+.slot.target:hover{background:#132050;border-color:var(--good)}
+.slot.locked{border-width:2px}
 .slot .sh{display:flex;justify-content:space-between;gap:6px;align-items:center}
-.slot .sn{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot .sn{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;gap:5px;align-items:center;min-width:0}
 .slot .sb{font-size:11px;color:var(--tc);white-space:nowrap}
+.mini-orb{flex:none;width:16px;height:16px;border-radius:50%;box-shadow:0 0 6px var(--tc)}
 .slot .so b{font-size:18px;font-variant-numeric:tabular-nums}
 .slot .so span{color:var(--dim);font-size:12px}
-.slot button{padding:4px 8px;font-size:12px}
+.slot .srow{display:flex;gap:4px}
+.slot .srow button{padding:4px 8px;font-size:12px}
+.slot .srow .lvbtn{flex:1;min-width:0}
+.slot .srow .lockbtn{padding:4px 6px}
+.slot .tag{position:absolute;right:8px;bottom:42px;font-size:11px;color:#d8ccff}
 
 /* side */
-.tabs{display:flex;gap:6px;margin-bottom:10px}
-.tabs button{flex:1;padding:6px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{flex:1;padding:6px 4px;font-size:13px;min-width:0;position:relative}
 .tabs button.on{background:var(--accent);color:#0b0e1f;border-color:var(--accent);font-weight:700}
+.tabs button .dot{position:absolute;top:3px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--good)}
 .up{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:8px;background:#0b1028}
 .up .t{font-weight:600}
 .up .t em{font-style:normal;color:var(--dim);font-weight:400;font-size:12px;margin-left:6px}
 .up .d{grid-column:1;color:var(--dim);font-size:12px}
 .up button{grid-row:1/3;grid-column:2;min-width:96px;font-size:13px}
 .up.afford{border-color:#3d57c9}
+.up.sp.afford{border-color:#b8851a}
 .cx-title{color:var(--dim);font-size:12px;margin:6px 0}
+.cx-title b{color:var(--warn)}
 .tierrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .tierrow .badge{opacity:.25;box-shadow:none}
 .tierrow .badge.got{opacity:1;box-shadow:0 0 10px var(--tc)}
@@ -136,6 +157,21 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .an.got{border-color:#6a4fd8}
 .an .h{color:var(--dim);font-size:12px}
 .cx-sum{margin-top:8px;color:var(--dim);font-size:12px}
+.bangbox{border:1px solid #8a5f10;background:#1a1405;border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.bangbox .gauge i{background:var(--warn)}
+.bangbox p{margin:0 0 4px;font-size:13px}
+.bangbox button{width:100%;margin-top:8px}
+.ach{display:grid;grid-template-columns:1fr auto;gap:0 10px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin-bottom:6px;background:#0b1028;font-size:13px}
+.ach.got{border-color:#b8851a;background:#1a1405}
+.ach .d{color:var(--dim);font-size:12px}
+.ach .p{grid-row:1/3;grid-column:2;align-self:center;font-size:12px;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+.ach.got .p{color:var(--warn)}
+.stbox{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:13px;margin-bottom:12px}
+.stbox span:nth-child(odd){color:var(--dim)}
+.stbox span:nth-child(even){text-align:right;font-variant-numeric:tabular-nums}
+textarea{width:100%;background:#0a0e22;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px;font:12px/1.4 ui-monospace,monospace;resize:vertical}
+.btnrow{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
+.btnrow button{flex:1;font-size:13px}
 
 #toasts{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;z-index:20;width:min(92vw,460px)}
 .toast{background:#0e1226ee;border:1px solid var(--line);border-radius:10px;padding:6px 14px;font-size:13px;animation:toast 3.2s ease forwards}
@@ -145,11 +181,26 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @keyframes flash{0%{opacity:.35}100%{opacity:0}}
 kbd{background:#0a0e22;border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px}
 
+.star{
+  position:fixed;z-index:15;width:56px;height:56px;border-radius:50%;padding:0;font-size:26px;line-height:1;
+  background:radial-gradient(circle,#fff 0%,#ffd86b 35%,#ff9d2e 70%,transparent 72%);
+  border:none;color:#7a3d00;box-shadow:0 0 26px 8px #ffb02088;animation:twinkle 1s ease-in-out infinite alternate;
+}
+.star:hover:not(:disabled){border:none}
+@keyframes twinkle{from{transform:scale(.9)}to{transform:scale(1.15)}}
+
+#modal{position:fixed;inset:0;background:#000b;z-index:30;display:grid;place-items:center;padding:16px}
+#modal[hidden]{display:none}
+.mbox{background:var(--panel);border:1px solid var(--warn);border-radius:18px;padding:22px;max-width:440px;box-shadow:0 0 40px #ffb02055}
+.mbox h2{margin:0 0 10px;font-size:20px;color:var(--warn)}
+.mbox p{margin:0 0 10px;color:var(--text)}
+.mbox button{width:100%}
+
 @media (max-width:860px){
   .grid{grid-template-columns:minmax(0,1fr)}
 }
 @media (prefers-reduced-motion:reduce){
-  #orb.spin,#orb.pop{animation:none}
+  #orb.spin,#orb.pop,.star{animation:none}
   #flash.go{animation:none}
 }
 </style>
@@ -159,7 +210,7 @@ kbd{background:#0a0e22;border:1px solid var(--line);border-radius:5px;padding:0 
   <header class="top">
     <div class="brand">
       <h1>平行宇宙抽樣器</h1>
-      <span class="sub">觀測隨機宇宙，留下最好的，培育你的文明</span>
+      <span class="sub">觀測隨機宇宙，留下最好的，培育你的文明 · <b id="title"></b></span>
     </div>
     <div class="stats">
       <div class="stat"><span class="lbl">文明點數</span><b id="cp">0</b></div>
@@ -171,10 +222,21 @@ kbd{background:#0a0e22;border:1px solid var(--line);border-radius:5px;padding:0 
       <button id="mute" aria-label="開關音效">🔊</button>
     </div>
   </header>
+  <div id="buffs"></div>
 
   <main class="grid">
     <div class="col">
       <section class="panel" aria-label="觀測">
+        <div id="hint" hidden>
+          <b>怎麼玩</b>
+          <ol>
+            <li><b>觀測</b>隨機宇宙。四個常數決定它每秒能產出多少文明點數。</li>
+            <li><b>收藏</b>比較好的，<b>回收</b>不要的換點數。有空位時按 <kbd>K</kbd>，也可以直接點選要取代的槽位。</li>
+            <li>用點數升級、培育宇宙；累積夠多就發動<b>大爆炸</b>，換取永久的奇點加成。</li>
+            <li>留意畫面上偶爾出現的 <b>✦ 星象</b>，點擊有驚喜。</li>
+          </ol>
+          <button id="hintOk" class="primary">知道了</button>
+        </div>
         <div class="stage"><div id="orbWrap"><div id="orb"></div></div></div>
 
         <div id="card">
@@ -198,31 +260,47 @@ kbd{background:#0a0e22;border:1px solid var(--line);border-radius:5px;padding:0 
       </section>
     </div>
 
-    <section class="panel" aria-label="升級與圖鑑">
-      <div class="tabs">
-        <button id="tabUp" class="on">升級</button>
-        <button id="tabCx">圖鑑</button>
+    <section class="panel" aria-label="升級、奇點、成就、圖鑑與設定">
+      <div class="tabs" id="tabs">
+        <button data-tab="up" class="on">升級<span class="dot" hidden></span></button>
+        <button data-tab="sing">奇點<span class="dot" hidden></span></button>
+        <button data-tab="ach">成就</button>
+        <button data-tab="cx">圖鑑</button>
+        <button data-tab="set">設定</button>
       </div>
-      <div id="paneUp"></div>
-      <div id="paneCx" hidden></div>
+      <div id="pane-up"></div>
+      <div id="pane-sing" hidden></div>
+      <div id="pane-ach" hidden></div>
+      <div id="pane-cx" hidden></div>
+      <div id="pane-set" hidden></div>
     </section>
   </main>
 </div>
 <div id="toasts" aria-live="polite"></div>
 <div id="flash"></div>
+<div id="modal" hidden>
+  <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <h2 id="mTitle"></h2>
+    <div id="mBody"></div>
+    <button id="mOk" class="warn">繼續探索</button>
+  </div>
+</div>
 
 <script>
 (() => {
 'use strict';
 
-/* ---------- 常數與資料表 ---------- */
+/* ================================================================
+   資料表
+   ================================================================ */
 const SAVE_KEY = 'multiverse-sampler-v1';
 const SIG = 0.7;                       // 各常數取對數後的標準差
 const W = { G: 0.5, c: 1.2, r: 0.9, L: -0.4 };   // 各常數對產出的影響(對數空間)
-const SD = SIG * Math.sqrt(W.G**2 + W.c**2 + W.r**2 + W.L**2);
+const SD = SIG * Math.sqrt(W.G ** 2 + W.c ** 2 + W.r ** 2 + W.L ** 2);
 const BASE_OUT = 0.6;
-const LEVEL_MULT = 1.3;
 const RECYCLE_SECS = 8;                // 回收 = 該宇宙 8 秒的產出
+const ACH_BONUS = 0.03;                // 每個成就 +3% 全部產出
+const BANG_BASE = 1e8;                 // 大爆炸：奇點 = floor(sqrt(本輪累計 / BANG_BASE))
 
 const TIERS = [
   { n: '普通', z: -Infinity, color: '#9aa6b8' },
@@ -257,13 +335,14 @@ const NOUN = ['之海', '之門', '之環', '迷宮', '花園', '深淵', '彼�
 const regenInt = n => 2 * 0.85 ** n;
 const autoInt = n => 2.4 * 0.8 ** (n - 1);
 
+/* 本輪升級（大爆炸會重置） */
 const UPS = [
   { id: 'energyMax', n: '觀測儲能', max: 10, cost: n => 40 * 1.8 ** n,
     d: n => `能量上限 ${10 + 2 * n} → ${12 + 2 * n}` },
   { id: 'regen', n: '快速回復', max: 12, cost: n => 60 * 2 ** n,
     d: n => `回復間隔 ${regenInt(n).toFixed(2)}s → ${regenInt(n + 1).toFixed(2)}s` },
   { id: 'slots', n: '宇宙槽位', max: 9, cost: n => 100 * 3 ** n,
-    d: n => `槽位 ${3 + n} → ${4 + n}` },
+    d: n => `槽位 +1 (本輪共 ${3 + S.su.head + n} → ${4 + S.su.head + n})` },
   { id: 'luck', n: '觀測幸運', max: 15, cost: n => 150 * 3 ** n,
     d: n => `更容易抽到好宇宙 (幸運 ${n} → ${n + 1})` },
   { id: 'mult', n: '文明加速', max: Infinity, cost: n => 100 * 4 ** n,
@@ -271,25 +350,104 @@ const UPS = [
   { id: 'auto', n: '自動觀測', max: 8, cost: n => 500 * 2.5 ** n,
     d: n => n === 0 ? '解鎖：能量足夠時自動觀測' : `間隔 ${autoInt(n).toFixed(2)}s → ${autoInt(n + 1).toFixed(2)}s` },
   { id: 'curate', n: '自動篩選', max: 1, cost: () => 1500,
-    d: () => '比最弱的槽位強就自動收藏，否則自動回收' },
+    d: () => '比最弱的未鎖定槽位強就自動收藏，否則自動回收' },
 ];
 
-/* ---------- 狀態 ---------- */
+/* 奇點商店（永久，花奇點購買） */
+const SUPS = [
+  { id: 'head',   n: '先發優勢', max: 3, cost: n => 2 * 3 ** n,
+    d: n => `每輪起始 +1 個宇宙槽位 (${n} → ${n + 1})` },
+  { id: 'mem',    n: '記憶殘留', max: 1, cost: () => 3,
+    d: () => '大爆炸後保留「自動觀測 Lv.1」與「自動篩選」' },
+  { id: 'rec',    n: '熵回收',   max: 8, cost: n => 1 + n,
+    d: n => `回收獲得的點數 +25% (目前 +${25 * n}%)` },
+  { id: 'luck',   n: '命運偏移', max: 5, cost: n => 3 + 2 * n,
+    d: n => `永久獲得 2 級幸運 (目前 +${2 * n} 級)` },
+  { id: 'cx',     n: '圖鑑共鳴', max: 4, cost: n => 4 + 3 * n,
+    d: n => `圖鑑加成 ×${(1 + 0.5 * n).toFixed(1)} → ×${(1.5 + 0.5 * n).toFixed(1)}` },
+  { id: 'lvl',    n: '培育效率', max: 5, cost: n => 3 + 2 * n,
+    d: n => `每級培育的產出倍率 ×${(1.3 + 0.02 * n).toFixed(2)} → ×${(1.32 + 0.02 * n).toFixed(2)}` },
+  { id: 'off',    n: '離線強化', max: 5, cost: n => 2 + n,
+    d: n => `離線收益 ${50 + 10 * n}% → ${60 + 10 * n}%` },
+  { id: 'energy', n: '儲能共鳴', max: 5, cost: n => 2 + n,
+    d: n => `能量上限永久 +3 (目前 +${3 * n})` },
+  { id: 'evt',    n: '星象感應', max: 5, cost: n => 3 + n,
+    d: n => `星象更常出現，獎勵更豐厚 (+${30 * n}% → +${30 * (n + 1)}%)` },
+];
+
+/* 成就：每個 +3% 全部產出 */
+const filledSlots = () => S.slots.slice(0, slotCount()).filter(Boolean).length;
+const ACH = [
+  { id: 's1',  n: '初學觀測',   d: '累計觀測 100 次',   cur: () => S.stats.samples, goal: 100 },
+  { id: 's2',  n: '勤奮觀測',   d: '累計觀測 1,000 次', cur: () => S.stats.samples, goal: 1000 },
+  { id: 's3',  n: '不眠天文台', d: '累計觀測 10,000 次', cur: () => S.stats.samples, goal: 10000 },
+  { id: 't3',  n: '紫色的光',   d: '發現史詩宇宙',     cur: () => +!!S.codex.tiers[3], goal: 1 },
+  { id: 't4',  n: '黃金傳說',   d: '發現傳說宇宙',     cur: () => +!!S.codex.tiers[4], goal: 1 },
+  { id: 't5',  n: '神話降臨',   d: '發現神話宇宙',     cur: () => +!!S.codex.tiers[5], goal: 1 },
+  { id: 'a3',  n: '異象獵人',   d: '發現 3 種異象',     cur: () => Object.keys(S.codex.anoms).length, goal: 3 },
+  { id: 'a6',  n: '異象全集',   d: '發現全部 6 種異象', cur: () => Object.keys(S.codex.anoms).length, goal: 6 },
+  { id: 'pf',  n: '一切剛剛好', d: '發現「完美平衡」宇宙', cur: () => +!!S.codex.anoms.perfect, goal: 1 },
+  { id: 'c1',  n: '第一桶金',   d: '累計獲得 1K 點數',  cur: () => S.stats.totalCp, goal: 1e3 },
+  { id: 'c2',  n: '百萬文明',   d: '累計獲得 1M 點數',  cur: () => S.stats.totalCp, goal: 1e6 },
+  { id: 'c3',  n: '十億文明',   d: '累計獲得 1B 點數',  cur: () => S.stats.totalCp, goal: 1e9 },
+  { id: 'c4',  n: '兆級文明',   d: '累計獲得 1T 點數',  cur: () => S.stats.totalCp, goal: 1e12 },
+  { id: 'c5',  n: '卡爾達肖夫', d: '累計獲得 1Qa 點數', cur: () => S.stats.totalCp, goal: 1e15 },
+  { id: 'r1',  n: '穩定產出',   d: '每秒產出達 1K',     cur: () => S.stats.bestRate, goal: 1e3 },
+  { id: 'r2',  n: '洪流',       d: '每秒產出達 1M',     cur: () => S.stats.bestRate, goal: 1e6 },
+  { id: 'r3',  n: '恆星引擎',   d: '每秒產出達 1B',     cur: () => S.stats.bestRate, goal: 1e9 },
+  { id: 'sl',  n: '收藏家',     d: '同時擁有 9 個宇宙', cur: filledSlots, goal: 9 },
+  { id: 'ep',  n: '精英陣容',   d: '同時擁有 3 個史詩以上宇宙',
+    cur: () => S.slots.slice(0, slotCount()).filter(u => u && u.tier >= 3).length, goal: 3 },
+  { id: 'l1',  n: '悉心栽培',   d: '把一個宇宙培育到 Lv.10', cur: () => S.stats.maxLvl, goal: 10 },
+  { id: 'l2',  n: '文明搖籃',   d: '把一個宇宙培育到 Lv.20', cur: () => S.stats.maxLvl, goal: 20 },
+  { id: 'rc',  n: '資源回收員', d: '回收宇宙 500 次',   cur: () => S.stats.recycles, goal: 500 },
+  { id: 'b1',  n: '起源',       d: '發動第一次大爆炸',  cur: () => S.stats.bangs, goal: 1 },
+  { id: 'b2',  n: '輪迴',       d: '發動 5 次大爆炸',   cur: () => S.stats.bangs, goal: 5 },
+  { id: 'sp',  n: '奇點收集者', d: '累計獲得 50 個奇點', cur: () => S.sing, goal: 50 },
+  { id: 'ev',  n: '追星人',     d: '點擊 10 個星象',     cur: () => S.stats.events, goal: 10 },
+];
+const RANKS = [
+  [0, '新手觀測員'], [4, '見習天文學家'], [8, '宇宙探索者'],
+  [13, '多元宇宙學家'], [19, '造物者'], [ACH.length, '萬物之主'],
+];
+
+/* ================================================================
+   狀態
+   ================================================================ */
 const fresh = () => ({
   cp: 0, runCp: 0, energy: 10,
-  slots: [], up: { energyMax: 0, regen: 0, slots: 0, luck: 0, mult: 0, auto: 0, curate: 0 },
-  autoOn: true, sing: 0,
+  slots: [],
+  up: { energyMax: 0, regen: 0, slots: 0, luck: 0, mult: 0, auto: 0, curate: 0 },
+  su: { head: 0, mem: 0, rec: 0, luck: 0, cx: 0, lvl: 0, off: 0, energy: 0, evt: 0 },
+  autoOn: true, sing: 0, singSpent: 0,
   codex: { tiers: {}, anoms: {} },
-  stats: { samples: 0, bestZ: -9, bangs: 0 },
-  muted: false, last: Date.now(),
+  ach: {},
+  stats: { samples: 0, bestZ: -9, bangs: 0, totalCp: 0, bestRate: 0, events: 0, recycles: 0, maxLvl: 0, play: 0 },
+  buff: { luckUntil: 0, prodUntil: 0 },
+  won: false, seen: false, muted: false, last: Date.now(),
 });
 let S = fresh();
 let candidate = null;         // 目前待決定的宇宙(不存檔)
 let revealing = false;
 let dirtySlots = true;
+let dirtyCodex = true;
 let autoAcc = 0;
+let eventAcc = 0, eventAt = 60;
+let tab = 'up';
 
-/* ---------- 工具 ---------- */
+function normalize(d) {
+  const f = fresh();
+  const o = Object.assign(f, d);
+  for (const k of ['up', 'su', 'stats', 'buff', 'ach']) o[k] = Object.assign(fresh()[k], d[k]);
+  o.codex = { tiers: Object.assign({}, d.codex && d.codex.tiers), anoms: Object.assign({}, d.codex && d.codex.anoms) };
+  o.slots = (Array.isArray(d.slots) ? d.slots : []).map(u =>
+    u && u.v && typeof u.base === 'number' ? Object.assign({ lvl: 0, locked: false, anoms: [], tier: 0, z: 0, name: '未命名' }, u) : null);
+  return o;
+}
+
+/* ================================================================
+   工具
+   ================================================================ */
 const $ = id => document.getElementById(id);
 const SUF = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
 function fmt(n) {
@@ -299,6 +457,11 @@ function fmt(n) {
   if (e >= SUF.length) return n.toExponential(2).replace('+', '');
   return (n / 1000 ** e).toFixed(2) + SUF[e];
 }
+function fmtTime(s) {
+  s = Math.floor(s);
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+  return h ? `${h} 小時 ${m} 分` : `${m} 分 ${s % 60} 秒`;
+}
 function randn() {
   let u = 0, v = 0;
   while (!u) u = Math.random();
@@ -307,26 +470,39 @@ function randn() {
 }
 const pick = a => a[Math.floor(Math.random() * a.length)];
 const tierOf = z => { let t = 0; TIERS.forEach((x, i) => { if (z >= x.z) t = i; }); return t; };
+const now = () => Date.now();
 
-/* ---------- 遊戲規則 ---------- */
-const maxEnergy = () => 10 + 2 * S.up.energyMax;
-const slotCount = () => 3 + S.up.slots;
+/* ================================================================
+   遊戲規則
+   ================================================================ */
+const maxEnergy = () => 10 + 2 * S.up.energyMax + 3 * S.su.energy;
+const slotCount = () => 3 + S.up.slots + S.su.head;
+const luckLevels = () => S.up.luck + 2 * S.su.luck + (now() < S.buff.luckUntil ? 10 : 0);
+const levelMult = () => 1.3 + 0.02 * S.su.lvl;
+const offlineEff = () => 0.5 + 0.1 * S.su.off;
 const codexCount = () => [Object.keys(S.codex.tiers).length, Object.keys(S.codex.anoms).length];
+const achCount = () => Object.keys(S.ach).length;
+const codexMult = () => { const [t, a] = codexCount(); return 1 + (0.05 * t + 0.10 * a) * (1 + 0.5 * S.su.cx); };
+const achMult = () => 1 + ACH_BONUS * achCount();
+const singMult = () => 1 + 0.5 * S.sing;
+const singAvail = () => S.sing - S.singSpent;
 function globalMult() {
-  const [t, a] = codexCount();
-  return 1.5 ** S.up.mult * (1 + 0.5 * S.sing) * (1 + 0.05 * t + 0.10 * a);
+  return 1.5 ** S.up.mult * singMult() * codexMult() * achMult() * (now() < S.buff.prodUntil ? 5 : 1);
 }
-const uOut = u => u.base * LEVEL_MULT ** u.lvl * globalMult();
+const uOut = u => u.base * levelMult() ** u.lvl * globalMult();
 const lvlCost = u => 25 * 2.5 ** u.lvl;
+const recycleValue = u => uOut(u) * RECYCLE_SECS * (1 + 0.25 * S.su.rec);
 function totalRate() {
+  const gm = globalMult(), lm = levelMult();
   let r = 0;
-  for (let i = 0; i < slotCount(); i++) if (S.slots[i]) r += uOut(S.slots[i]);
+  for (let i = 0; i < slotCount(); i++) { const u = S.slots[i]; if (u) r += u.base * lm ** u.lvl * gm; }
   return r;
 }
-const bangGain = () => Math.floor(Math.sqrt(S.runCp / 1e8));
+const bangGain = () => Math.floor(Math.sqrt(S.runCp / BANG_BASE));
+const rankName = () => { let r = RANKS[0][1]; for (const [n, name] of RANKS) if (achCount() >= n) r = name; return r; };
 
 function generate() {
-  const luck = S.up.luck * 0.03;
+  const luck = luckLevels() * 0.03;
   const ln = {
     G: randn() * SIG + luck, c: randn() * SIG + luck,
     r: randn() * SIG + luck, L: randn() * SIG - luck,
@@ -339,11 +515,19 @@ function generate() {
   return {
     name: pick(ADJ) + pick(NOUN) + '·' + String(Math.floor(Math.random() * 9000) + 1000),
     v, z, tier: tierOf(z), anoms: anoms.map(a => a.id),
-    base: BASE_OUT * Math.exp(lnOut) * am, lvl: 0,
+    base: BASE_OUT * Math.exp(lnOut) * am, lvl: 0, locked: false,
   };
 }
 
-/* ---------- 音效 ---------- */
+function orbBg(u) {
+  const h1 = (210 + Math.log(u.v.c) * 70 + 360) % 360, h2 = (280 + Math.log(u.v.r) * 70 + 360) % 360;
+  return `radial-gradient(circle at 32% 30%,#fffa,transparent 22%),` +
+         `radial-gradient(circle at 60% 60%,hsl(${h2} 70% 38%),hsl(${h1} 75% 22%) 75%)`;
+}
+
+/* ================================================================
+   音效 / 提示
+   ================================================================ */
 let actx = null;
 function beep(freq, dur = 0.09, type = 'sine', vol = 0.05, delay = 0) {
   if (S.muted) return;
@@ -363,8 +547,6 @@ function tierSound(t) {
   beep(base, 0.1, 'triangle', 0.04);
   for (let i = 1; i <= t; i++) beep(base * (1 + i * 0.25), 0.12, 'triangle', 0.045, i * 0.07);
 }
-
-/* ---------- 提示 ---------- */
 function toast(msg) {
   const el = document.createElement('div');
   el.className = 'toast'; el.textContent = msg;
@@ -384,8 +566,16 @@ function flash(color) {
   f.style.setProperty('--tc', color);
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
 }
+function showModal(title, html) {
+  $('mTitle').textContent = title;
+  $('mBody').innerHTML = html;
+  $('modal').hidden = false;
+  $('mOk').focus();
+}
 
-/* ---------- 觀測流程 ---------- */
+/* ================================================================
+   觀測流程
+   ================================================================ */
 function observe(auto = false) {
   if (revealing || S.energy < 1) return;
   S.energy -= 1;
@@ -432,12 +622,7 @@ function finishReveal(u) {
   const t = TIERS[u.tier];
   const orb = $('orb');
   orb.classList.remove('spin'); void orb.offsetWidth; orb.classList.add('pop');
-  orb.style.setProperty('--tc', t.color);
-  const h1 = (210 + Math.log(u.v.c) * 70 + 360) % 360, h2 = (280 + Math.log(u.v.r) * 70 + 360) % 360;
-  orb.style.background =
-    `radial-gradient(circle at 32% 30%,#fffa,transparent 22%),` +
-    `radial-gradient(circle at 60% 60%,hsl(${h2} 70% 38%),hsl(${h1} 75% 22%) 75%)`;
-  $('orbWrap').style.setProperty('--tc', t.color);
+  orb.style.background = orbBg(u);
   document.documentElement.style.setProperty('--tc', t.color);
 
   $('uName').textContent = u.name;
@@ -472,12 +657,12 @@ function finishReveal(u) {
   // 圖鑑
   if (!S.codex.tiers[u.tier]) {
     S.codex.tiers[u.tier] = 1;
-    toast(`圖鑑新增：${t.n} 宇宙 (全部產出 +5%)`);
+    toast(`圖鑑新增：${t.n}宇宙 (全部產出加成)`);
   }
   u.anoms.forEach(id => {
     if (!S.codex.anoms[id]) {
       S.codex.anoms[id] = 1;
-      toast(`圖鑑新增異象：${ANOMS.find(a => a.id === id).n} (全部產出 +10%)`);
+      toast(`圖鑑新增異象：${ANOMS.find(a => a.id === id).n}`);
     }
   });
   if (u.z > S.stats.bestZ) S.stats.bestZ = u.z;
@@ -494,53 +679,56 @@ function finishReveal(u) {
 }
 
 function autoDecide(u) {
-  const worst = worstSlot();
-  const cur = worst.idx >= 0 ? worst.out : -1;
-  if (worst.empty || uOut(u) > cur) keep(); else recycle();
+  const w = worstSlot();
+  if (w.idx >= 0 && (w.empty || uOut(u) > w.out)) keep(); else recycle();
 }
 
+/* 預設的取代對象：先找空槽，否則是最弱的「未鎖定」槽位；全部鎖定時 idx = -1 */
 function worstSlot() {
-  let idx = -1, out = Infinity, empty = false;
+  let idx = -1, out = Infinity;
   for (let i = 0; i < slotCount(); i++) {
     const s = S.slots[i];
     if (!s) return { idx: i, out: 0, empty: true };
+    if (s.locked) continue;
     const o = uOut(s);
     if (o < out) { out = o; idx = i; }
   }
-  return { idx, out, empty };
+  return { idx, out, empty: false };
 }
 
-function recycleValue(u) { return uOut(u) * RECYCLE_SECS; }
-
-function keep() {
-  if (!candidate || revealing) return;
-  const u = candidate;
-  const w = worstSlot();
-  const old = S.slots[w.idx];
+function keepAt(i) {
+  if (!candidate || revealing || i < 0 || i >= slotCount()) return;
+  const old = S.slots[i];
+  if (old && old.locked) return;
   if (old) {
     const v = recycleValue(old);
-    addCp(v);
+    addCp(v); S.stats.recycles++;
     floatText('+' + fmt(v) + ' CP', '#8fd3ff');
   }
-  S.slots[w.idx] = u;
+  S.slots[i] = candidate;
   candidate = null;
   dirtySlots = true;
   beep(520, 0.08, 'sine', 0.05); beep(780, 0.1, 'sine', 0.05, 0.07);
   markResolved('已收藏');
   render();
 }
+function keep() {
+  if (!candidate || revealing) return;
+  const w = worstSlot();
+  if (w.idx >= 0) keepAt(w.idx);
+}
 
 function recycle(silent = false) {
   if (!candidate || revealing) return;
   const v = recycleValue(candidate);
-  addCp(v);
+  addCp(v); S.stats.recycles++;
   if (!silent) { floatText('+' + fmt(v) + ' CP', '#8fd3ff'); beep(300, 0.06, 'sine', 0.03); }
   candidate = null;
   if (!silent) markResolved('已回收');
   render();
 }
 
-function addCp(v) { S.cp += v; S.runCp += v; }
+function addCp(v) { S.cp += v; S.runCp += v; S.stats.totalCp += v; }
 
 function levelUp(i) {
   const u = S.slots[i];
@@ -548,7 +736,16 @@ function levelUp(i) {
   const c = lvlCost(u);
   if (S.cp < c) return;
   S.cp -= c; u.lvl++;
+  if (u.lvl > S.stats.maxLvl) S.stats.maxLvl = u.lvl;
   beep(600 + u.lvl * 20, 0.07, 'triangle', 0.04);
+  render();
+}
+function toggleLock(i) {
+  const u = S.slots[i];
+  if (!u) return;
+  u.locked = !u.locked;
+  dirtySlots = true;
+  if (candidate) updateKeepButton();
   render();
 }
 
@@ -565,23 +762,100 @@ function buy(id) {
   render();
 }
 
+function buySing(id) {
+  const d = SUPS.find(x => x.id === id);
+  const n = S.su[id];
+  if (n >= d.max) return;
+  const c = d.cost(n);
+  if (singAvail() < c) return;
+  S.singSpent += c; S.su[id]++;
+  if (id === 'mem') { S.up.auto = Math.max(S.up.auto, 1); S.up.curate = 1; }
+  if (id === 'head') dirtySlots = true;
+  beep(520, 0.1, 'sine', 0.05); beep(780, 0.1, 'sine', 0.05, 0.08); beep(1040, 0.14, 'sine', 0.05, 0.16);
+  render();
+}
+
 function bigBang() {
   const g = bangGain();
   if (g < 1) return;
-  if (!confirm(`發動大爆炸？\n\n你會獲得 ${g} 個奇點 (每個奇點讓全部產出 +50%)。\n文明點數、升級與已收藏的宇宙會重置，圖鑑與奇點會保留。`)) return;
-  const keepState = { sing: S.sing + g, codex: S.codex, stats: S.stats, muted: S.muted, autoOn: S.autoOn };
+  if (!confirm(`發動大爆炸？\n\n你會獲得 ${g} 個奇點 (每個奇點讓全部產出 +50%，也可以在奇點商店購買永久升級)。\n文明點數、本輪升級與已收藏的宇宙會重置，奇點、圖鑑與成就會保留。`)) return;
+  const keepState = {
+    sing: S.sing + g, singSpent: S.singSpent, su: S.su, codex: S.codex, ach: S.ach, stats: S.stats,
+    muted: S.muted, autoOn: S.autoOn, won: S.won, seen: S.seen,
+  };
   S = Object.assign(fresh(), keepState);
   S.stats.bangs++;
-  candidate = null; dirtySlots = true; dirtyCodex = true; cardBuilt = false;
+  if (S.su.mem) { S.up.auto = 1; S.up.curate = 1; }
+  S.energy = maxEnergy();
+  candidate = null; revealing = false; dirtySlots = true; dirtyCodex = true; cardBuilt = false;
   $('card').innerHTML = '<div class="placeholder">新的宇宙誕生了。按下「觀測新宇宙」繼續。</div>';
-  toast(`大爆炸！奇點 +${g}，目前全部產出 ×${(1 + 0.5 * S.sing).toFixed(2)}`);
+  toast(`大爆炸！奇點 +${g}，目前全部產出 ×${singMult().toFixed(2)}`);
+  flash('#ffb020'); beep(160, 0.5, 'sawtooth', 0.05); beep(880, 0.4, 'triangle', 0.05, 0.25);
   render(); save();
 }
 
-/* ---------- 畫面 ---------- */
-let dirtyCodex = true;
-let cardBuilt = false;
+/* ================================================================
+   星象事件
+   ================================================================ */
+function scheduleEvent() {
+  eventAcc = 0;
+  eventAt = (45 + Math.random() * 55) / (1 + 0.3 * S.su.evt);
+}
+function spawnStar() {
+  if ($('star')) return;
+  const el = document.createElement('button');
+  el.id = 'star'; el.className = 'star'; el.textContent = '✦';
+  el.setAttribute('aria-label', '星象：點擊獲得獎勵');
+  el.style.left = (6 + Math.random() * 82) + '%';
+  el.style.top = (14 + Math.random() * 66) + '%';
+  el.onclick = collectStar;
+  document.body.appendChild(el);
+  beep(990, 0.12, 'sine', 0.04); beep(1320, 0.16, 'sine', 0.04, 0.1);
+  setTimeout(() => { if (el.isConnected) el.remove(); }, 14000);
+}
+function collectStar() {
+  const el = $('star'); if (el) el.remove();
+  const k = 1 + 0.3 * S.su.evt, r = Math.random();
+  S.stats.events++;
+  if (r < 0.4) {
+    const g = Math.max(totalRate() * 60 * k, 50 * k);
+    addCp(g); toast(`🌠 星塵暴！獲得 ${fmt(g)} CP`);
+  } else if (r < 0.65) {
+    S.energy = maxEnergy(); toast('⚡ 能量潮！觀測能量全滿');
+  } else if (r < 0.85) {
+    S.buff.luckUntil = now() + 30000 * k; toast(`🍀 幸運流星！${Math.round(30 * k)} 秒內更容易抽到好宇宙`);
+  } else {
+    S.buff.prodUntil = now() + 20000 * k; toast(`🔥 文明狂熱！${Math.round(20 * k)} 秒內全部產出 ×5`);
+  }
+  beep(660, 0.08, 'triangle', 0.05); beep(990, 0.1, 'triangle', 0.05, 0.07); beep(1320, 0.14, 'triangle', 0.05, 0.14);
+  render();
+}
 
+/* ================================================================
+   成就 / 結局
+   ================================================================ */
+function checkAch() {
+  for (const a of ACH) {
+    if (!S.ach[a.id] && a.cur() >= a.goal) {
+      S.ach[a.id] = 1;
+      toast(`🏆 成就解鎖：${a.n} (全部產出 +${Math.round(ACH_BONUS * 100)}%)`);
+      beep(784, 0.1, 'triangle', 0.05); beep(1046, 0.16, 'triangle', 0.05, 0.1);
+    }
+  }
+  if (!S.won && Object.keys(S.codex.tiers).length === TIERS.length &&
+      Object.keys(S.codex.anoms).length === ANOMS.length && S.sing >= 10) {
+    S.won = true;
+    showModal('你找到了萬物理論', `
+      <p>你觀測過每一種稀有度、每一種異象。無數個平行宇宙的常數，在你面前展開成一張完整的地圖。</p>
+      <p>累計觀測 ${S.stats.samples} 次 · 大爆炸 ${S.stats.bangs} 次 · 成就 ${achCount()} / ${ACH.length}</p>
+      <p>宇宙沒有盡頭，奇點也沒有。想繼續累積的話，旅程仍然開放。</p>`);
+  }
+}
+
+/* ================================================================
+   畫面：觀測卡片
+   ================================================================ */
+let cardBuilt = false;
 function renderCardShell() {
   if (cardBuilt) {
     CONSTS.forEach(c => delete $('row-' + c.k).dataset.set);
@@ -603,7 +877,8 @@ function renderCardShell() {
     <div class="actions">
       <button id="keepBtn" class="good" disabled>收藏</button>
       <button id="recBtn" disabled>回收</button>
-    </div>`;
+    </div>
+    <div class="pickhint" id="pickHint"></div>`;
   $('keepBtn').onclick = keep;
   $('recBtn').onclick = () => recycle();
   cardBuilt = true;
@@ -615,15 +890,17 @@ function updateKeepButton() {
   if (!kb || !candidate) return;
   const w = worstSlot();
   const out = uOut(candidate);
-  if (w.empty) {
-    kb.textContent = `收藏到空槽 (${fmt(out)}/s)`; kb.className = 'good';
-  } else if (out > w.out) {
-    kb.textContent = `取代 #${w.idx + 1}：${fmt(w.out)} → ${fmt(out)}/s`; kb.className = 'good';
+  if (w.idx < 0) {
+    kb.textContent = '所有槽位都已鎖定'; kb.className = 'warn'; kb.disabled = true;
   } else {
-    kb.textContent = `取代 #${w.idx + 1}：${fmt(w.out)} → ${fmt(out)}/s (較弱)`; kb.className = 'warn';
+    if (w.empty) { kb.textContent = `收藏到空槽 (${fmt(out)}/s)`; kb.className = 'good'; }
+    else if (out > w.out) { kb.textContent = `取代 #${w.idx + 1}：${fmt(w.out)} → ${fmt(out)}/s`; kb.className = 'good'; }
+    else { kb.textContent = `取代 #${w.idx + 1}：${fmt(w.out)} → ${fmt(out)}/s (較弱)`; kb.className = 'warn'; }
+    kb.disabled = false;
   }
-  kb.disabled = false; rb.disabled = false;
+  rb.disabled = false;
   rb.textContent = `回收 +${fmt(recycleValue(candidate))} CP`;
+  $('pickHint').textContent = '也可以直接點選下方的槽位，指定要取代誰。';
 }
 
 function markResolved(msg) {
@@ -631,25 +908,39 @@ function markResolved(msg) {
   if (!kb) return;
   kb.disabled = true; rb.disabled = true;
   kb.className = ''; kb.textContent = msg; rb.textContent = '回收';
+  $('pickHint').textContent = '';
 }
 
-/* 槽位：結構變動時重建，其餘只更新文字 */
+/* ================================================================
+   畫面：槽位（結構變動時重建，其餘只更新文字）
+   ================================================================ */
 function buildSlots() {
   const grid = $('slotGrid');
   grid.innerHTML = '';
   for (let i = 0; i < slotCount(); i++) {
     const u = S.slots[i];
     const el = document.createElement('div');
+    el.onclick = () => { if (candidate && !revealing) keepAt(i); };
     if (!u) {
       el.className = 'slot empty'; el.textContent = `空槽 #${i + 1}`;
     } else {
-      const t = TIERS[u.tier];
-      el.className = 'slot'; el.style.setProperty('--tc', t.color);
+      const t = TIERS[u.tier] || TIERS[0];
+      el.className = 'slot' + (u.locked ? ' locked' : '');
+      el.style.setProperty('--tc', t.color);
       el.innerHTML = `
-        <div class="sh"><span class="sn" title="${u.name}">#${i + 1} ${u.name}</span><span class="sb">${t.n}</span></div>
+        <div class="sh"><span class="sn"><i class="mini-orb"></i><span class="nm"></span></span><span class="sb"></span></div>
         <div class="so"><b class="o">0</b><span>/s</span> <span class="lv"></span></div>
-        <button class="lvbtn"></button>`;
-      el.querySelector('.lvbtn').onclick = () => levelUp(i);
+        <div class="tag"></div>
+        <div class="srow"><button class="lvbtn"></button><button class="lockbtn" aria-label="鎖定或解鎖"></button></div>`;
+      el.querySelector('.mini-orb').style.background = orbBg(u);
+      el.querySelector('.nm').textContent = `#${i + 1} ${u.name}`;
+      el.querySelector('.sb').textContent = t.n;
+      el.querySelector('.tag').textContent = u.anoms.length ? `✦×${u.anoms.length}` : '';
+      el.querySelector('.lvbtn').onclick = e => { e.stopPropagation(); levelUp(i); };
+      const lb = el.querySelector('.lockbtn');
+      lb.textContent = u.locked ? '🔒' : '🔓';
+      lb.title = u.locked ? '已鎖定：不會被取代' : '點擊鎖定，避免被取代';
+      lb.onclick = e => { e.stopPropagation(); toggleLock(i); };
     }
     grid.appendChild(el);
   }
@@ -658,38 +949,38 @@ function buildSlots() {
 function updateSlots() {
   if (dirtySlots) buildSlots();
   const els = $('slotGrid').children;
+  const picking = !!candidate && !revealing;
   for (let i = 0; i < els.length; i++) {
-    const u = S.slots[i];
+    const u = S.slots[i], el = els[i];
+    el.classList.toggle('target', picking && !(u && u.locked));
     if (!u) continue;
-    const el = els[i], c = lvlCost(u);
+    const c = lvlCost(u);
     el.querySelector('.o').textContent = fmt(uOut(u));
     el.querySelector('.lv').textContent = u.lvl ? `Lv.${u.lvl}` : '';
     const b = el.querySelector('.lvbtn');
-    b.textContent = `培育 ${fmt(c)} CP`;
+    b.textContent = `培育 ${fmt(c)}`;
     b.disabled = S.cp < c;
   }
-  const filled = S.slots.slice(0, slotCount()).filter(Boolean).length;
-  $('slotInfo').textContent = `${filled} / ${slotCount()}`;
+  $('slotInfo').textContent = `${filledSlots()} / ${slotCount()}`;
 }
 
-/* 升級面板：建立一次，之後只更新 */
-let upBuilt = false;
-function buildUps() {
-  const pane = $('paneUp');
-  pane.innerHTML = '';
-  UPS.forEach(d => {
+/* ================================================================
+   畫面：側邊分頁
+   ================================================================ */
+function buildList(paneId, defs, onBuy, spClass) {
+  const pane = $(paneId);
+  defs.forEach(d => {
     const el = document.createElement('div');
-    el.className = 'up'; el.id = 'up-' + d.id;
+    el.className = 'up' + (spClass ? ' sp' : ''); el.id = (spClass ? 'su-' : 'up-') + d.id;
     el.innerHTML = `<div class="t">${d.n}<em></em></div><div class="d"></div><button></button>`;
-    el.querySelector('button').onclick = () => buy(d.id);
+    el.querySelector('button').onclick = () => onBuy(d.id);
     pane.appendChild(el);
   });
-  upBuilt = true;
 }
-function updateUps() {
-  if (!upBuilt) buildUps();
-  UPS.forEach(d => {
-    const el = $('up-' + d.id), n = S.up[d.id];
+function updateList(defs, levels, prefix, budget, unit) {
+  let any = false;
+  defs.forEach(d => {
+    const el = $(prefix + d.id), n = levels[d.id];
     const maxed = n >= d.max;
     el.querySelector('em').textContent = d.max === Infinity ? `Lv.${n}` : `Lv.${n}/${d.max}`;
     el.querySelector('.d').textContent = maxed ? '已達上限' : d.d(n);
@@ -697,32 +988,143 @@ function updateUps() {
     if (maxed) { b.textContent = '已滿'; b.disabled = true; el.classList.remove('afford'); }
     else {
       const c = d.cost(n);
-      b.textContent = fmt(c) + ' CP'; b.disabled = S.cp < c;
-      el.classList.toggle('afford', S.cp >= c);
+      b.textContent = fmt(c) + ' ' + unit; b.disabled = budget < c;
+      el.classList.toggle('afford', budget >= c);
+      if (budget >= c) any = true;
     }
+  });
+  return any;
+}
+
+function buildSingPane() {
+  $('pane-sing').innerHTML = `
+    <div class="bangbox">
+      <p id="bangInfo"></p>
+      <div class="gauge"><i id="bangFill"></i></div>
+      <p id="bangNext" style="color:var(--dim);font-size:12px;margin-top:4px"></p>
+      <button id="bangBtn2" class="warn">大爆炸</button>
+    </div>
+    <div class="cx-title">奇點商店 · 可用奇點 <b id="spAvail">0</b>　(每個累計奇點使全部產出 +50%，花掉也不會失去)</div>
+    <div id="supList"></div>`;
+  buildList('supList', SUPS, buySing, true);
+  $('bangBtn2').onclick = bigBang;
+}
+function updateSingPane() {
+  const g = bangGain();
+  $('bangInfo').textContent = g >= 1
+    ? `現在發動大爆炸可獲得 ${g} 個奇點。`
+    : `本輪累計 ${fmt(S.runCp)} CP，達到 ${fmt(BANG_BASE)} CP 即可獲得第 1 個奇點。`;
+  const cur = BANG_BASE * g * g, nxt = BANG_BASE * (g + 1) ** 2;
+  $('bangFill').style.width = Math.max(0, Math.min(100, (S.runCp - cur) / (nxt - cur) * 100)) + '%';
+  $('bangNext').textContent = `下一個奇點需要本輪累計 ${fmt(nxt)} CP`;
+  $('bangBtn2').disabled = g < 1;
+  $('spAvail').textContent = singAvail();
+  updateList(SUPS, S.su, 'su-', singAvail(), '奇點');
+}
+
+function buildAchPane() {
+  const pane = $('pane-ach');
+  pane.innerHTML = `<div class="cx-title" id="achSum"></div>`;
+  ACH.forEach(a => {
+    const el = document.createElement('div');
+    el.className = 'ach'; el.id = 'ach-' + a.id;
+    el.innerHTML = `<div class="t"></div><div class="d"></div><div class="p"></div>`;
+    el.querySelector('.t').textContent = a.n;
+    el.querySelector('.d').textContent = a.d;
+    pane.appendChild(el);
+  });
+}
+function updateAchPane() {
+  $('achSum').innerHTML = `已解鎖 <b>${achCount()}</b> / ${ACH.length} · 全部產出 ×${achMult().toFixed(2)} · 稱號「${rankName()}」`;
+  ACH.forEach(a => {
+    const el = $('ach-' + a.id), got = !!S.ach[a.id];
+    el.classList.toggle('got', got);
+    el.querySelector('.p').textContent = got ? '✔' : `${fmt(Math.min(a.cur(), a.goal))} / ${fmt(a.goal)}`;
   });
 }
 
 function renderCodex() {
   const [t, a] = codexCount();
-  const pane = $('paneCx');
-  pane.innerHTML = `
-    <div class="cx-title">稀有度 (每種首次發現：全部產出 +5%)</div>
+  const k = 1 + 0.5 * S.su.cx;
+  $('pane-cx').innerHTML = `
+    <div class="cx-title">稀有度 (每種首次發現：全部產出 +${(5 * k).toFixed(1).replace('.0', '')}%)</div>
     <div class="tierrow">${TIERS.map((x, i) =>
       `<span class="badge ${S.codex.tiers[i] ? 'got' : ''}" style="--tc:${x.color}">${x.n}</span>`).join('')}</div>
-    <div class="cx-title">異象 (每種首次發現：全部產出 +10%)</div>
+    <div class="cx-title">異象 (每種首次發現：全部產出 +${(10 * k).toFixed(1).replace('.0', '')}%)</div>
     ${ANOMS.map(x => S.codex.anoms[x.id]
       ? `<div class="an got"><span>✦ ${x.n} <small>×${x.m}</small></span><span class="h">${x.h}</span></div>`
       : `<div class="an"><span>？？？</span><span class="h">提示：${x.h}</span></div>`).join('')}
-    <div class="cx-sum">圖鑑加成：全部產出 ×${(1 + 0.05 * t + 0.10 * a).toFixed(2)}<br>
-    累計觀測 ${S.stats.samples} 次 · 大爆炸 ${S.stats.bangs} 次</div>`;
+    <div class="cx-sum">圖鑑加成：全部產出 ×${codexMult().toFixed(2)} (${t}/${TIERS.length} 稀有度 · ${a}/${ANOMS.length} 異象)</div>`;
   dirtyCodex = false;
 }
 
+function buildSetPane() {
+  $('pane-set').innerHTML = `
+    <div class="cx-title">統計</div>
+    <div class="stbox" id="statBox"></div>
+    <div class="cx-title">存檔 (自動存在這個瀏覽器；換裝置時用匯出入)</div>
+    <textarea id="saveBox" rows="3" placeholder="匯出的存檔會出現在這裡；要匯入請貼上後按「匯入」" spellcheck="false"></textarea>
+    <div class="btnrow">
+      <button id="expBtn">匯出</button>
+      <button id="impBtn">匯入</button>
+      <button id="rstBtn" class="danger">重置進度</button>
+    </div>`;
+  $('expBtn').onclick = () => {
+    save();
+    const code = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+    $('saveBox').value = code; $('saveBox').select();
+    const manual = () => toast('存檔已產生，請手動複製');
+    try { navigator.clipboard.writeText(code).then(() => toast('存檔已複製到剪貼簿'), manual); } catch (e) { manual(); }
+  };
+  $('impBtn').onclick = () => {
+    const raw = $('saveBox').value.trim();
+    if (!raw) return toast('請先貼上存檔');
+    try {
+      const d = JSON.parse(decodeURIComponent(escape(atob(raw))));
+      if (typeof d !== 'object' || d === null || typeof d.cp !== 'number') throw new Error('bad');
+      if (!confirm('匯入會覆蓋目前的進度，確定嗎？')) return;
+      S = normalize(d); S.last = now();
+      candidate = null; dirtySlots = true; dirtyCodex = true; cardBuilt = false;
+      $('card').innerHTML = '<div class="placeholder">存檔已匯入。按下「觀測新宇宙」繼續。</div>';
+      toast('匯入成功'); render(); save();
+    } catch (e) { toast('存檔格式不正確'); }
+  };
+  $('rstBtn').onclick = () => {
+    if (!confirm('這會刪除所有進度，包含奇點、圖鑑與成就。確定嗎？')) return;
+    if (!confirm('真的要重置嗎？這個動作無法復原。')) return;
+    S = fresh(); save(); location.reload();
+  };
+}
+function updateStats() {
+  const rows = [
+    ['累計觀測', S.stats.samples.toLocaleString()],
+    ['累計獲得點數', fmt(S.stats.totalCp)],
+    ['最高每秒產出', fmt(S.stats.bestRate)],
+    ['最佳宇宙 z 值', S.stats.bestZ > -9 ? S.stats.bestZ.toFixed(2) : '—'],
+    ['大爆炸次數', S.stats.bangs],
+    ['累計奇點', S.sing],
+    ['點擊星象', S.stats.events],
+    ['遊玩時間', fmtTime(S.stats.play)],
+  ];
+  $('statBox').innerHTML = rows.map(r => `<span>${r[0]}</span><span>${r[1]}</span>`).join('');
+}
+
+function setTab(name) {
+  tab = name;
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  ['up', 'sing', 'ach', 'cx', 'set'].forEach(n => { $('pane-' + n).hidden = n !== name; });
+  if (name === 'cx') renderCodex();
+  render();
+}
+
+/* ================================================================
+   總渲染
+   ================================================================ */
 function render() {
   $('cp').textContent = fmt(S.cp);
   $('rate').textContent = fmt(totalRate());
-  $('sing').textContent = S.sing;
+  $('sing').textContent = singAvail() === S.sing ? S.sing : `${singAvail()} / ${S.sing}`;
+  $('title').textContent = `稱號：${rankName()}`;
 
   const g = bangGain();
   const bb = $('bang');
@@ -732,82 +1134,104 @@ function render() {
   const mx = maxEnergy();
   $('eTxt').textContent = `${Math.floor(S.energy)} / ${mx}`;
   $('eFill').style.width = (S.energy / mx * 100) + '%';
-  const ob = $('obsBtn');
-  ob.disabled = revealing || S.energy < 1;
-  if (S.energy >= mx) $('eNext').textContent = '已滿';
-  else $('eNext').textContent = `下一點 ${((1 - (S.energy % 1)) * regenInt(S.up.regen)).toFixed(1)}s`;
+  $('obsBtn').disabled = revealing || S.energy < 1;
+  $('eNext').textContent = S.energy >= mx ? '已滿' : `下一點 ${((1 - (S.energy % 1)) * regenInt(S.up.regen)).toFixed(1)}s`;
 
   $('autoLbl').hidden = S.up.auto < 1;
+  $('hint').hidden = S.seen;
   updateSlots();
-  updateUps();
-  if (dirtyCodex && !$('paneCx').hidden) renderCodex();
+
+  const tn = now();
+  $('buffs').innerHTML = '';
+  if (tn < S.buff.luckUntil) addBuff('🍀 幸運', S.buff.luckUntil - tn, 'luck');
+  if (tn < S.buff.prodUntil) addBuff('🔥 狂熱 ×5', S.buff.prodUntil - tn, '');
+
+  const upAffordable = updateList(UPS, S.up, 'up-', S.cp, 'CP');
+  if (tab === 'sing') updateSingPane();
+  if (tab === 'ach') updateAchPane();
+  if (tab === 'cx' && dirtyCodex) renderCodex();
+  if (tab === 'set') updateStats();
+  const dots = document.querySelectorAll('#tabs .dot');
+  dots[0].hidden = !upAffordable || tab === 'up';
+  dots[1].hidden = !(g >= 1 || SUPS.some(d => S.su[d.id] < d.max && singAvail() >= d.cost(S.su[d.id]))) || tab === 'sing';
+}
+function addBuff(label, ms, cls) {
+  const el = document.createElement('span');
+  el.className = 'buff ' + cls;
+  el.textContent = `${label} ${Math.ceil(ms / 1000)}s`;
+  $('buffs').appendChild(el);
 }
 
-/* ---------- 主迴圈 ---------- */
+/* ================================================================
+   主迴圈
+   ================================================================ */
 function tick() {
-  const now = Date.now();
-  let dt = (now - S.last) / 1000;
-  S.last = now;
+  const t = now();
+  const dt = (t - S.last) / 1000;
+  S.last = t;
   if (dt <= 0) return;
   const rate = totalRate();
   const mx = maxEnergy();
+  if (rate > S.stats.bestRate) S.stats.bestRate = rate;
 
   if (dt > 120) {                       // 離線
     const sec = Math.min(dt, 8 * 3600);
-    const gain = rate * sec * 0.5;
+    const gain = rate * sec * offlineEff();
     addCp(gain);
     S.energy = mx;
     if (gain > 0) toast(`離線 ${Math.round(sec / 60)} 分鐘，獲得 ${fmt(gain)} CP`);
   } else {
     addCp(rate * dt);
+    S.stats.play += dt;
     S.energy = Math.min(mx, S.energy + dt / regenInt(S.up.regen));
-  }
 
-  if (S.up.auto > 0 && S.autoOn && dt <= 120) {
-    autoAcc += dt;
-    if (autoAcc >= autoInt(S.up.auto) && S.energy >= 1 && !revealing) {
-      autoAcc = 0;
-      observe(true);
+    if (S.up.auto > 0 && S.autoOn) {
+      autoAcc += dt;
+      if (autoAcc >= autoInt(S.up.auto) && S.energy >= 1 && !revealing) {
+        autoAcc = 0;
+        observe(true);
+      }
+    }
+    if (!document.hidden && $('modal').hidden) {
+      eventAcc += dt;
+      if (eventAcc >= eventAt) { scheduleEvent(); spawnStar(); }
     }
   }
+  checkAch();
   render();
 }
 
-/* ---------- 存檔 ---------- */
+/* ================================================================
+   存檔
+   ================================================================ */
 function save() {
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* 無痕模式等情況 */ }
 }
 function load() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return;
-    const d = JSON.parse(raw);
-    const f = fresh();
-    S = Object.assign(f, d, {
-      up: Object.assign(f.up, d.up),
-      codex: Object.assign(f.codex, d.codex),
-      stats: Object.assign(f.stats, d.stats),
-    });
-    S.slots = (d.slots || []).map(u => u || null);
+    if (raw) S = normalize(JSON.parse(raw));
   } catch (e) { S = fresh(); }
 }
 
-/* ---------- 事件 ---------- */
+/* ================================================================
+   事件綁定與啟動
+   ================================================================ */
 $('obsBtn').onclick = () => observe();
 $('bang').onclick = bigBang;
 $('autoOn').onchange = e => { S.autoOn = e.target.checked; };
+$('hintOk').onclick = () => { S.seen = true; render(); };
+$('mOk').onclick = () => { $('modal').hidden = true; };
 $('mute').onclick = () => { S.muted = !S.muted; $('mute').textContent = S.muted ? '🔇' : '🔊'; };
-$('tabUp').onclick = () => {
-  $('paneUp').hidden = false; $('paneCx').hidden = true;
-  $('tabUp').classList.add('on'); $('tabCx').classList.remove('on');
-};
-$('tabCx').onclick = () => {
-  $('paneUp').hidden = true; $('paneCx').hidden = false;
-  $('tabCx').classList.add('on'); $('tabUp').classList.remove('on');
-  renderCodex();
-};
+$('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-tab]');
+  if (b) setTab(b.dataset.tab);
+});
 document.addEventListener('keydown', e => {
   if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (!$('modal').hidden) return;
+  const tg = e.target.tagName;
+  if (tg === 'TEXTAREA' || tg === 'INPUT') return;
   if (e.code === 'Space') { e.preventDefault(); observe(); }
   else if (e.code === 'KeyK') keep();
   else if (e.code === 'KeyR') recycle();
@@ -815,8 +1239,12 @@ document.addEventListener('keydown', e => {
 window.addEventListener('beforeunload', save);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
-/* ---------- 啟動 ---------- */
 load();
+buildList('pane-up', UPS, buy, false);
+buildSingPane();
+buildAchPane();
+buildSetPane();
+scheduleEvent();
 $('mute').textContent = S.muted ? '🔇' : '🔊';
 $('autoOn').checked = S.autoOn;
 tick();
@@ -825,9 +1253,10 @@ setInterval(save, 5000);
 
 if (location.hash.includes('debug')) {
   window.__mv = {
-    get S() { return S; }, observe, keep, recycle, buy, levelUp, tick, generate, uOut, totalRate,
-    get candidate() { return candidate; }, UPS, TIERS, ANOMS,
-    set S(v) { S = v; },
+    get S() { return S; }, set S(v) { S = v; },
+    observe, keep, keepAt, recycle, buy, buySing, bigBang, levelUp, tick, generate, uOut, totalRate, bangGain,
+    spawnStar, collectStar, checkAch, singAvail,
+    get candidate() { return candidate; }, UPS, SUPS, TIERS, ANOMS, ACH,
   };
 }
 })();
