@@ -1,0 +1,56 @@
+# S5 衝線｜Google Flow：Frames to Video（首幀＋尾幀）
+
+- 模型：Veo 3.1 Lite｜長度：8 秒｜畫幅：16:9｜720p
+- 首幀：`04_frames/shot_05_start.png`
+- 尾幀：`04_frames/shot_05_end_v2.png`
+- 後期取用：生成第 1.3–6.63 秒（撞線約在生成第 4.0 秒，對片中 0:24.00）。實際撞線時刻以成片為準，取用區間要依它平移。
+- 預算：10 點（全片 70 點的第 1 次）。
+
+---
+
+## 中文底稿（給你看；貼 Flow 請用下面的英文版）
+
+【畫風】乾淨的現代 2D 日系手繪動畫，賽璐珞平塗上色，線條俐落，暖色金色夕陽光，無顆粒與紋理。整段畫風、顏色、人物設計與首幀和尾幀完全一致。
+【鏡頭】整段 8 秒，整段慢動作（約 0.4 倍速），全景，低機位、中長焦，固定機位，不推不拉不搖，不切鏡。
+【構圖與配色】沙褐色跑道、白色分道線；右上方遠處是金色逆光的太陽與暖橘天空，左側是看台，右側是樹林；一條白色終點帶橫跨跑道中段。影子往畫面左前方，風往畫面左後方。完全對齊首幀。
+【人物】小晴：十七歲女生，全黑單一高馬尾（純黑髮圈）、齊瀏海、深藍無袖背心、胸前一塊純白素面號碼布（無字、無數字、無別針）、黑色短褲（無開衩）、純紅跑鞋配白底（無標誌、無記號）。兩名對手：模糊的小身影，一人灰上衣深灰短褲、一人白上衣黃短褲，沒有任何紅色，步態不同。
+【逐秒】
+0–0.2 秒：畫面完全靜止，與首幀一模一樣。
+0.2–3.8 秒：小晴咬牙全力衝刺，沿著斜線從畫面左後方朝右前方跑向終點帶；頭髮與號碼布邊緣被風吹向畫面左後方。兩名對手一直在她後方的畫面左側，速度比她慢，全程在終點帶前面，不靠近她、不交叉。
+3.8–4.3 秒：她的胸口撞上終點帶，帶子從中間斷成兩截；同時雙臂順勢向兩側張開。
+4.3–7.7 秒：她繼續慢慢往右前方跑，雙臂張開、頭微微後仰、露出喜悅疲憊的表情；斷成兩截的帶子先隨她往前飄，再往畫面左右兩側垂落，一直留在畫面中，不消失。對手仍在終點帶前面、沒有人過線。
+最後 0.3 秒：所有人完全停住，畫面與尾幀完全一致。
+【聲音】只有輕微的風聲與腳步聲。人物不說話。無背景音樂。無觀眾歡呼。
+【約束】畫面裡自始至終只有首幀這三個人（小晴與兩名對手）與終點帶；臉與身形全程不變；小晴在整段保持與首尾幀相近的大小，不衝向鏡頭、不變得比尾幀更大。背景（看台、樹、跑道分道線、太陽）保持不變，不新增人物與物品。畫面乾淨，無文字、無字幕、無浮水印、無商標。
+
+---
+
+## English prompt（直接貼進 Flow）
+
+```text
+[Style] Clean modern Japanese 2D hand-drawn animation, flat cel-shaded coloring, crisp clean linework, warm golden-hour light, no film grain, no texture. Style, colors and character design stay exactly identical to the first frame and the last frame throughout.
+
+[Camera] 8 seconds total, the whole shot in slow motion (about 0.4x speed). Wide shot, low angle, medium-telephoto look. Locked-off static camera: no push, no pull, no pan, no cut.
+
+[Composition and color] Sandy beige-brown running track with white lane lines. Far upper right: a golden backlit sun and a warm orange sky. Stands on the left, trees on the right. One white finish-line tape stretches across the middle of the track. Shadows fall toward the left-front of the frame; wind blows toward the left-rear. Match the first frame exactly.
+
+[Characters] "Xiao Qing": a 17-year-old girl, single high jet-black ponytail with a plain black hair tie, straight bangs, dark navy sleeveless running tank top, a plain pure-white race bib on her chest (no text, no numbers, no pins), plain black shorts (no side slits), completely plain bright red running shoes with white soles (no logos, no marks). Two small blurred opposing runners: one in a gray top and dark gray shorts, one in a white top and yellow shorts; NO red anywhere on them; they run with different strides.
+
+[Timeline]
+0–0.2 s: the picture is completely still, identical to the first frame.
+0.2–3.8 s: Xiao Qing sprints at full effort with a gritted-teeth expression, running diagonally from the left-rear toward the right-front, toward the finish tape; her hair and the edges of her bib flutter toward the left-rear. The two opposing runners stay behind her on the left side of the frame, slower than her, always before the finish tape, never approaching her, never crossing her path.
+3.8–4.3 s: her chest hits the finish tape and the tape snaps in the middle into two pieces; at the same time her arms swing open to both sides.
+4.3–7.7 s: she keeps running slowly toward the right-front with both arms spread wide, head tilted slightly back, a joyful exhausted expression; the two pieces of the broken tape first drift forward with her, then droop down toward the left and right sides of the frame, and stay visible in the frame, never disappearing. The opposing runners stay before the tape; nobody else crosses the line.
+Last 0.3 s: everything stops completely, and the picture is identical to the last frame.
+
+[Sound] Only soft wind and light footsteps. No speech. No background music. No crowd cheering.
+
+[Constraints] From start to finish only the three runners from the first frame (Xiao Qing and two opponents) and the finish tape appear. Faces and body shapes never change. Xiao Qing stays about the same size as in the first and last frames: she never runs into the camera and never grows larger than in the last frame. The background (stands, trees, lane lines, sun) stays unchanged; no new people or objects. Clean image: no text, no captions, no watermark, no logos.
+```
+
+---
+
+## 送出後
+1. 把 8 秒影片存成 `06_clips/shot_05_v1.mp4`（新版本一律存新檔名，不覆蓋）。
+2. **請你親自看動態**，我看不到：撞線有沒有斷成兩截、小晴有沒有衝進鏡頭、對手有沒有亂動、背景有沒有蠕動。
+3. 有問題告訴我哪個時間點出錯，我先看能不能剪掉或用程式修，修不好再改提示詞重拍（要等你同意花點數）。
