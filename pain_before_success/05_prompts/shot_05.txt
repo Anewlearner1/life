@@ -2,7 +2,7 @@
 
 - 模型：Veo 3.1 Lite｜長度：8 秒｜畫幅：16:9｜720p
 - 首幀：`04_frames/shot_05_start.png`
-- 尾幀：`04_frames/shot_05_end_v2.png`
+- 尾幀：`04_frames/shot_05_end_v3.png`（v2 只把髮圈改成深色，其餘相同）
 - 後期取用：生成第 1.3–6.63 秒（撞線約在生成第 4.0 秒，對片中 0:24.00）。實際撞線時刻以成片為準，取用區間依它平移。
 - 預算：10 點（全片 70 點的第 1 次）。
 
@@ -18,9 +18,9 @@ v1 → v2 修改：尺寸句改成「平順變大到尾幀大小」；風格改�
 【人物】小晴：十七歲女生，全黑單一高馬尾（深色小髮圈）、齊瀏海、深藍無袖背心、胸前一塊純白素面號碼布（無字、無數字、無別針）、黑色短褲（無開衩）、純紅跑鞋配白底（無標誌、無記號）。兩名對手：比小晴更小、離鏡頭更遠、稍微失焦，一人灰上衣深灰短褲、一人白上衣黃短褲，沒有任何紅色，步態不同。
 【逐秒】
 0–0.2 秒：畫面完全靜止，與首幀一模一樣。
-0.2–3.8 秒：小晴咬牙全力衝刺，沿著斜線從畫面左後方朝右前方跑向終點帶，從首幀的大小平順、逐漸地變大；頭髮與馬尾被風吹向畫面左後方。兩名對手一直離鏡頭比她更遠、在畫面左側，速度比她慢，全程在終點帶的遠側、尚未過線，不靠近她、不交叉。
+0.2–3.8 秒：小晴咬牙全力衝刺，沿著斜線從畫面左後方朝右前方跑向終點帶，從首幀的大小平順、逐漸地變大；頭髮與馬尾被風吹向畫面左後方。兩名對手一直離鏡頭比她更遠、在畫面左側，速度比她慢，全程在從鏡頭看去的終點帶後方、尚未過線，只會因為往前跑而稍微變大，不靠近她、不交叉。
 3.8–4.3 秒：她的胸口撞上終點帶，帶子在被撞到的位置斷成兩截；接著雙臂順勢向兩側張開。
-4.3–7.7 秒：她繼續慢慢往右前方跑，雙臂張開、頭微微後仰，表情慢慢轉成喜悅；斷成兩截的帶子先隨她往前飄，再往畫面左右兩側垂落，一直留在畫面中，不消失。對手仍沒有過線。
+4.3–7.7 秒：她繼續往右前方跑，雙臂張開、頭微微後仰，表情慢慢轉成喜悅；斷成兩截的帶子先隨她往前飄，再往畫面左右兩側垂落，一直留在畫面中，不消失。對手仍沒有過線。
 最後 0.3 秒：所有人完全停住，畫面與尾幀完全一致。
 【聲音】只有輕微的風聲與腳步聲。人物不說話。無背景音樂。無觀眾歡呼。
 【約束】畫面裡自始至終只有首幀這三個人（小晴與兩名對手）與終點帶；臉與身形全程不變。小晴只會從首幀大小平順地變大到尾幀大小，過程中不突然放大、絕不比尾幀更大，不衝向鏡頭。背景（看台、樹、跑道分道線、太陽）保持不變，不新增人物與物品。除了紅鞋以外，任何地方都沒有紅色或粉色配件。畫面乾淨，無文字、無字幕、無浮水印、無商標。
@@ -40,9 +40,9 @@ v1 → v2 修改：尺寸句改成「平順變大到尾幀大小」；風格改�
 
 [Timeline]
 0–0.2 s: the picture is completely still, identical to the first frame.
-0.2–3.8 s: Xiao Qing sprints at full effort with a gritted-teeth expression, running diagonally from the left-rear toward the right-front, toward the finish tape, smoothly and gradually growing from her size in the first frame; her hair and ponytail are blown toward the left-rear. The two opponents always stay farther from the camera than Xiao Qing, on the left side of the frame, slower than her, on the far side of the finish tape and have not crossed it; they never approach her and never cross her path.
+0.2–3.8 s: Xiao Qing sprints at full effort with a gritted-teeth expression, running diagonally from the left-rear toward the right-front, toward the finish tape, smoothly and gradually growing from her size in the first frame; her hair and ponytail are blown toward the left-rear. The two opponents always stay farther from the camera than Xiao Qing, on the left side of the frame, slower than her, behind the finish tape from the camera's view and have not crossed it; they grow only slightly larger as they run forward, never approach her and never cross her path.
 3.8–4.3 s: her chest hits the finish tape and the tape snaps at the point where her chest hits it, into two pieces; then her arms swing open to both sides.
-4.3–7.7 s: she keeps running slowly toward the right-front with both arms spread wide and her head tilted slightly back, her expression slowly turning to joy; the two pieces of the broken tape first drift forward with her, then droop down toward the left and right sides of the frame, and stay visible in the frame, never disappearing. The opponents still have not crossed the line.
+4.3–7.7 s: she keeps running toward the right-front with both arms spread wide and her head tilted slightly back, her expression slowly turning to joy; the two pieces of the broken tape first drift forward with her, then droop down toward the left and right sides of the frame, and stay visible in the frame, never disappearing. The opponents still have not crossed the line.
 Last 0.3 s: everything stops completely, and the picture is identical to the last frame.
 
 [Sound] Only soft wind and light footsteps. No speech. No background music. No crowd cheering.
