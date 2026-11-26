@@ -73,3 +73,19 @@ No logos, brand marks, text, labels, letters or numbers anywhere.
 
 ## 交回之後
 4 張圖全部傳給我。我會先用 Python 檢查比例和配色，再交給審核子 Agent 放大檢查一致性：髮圈、瀏海、鞋子數量、破洞只在右鞋、無文字。最後請你確認。
+
+---
+
+## 3D v2 鞋子道具設定圖（v1 審核不通過：渲染過細、破洞內露紅色、左右定義矛盾）
+- **上傳參考圖**：`style_sample_v1.png`、`char_xiaoqing_outfits_v1.png`（讓鞋子渲染和角色同一等級）
+- **存檔名**：`03_design/prop_shoes_v2.png`
+
+```text
+Using the uploaded images as the exact style reference, create a PROP DESIGN SHEET. 16:9, 1920x1080, plain warm light-beige background (#EFE4D2), even soft neutral lighting. The rendering must be SIMPLE FLAT CEL-SHADED 2D animation, exactly the same level of detail as the characters in the uploaded images: flat color areas, one soft shadow tone, thin clean linework. NOT realistic, NO fabric texture, NO mesh holes, NO fibers, NO crocodile or knit texture.
+
+Left side – the OLD running shoes: exactly one pair (two shoes), white (#E6DFD1) with a few bold blue (#4A6FA5) diagonal stripes (only 3–4 thick stripes per shoe), a few small dirt smudges in fixed spots only (not covered in mud), thin worn gray soles. Viewed from the front with toes pointing toward the viewer, show the pair side by side. THE HOLE IS ON THE SHOE AT THE LEFT SIDE OF THE IMAGE ONLY: a small torn hole right at the very front of its toe cap, near the sole, and the inside of the hole is DARK GRAY (not red, not pink). The shoe on the right side of the image has NO hole. Below, show the hole shoe alone in side view, toe pointing right, hole clearly visible.
+
+Right side – the NEW running shoes: exactly one pair (two shoes), solid flat bright red (#D7322B) uppers with NO texture, one thin stitched seam line on the side, pure white midsole and thin dark-gray outsole. Plain: no stripes, no swoosh, no logos, no side markings. Same angle as the old pair. Below, one new shoe alone in side view.
+
+Exactly two shoes in each pair. No logos, brand marks, text, labels, letters or numbers anywhere.
+```
