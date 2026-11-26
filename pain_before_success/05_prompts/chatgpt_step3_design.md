@@ -96,3 +96,27 @@ Exactly two pairs of shoes in total (one old pair, one new pair) plus the single
 
 ## 交回給我之後
 我會用 Python 檢查比例、配色和黑白明暗，再交給獨立審核子 Agent 放大檢查，最後請你確認。
+
+---
+
+## 3A v2 畫風樣幀（v1 審核不通過：畫成了日系動漫風）
+
+- **上傳參考圖（4 張）**：`ref_A_fullbody.png`、`ref_B_lamp_interior.png`、`ref_C_sunset_exterior.png`、**`ref_D_face_closeup.png`**（新增，臉部畫法）
+- **存檔名**：`03_design/style_sample_v2.png`
+- **建議**：在新對話裡貼上；如果在原對話接著修改，ChatGPT 容易沿用 v1 的動漫畫風。
+
+```text
+Use the four uploaded images ONLY as a style reference. Match their rendering style EXACTLY, but do NOT copy their characters, outfits, or scenes.
+
+STYLE (most important): Western feature-animation 2D illustration style matching the references exactly — NOT anime, NOT manga, NOT Japanese animation style. Painterly cel shading with strong warm shadow shapes on face and body, a bright warm rim light, bold confident linework with thick-thin variation, hair drawn as bold chunky shapes (not fine strands). The background is painted as a stylized illustration, not photographic depth-of-field blur. No film grain, no texture overlay, no vignette.
+
+CHARACTER PROPORTIONS AND FACE (match the references): large head relative to the body, long thin neck, elongated stylized torso and limbs. Large round cartoon nose with a rosy pink-orange tip. Big round expressive eyes with visible whites and dark brown irises, thick expressive eyebrows. Light freckles and soft blush on the cheeks. No anime sweat drops.
+
+Scene: a quiet athletics track at golden-hour sunset. The running track surface is a LOW-SATURATION SANDY BEIGE-BROWN (#D2B48C), NOT red. Warm sunlight comes from the right side of the frame.
+
+Character: "Xiao Qing", a 17-year-old East Asian high-school girl, long-distance runner, slim athletic build. Black hair in a single high ponytail tied at the exact back-center of her head with a plain black hair tie that blends into the hair (no colored scrunchie), straight-cut full bangs, no stray flyaway strands. Plain dark navy sleeveless running tank top (#1F2E4A) with NO text, logo, or number; plain black running shorts. Completely plain bright red running shoes (#D7322B) with clean white soles — no stripes, no swoosh, no side markings. No accessories, no jewelry, no watch.
+
+Composition: medium-full shot, eye level. Her body is turned three-quarter toward the LEFT of the frame (not facing the camera). She stands still catching her breath, hands on her hips, looking toward the left with a tired but determined expression. Her head sits at about 62% of the frame width from the left. Empty track and a painted stadium in the background, no people.
+
+Absolutely no text, letters, numbers, signs, logos, watermarks, or captions anywhere in the image.
+```
