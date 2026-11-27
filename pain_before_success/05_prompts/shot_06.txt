@@ -1,0 +1,35 @@
+# S6 看台含淚笑｜Google Flow：Frames to Video（首幀＋尾幀）　v1
+
+- 模型：Veo 3.1 Lite｜8 秒｜16:9｜720p
+- 首幀：`04_frames/shot_06_start.png`　尾幀：`04_frames/shot_06_end.png`
+- 後期取用：生成第 0.3–5.63 秒；固定機位。
+- 預算：10 點（全片最後一鏡）。
+
+## English prompt（直接貼進 Flow）
+
+```text
+[Style] Japanese animated-film look: cel-shaded characters with clean linework, a softly painted detailed background, warm golden afternoon light. Style, colors and character design stay exactly identical to the first frame and the last frame throughout.
+
+[Camera] 8 seconds total. A medium close-up at eye level, straight from the front. Locked-off static camera: no push, no pull, no pan, no cut.
+
+[Scene] A sunny golden afternoon in a stadium grandstand, with warm golden backlight and softly blurred rows of warm brown seats and green trees behind. Mom stands on the left of the frame (her head at about one third of the frame width), hugging a clean pair of old white running shoes with a blue band against her chest with both arms. Auntie sits on the right of the frame, lower than Mom. Far behind them, three small spectators stay in fixed poses: one raising a single hand with a towel around his neck, one sitting with her hands resting on her lap, one standing with a hand on his hip. Match the first frame exactly.
+
+[Characters] "Mom": about 45 years old, a black chin-length bob, a beige knit cardigan over a white top. The shoes she hugs: exactly two worn old white shoes with a blue band; only the shoe on the LEFT side of the image has a small torn hole at the toe with a dark gray inside, the other shoe has no hole. "Auntie": about 60 years old, short curly gray-white hair, an olive-green short-sleeve top.
+
+[Timeline]
+0–0.2 s: the picture is completely still, identical to the first frame: Mom is tense, holding her breath, her eyes fixed on the running track at the lower left of the frame, her arms hugging the shoes; Auntie sits calmly, looking at the track at the lower left, her hands resting in her lap out of view.
+0.2–2.0 s: both keep watching the track, only breathing softly.
+2.0–4.0 s: Mom's expression slowly breaks: her eyes fill with tears that run down her cheeks, and her tight lips tremble into a trembling, happy smile. Her arms keep hugging the shoes in the same way.
+3.5–5.5 s: Auntie turns her head and looks up toward Mom, smiles warmly, and starts to clap softly, her hands rising in front of her chest.
+5.5–7.7 s: Mom, smiling through her tears, hugs the shoes a little tighter; Auntie keeps clapping gently, looking at Mom.
+Last 0.3 s: everything stops completely, and the picture is identical to the last frame: Mom smiling through tears and hugging the shoes, Auntie clapping and smiling at her.
+
+[Sound] Only a soft breeze, quiet breathing, and the gentle sound of Auntie's light clapping. No speech. No cheering. No background music.
+
+[Constraints] Mom's arms keep hugging the shoes the whole time; there are always exactly two shoes, the hole only in the shoe on the left side of the image. Mom's face never turns away. The three spectators in the background keep their poses and do not clap or move around, nobody else appears, and no one walks into the frame. Faces never deform. Clean image: no text, no captions, no watermark, no logos.
+```
+
+## 送出後
+1. 存成 `06_clips/shot_06_v1.mp4`（新版本一律存新檔名）。
+2. **請你親自看動態**：媽媽的眼淚與表情變化是否自然、阿姨有沒有轉頭並鼓掌（手是從畫面下方升起）、鞋子是否一直只有兩隻、背景三人有沒有亂動或一起鼓掌、聲音是否只有輕輕掌聲。
+3. 有問題告訴我時間點；先看能不能剪掉或用程式修，再問你是否重拍。
