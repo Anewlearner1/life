@@ -1,0 +1,55 @@
+# S2 臥室放鞋｜Google Flow：Frames to Video（首幀＋尾幀）　v1
+
+- 模型：Veo 3.1 Lite｜長度：8 秒｜畫幅：16:9｜720p
+- 首幀：`04_frames/shot_02_start.png`
+- 尾幀：`04_frames/shot_02_end.png`
+- 後期取用：生成第 1.0–6.33 秒（放鞋動作要在約第 5.5 秒前完成）。**固定機位，不做後期推近**（尾幀媽媽頭髮已貼上緣）。
+- 預算：10 點（全片 70 點的第 3 次；已用 20 點，送出後剩 40 點）。
+
+## 中文底稿
+【畫風】日系動畫電影質感：角色賽璐珞上色、線條俐落，背景是細緻手繪、溫暖的夜間檯燈光。整段畫風、顏色、人物設計與首幀和尾幀完全一致。
+【鏡頭】整段 8 秒，床沿高度的低機位，側面中景，固定機位，不推不拉不搖，不切鏡。
+【構圖與配色】深夜臥室：左上方一盞暖黃檯燈，牆是暖棕色，地板是深色木地板，床單深靛色。床在畫面左側，小晴睡在床上；前景地板上有一雙舊鞋；媽媽蹲在畫面右側。完全對齊首幀。
+【人物】小晴：十七歲女生，熟睡，側躺面向鏡頭，淺灰 T 恤、深灰短褲，沒蓋被，兩膝微彎，兩個膝蓋各貼一塊純白方形紗布（無膠帶）。媽媽：四十五歲左右，黑色齊平鮑伯（到下巴）、米色開襟毛衣、白上衣、深棕長褲，穿襪子，蹲姿，四分之三側臉朝畫面左邊，眼眶泛紅，神情溫柔憂心。舊鞋：一雙（兩隻），白底藍帶、髒舊，**畫面左邊那一隻鞋頭有破洞、內裡暗灰，右邊那隻沒有洞**。紅鞋：一雙（兩隻），純紅、有鞋帶、白底，無商標無文字。
+【逐秒】
+0–0.2 秒：畫面完全靜止，與首幀一模一樣：媽媽雙手各拿一隻紅鞋，低頭看著地上的舊鞋；舊鞋右邊的地板是空的。
+0.2–1.0 秒：媽媽保持原姿勢，只有輕微呼吸。
+1.0–2.5 秒：媽媽慢慢抬起頭，看向熟睡的女兒。
+2.5–5.0 秒：媽媽慢慢低下頭，雙手同時把兩隻紅鞋輕輕放在舊鞋右邊的空地板上，兩隻紅鞋並排、鞋尖朝鏡頭、不旋轉，和舊鞋同方向。約第 5.5 秒前放好。
+5.0–7.7 秒：媽媽的雙手收回、放在大腿上，看著女兒，不再有其他動作。
+最後 0.3 秒：所有人完全停住，畫面與尾幀完全一致：地上共四隻鞋，舊鞋在左、紅鞋在右。
+【聲音】只有安靜的夜間室內聲、輕微的衣料摩擦聲，以及鞋子輕輕放在木地板上的聲音。人物不說話。無背景音樂。
+【約束】小晴全程熟睡，不動、不翻身、不睜眼、不蓋被，兩塊紗布位置不變；畫面左邊那隻手（媽媽的右手）不碰小晴的腳與床沿。地上最終只有四隻鞋，不多不少；紅鞋純紅、無商標、無文字、無紋理；破洞只在畫面左邊那隻舊鞋。媽媽穿襪子，腳不入鏡、不穿鞋，雙手不插口袋，臉不背對鏡頭。畫面裡自始至終只有小晴與媽媽兩個人。畫面乾淨，無文字、無字幕、無浮水印。
+
+---
+
+## English prompt（直接貼進 Flow）
+
+```text
+[Style] Japanese animated-film look: cel-shaded characters with clean linework, a softly painted detailed background, warm night-time table-lamp light. Style, colors and character design stay exactly identical to the first frame and the last frame throughout.
+
+[Camera] 8 seconds total. Low camera at bed-edge height, side-on medium shot. Locked-off static camera: no push, no pull, no pan, no cut.
+
+[Composition and color] A quiet bedroom at night: a warm yellow table lamp in the upper left, warm brown wall, dark wooden floor, deep indigo bed linen. The bed is on the left side of the frame with the girl asleep on it; a pair of old shoes on the floor in the foreground; the mother crouching on the right side of the frame. Match the first frame exactly.
+
+[Characters] "Xiao Qing": a 17-year-old girl, fast asleep, lying on her side facing the camera, loose light-gray T-shirt, dark gray shorts, no blanket over her legs, both knees slightly bent, one plain pure-white square gauze pad (no tape) on each knee. "Mom": about 45 years old, a black blunt chin-length bob, beige open-front knit cardigan, white top, dark brown trousers, wearing socks, crouching, her head turned three-quarters toward the LEFT of the frame, slightly reddened eyes, a gentle worried expression. The OLD shoes: one pair (two shoes), white with a bold blue side band, dirty and worn; ONLY the shoe on the LEFT side of the image has a torn hole at the toe with a dark gray inside, the old shoe on the right has NO hole. The RED shoes: one pair (two shoes), plain bright red with laces and white soles, no logos, no text.
+
+[Timeline]
+0–0.2 s: the picture is completely still, identical to the first frame: Mom holds one red shoe in each hand and looks down at the old shoes on the floor; the floor to the right of the old pair is empty.
+0.2–1.0 s: Mom keeps the same pose, only breathing slightly.
+1.0–2.5 s: Mom slowly raises her head and looks at her sleeping daughter.
+2.5–5.0 s: Mom slowly lowers her head and, with both hands at the same time, gently sets the two red shoes down on the empty floor to the right of the old shoes, side by side, toes toward the camera, without rotating them, pointing the same way as the old shoes. The shoes are set down by about 5.5 s.
+5.0–7.7 s: Mom draws both hands back and rests them on her thighs, looking at her daughter, with no further movement.
+Last 0.3 s: everything stops completely, and the picture is identical to the last frame: four shoes on the floor, the old pair on the left, the red pair on the right.
+
+[Sound] Only quiet night-time room tone, light fabric rustle, and the soft sound of shoes being set down on the wooden floor. No speech. No background music.
+
+[Constraints] Xiao Qing stays fast asleep the whole time: she does not move, roll over, open her eyes or pull up a blanket, and both gauze pads stay exactly where they are. The hand on the left side of the image (Mom's right hand) never touches the girl's feet or the bed edge. In the end there are exactly four shoes on the floor, no more, no fewer; the red shoes stay plain red with no logos, no text and no texture; the hole is only on the old shoe on the left side of the image. Mom wears socks, her feet stay out of view and she wears no shoes, her hands never go into pockets, and her face never turns away from the camera. Only these two people appear. Clean image: no text, no captions, no watermark.
+```
+
+---
+
+## 送出後
+1. 存成 `06_clips/shot_02_v1.mp4`（新版本一律存新檔名）。
+2. **請你親自看動態**：紅鞋有沒有變形、數量是否變成 4（不多不少）、鞋尖方向有沒有旋轉、小晴有沒有動、媽媽的手有沒有碰到小晴的腳、聲音是否乾淨。
+3. 有問題告訴我時間點；先看能不能剪掉或用程式修，再問你是否重拍。
