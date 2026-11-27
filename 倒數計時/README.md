@@ -19,7 +19,10 @@
 - `timeline.json`：時間軸總表，包含鏡頭、數字的位置與出現時間、字幕和片尾字卡
 - `tools/music.py`：配樂合成
 - `tools/assemble.py`：合成成片（鏡頭＋數字＋字幕＋字卡＋配樂）
-- **`倒數計時_成片.mp4`：32 秒成片**
+- **`倒數計時_成片_韓英版.mp4`：32 秒成片，韓英雙語字幕＋韓文配音**
+- `倒數計時_成片_中文版.mp4`：中文字幕、純配樂版（備份）
+- `vo/`：韓文配音檔（edge-tts 生成，已存檔，重新合成不需要連網）
+- `tools/voice.py`：產生韓文配音；`tools/mix.py`：配音＋配樂混音，人聲進來時壓低配樂
 - `QC_第一批.md`：每一鏡的檢查結論與取用片段
 - `倒數計時_動態分鏡.mp4`：用佔位卡先跑的版本
 - `生圖提示詞.md`：ChatGPT 生圖的 12 張提示詞、張數與順序
@@ -109,3 +112,21 @@ Slow push-in. 0–1s: the textbooks fall from his arms and hit the wet pavement.
 3. **先把 `refs/169/S2_first.png` 傳給我**：我照人頭位置設定好數字座標，你同時就可以開始生影片。
 4. **Flow 生片**，順序 S2 → S3 → S4 → S1 → S5 → S6。先做最簡單的，確認色調沒跑掉，再處理有尾幀的難鏡頭。生完存成 `shots/S1.mp4` 到 `S6.mp4`。
 5. **合成**：`python3 tools/assemble.py`，輸出 `倒數計時_成片.mp4`。或把片段丟回來，我幫你對時間、合成。
+
+## 韓英版（字幕＋配音）
+
+```bash
+python3 tools/voice.py          # 只補生缺少的配音（需連到 speech.platform.bing.com）
+python3 tools/assemble.py --ko-en   # → 倒數計時_成片_韓英版.mp4
+python3 tools/assemble.py           # → 倒數計時_成片_中文版.mp4
+```
+
+| 角色 | 聲線 | 調整 |
+|---|---|---|
+| 主角＋旁白＋片尾 | ko-KR-SunHiNeural | 音調 +12Hz、語速 −6%（第 3 句 +4%、片尾 +8%），旁白加一點空間殘響 |
+| 好友 | ko-KR-SunHiNeural | 音調 +30Hz、語速 +12%（比較開朗） |
+| 男生 | ko-KR-InJoonNeural | 語速 −8% |
+
+- 每句台詞的開口時間寫在 `timeline.json` 的 `vo_at`，雙語字幕會依實際配音長度自動排時間。
+- 混音：每句人聲響度先對齊，人聲進來前 0.15 秒開始把配樂壓低 10 dB，人聲結束後 0.45 秒放回；人聲平均比配樂高約 12 dB。
+- 成品響度約 −15 LUFS，真峰值 −1.5 dBTP。

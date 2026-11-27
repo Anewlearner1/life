@@ -14,7 +14,9 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 cfg = json.load(open(os.path.join(ROOT, "timeline.json"), encoding="utf-8"))
 FPS, W, H, DUR = cfg["fps"], cfg["w"], cfg["h"], cfg["duration"]
-out = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else os.path.join(ROOT, "倒數計時_成片.mp4")
+KOEN = "--ko-en" in sys.argv   # 韓英雙語字幕＋韓文配音版
+out = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else os.path.join(
+    ROOT, "倒數計時_成片_韓英版.mp4" if KOEN else "倒數計時_成片_中文版.mp4")
 
 
 def font_path():
@@ -26,6 +28,19 @@ def font_path():
 
 
 FONT = font_path()
+KO_FONT = ("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc", 1)   # index 1 = Korean
+EN_FONT = ("/usr/share/fonts/opentype/inter/Inter-Medium.otf", 0)
+KO_FONT_REG = ("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc", 1)
+_fx = {}
+def FX(spec, size):
+    path, idx = spec
+    if not os.path.exists(path):
+        return F(size)
+    if (path, size) not in _fx:
+        _fx[(path, size)] = ImageFont.truetype(path, size, index=idx)
+    return _fx[(path, size)]
+
+
 _fc = {}
 def F(size):
     if size not in _fc:
@@ -126,6 +141,9 @@ def overlay(t):
         layer = Image.alpha_composite(layer, glow_text(layer, (nx * W, ny * H + rise + bob), text,
                                                          n["size"], a * flick, n.get("blur", 0)))
     d = ImageDraw.Draw(layer)
+    if KOEN:
+        draw_bilingual(d, t)
+        return layer
     for s in cfg["subs"]:
         if s["start"] <= t < s["end"]:
             lines = s["text"].split("\n")
@@ -148,8 +166,54 @@ def overlay(t):
     return layer
 
 
+def shadow_text(d, xy, text, font, fill, alpha):
+    x, y = xy
+    for dx, dy in ((2, 2), (-1, -1), (2, 0), (0, 2), (1, 3)):
+        d.text((x + dx, y + dy), text, font=font, fill=(0, 0, 0, int(150 * alpha)))
+    d.text((x, y), text, font=font, fill=fill[:3] + (int(255 * alpha),))
+
+
+def draw_bilingual(d, t):
+    """韓文在上（大、白），英文在下（小、淡灰藍），整組貼齊畫面下緣、置中，不壓到臉。"""
+    for s in SUBS:
+        if not (s["t0"] <= t < s["t1"]):
+            continue
+        a = min((t - s["t0"]) / 0.12, (s["t1"] - t) / 0.12, 1.0)
+        ko = s["ko"].split("\n"); en = s["en"].split("\n")
+        fk, fe = FX(KO_FONT, 46), FX(EN_FONT, 31)
+        y = H - 64 - len(en) * 40 - len(ko) * 60
+        for line in ko:
+            shadow_text(d, ((W - fk.getlength(line)) / 2, y), line, fk, (255, 255, 255), a); y += 60
+        y += 4
+        for line in en:
+            shadow_text(d, ((W - fe.getlength(line)) / 2, y), line, fe, (214, 224, 236), a); y += 40
+    c = cfg["card"]
+    if t >= c["start"]:
+        lt = t - c["start"]
+        fk, fe = FX(KO_FONT, 58), FX(EN_FONT, 30)
+        for i, (k, e) in enumerate(zip(c["ko"], c["en"])):
+            a = max(0.0, min((lt - (0.15, 1.35)[i]) / 0.5, 1.0))
+            y0 = H / 2 - 170 + i * 150
+            d.text(((W - fk.getlength(k)) / 2, y0), k, font=fk, fill=(242, 242, 242, int(255 * a)))
+            d.text(((W - fe.getlength(e)) / 2, y0 + 78), e, font=fe, fill=(165, 180, 198, int(255 * a)))
+        a = max(0.0, min((lt - 2.0) / 0.4, 1.0))
+        ft = FX(KO_FONT_REG, 28); line = f"{c['title_ko']}   ·   {c['title_en']}"
+        d.text(((W - ft.getlength(line)) / 2, H / 2 + 150), line, font=ft, fill=(150, 190, 230, int(255 * a)))
+
+
 music = os.path.join(tmp, "music.wav")
-subprocess.run([sys.executable, os.path.join(ROOT, "tools", "music.py"), music], check=True)
+if KOEN:
+    tj = os.path.join(tmp, "timing.json")
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "mix.py"), music, tj], check=True)
+    timing = json.load(open(tj))
+    SUBS = []
+    order = sorted(cfg["subs"], key=lambda s: timing[s["id"]][0])
+    for i, s in enumerate(order):
+        t0, t1 = timing[s["id"]]
+        nxt = timing[order[i + 1]["id"]][0] if i + 1 < len(order) else cfg["card"]["start"]
+        SUBS.append(dict(s, t0=t0 - 0.08, t1=min(t1 + 0.4, nxt - 0.06, cfg["card"]["start"])))
+else:
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "music.py"), music], check=True)
 
 dec = subprocess.Popen(["ffmpeg", "-v", "error", "-i", base, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
                        stdout=subprocess.PIPE)
