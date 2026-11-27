@@ -1,0 +1,49 @@
+# S3 冬晨慢跑｜Google Flow：Frames to Video（首幀＋尾幀）　v1
+
+- 模型：Veo 3.1 Lite｜長度：8 秒｜畫幅：16:9｜720p
+- 首幀：`04_frames/shot_03_start.png`
+- 尾幀：`04_frames/shot_03_end.png`
+- 後期取用：生成第 1.0–6.33 秒（5.33 秒）。
+- 預算：10 點（全片 70 點的第 2 次；S5 已用 10 點，剩 60 點）。
+
+## 中文底稿
+【畫風】日系動畫電影質感：角色賽璐珞上色、線條俐落，背景是細緻手繪、帶柔焦與薄霧，冬天清晨暖金色朝陽光。整段畫風、顏色、人物設計與首幀和尾幀完全一致。
+【鏡頭】整段 8 秒，全景到中全景，視線與地面平行的側面平視，攝影機向右平行跟拍：與小晴同速平移，不推不拉不搖，不切鏡。小晴在畫面中的位置與大小固定（頭約在畫面左側 38%）。
+【構圖與配色】暖橘褐色跑道、橫向白色分道線；跑道後方是低矮金屬欄杆（有一個缺口）、一張木長椅、一根街燈柱、一個垃圾桶、一棵光禿的大樹，遠處薄霧中有看台與光禿的樹林。光從畫面右後方來，太陽不入鏡；影子往畫面左側；風往畫面左後方。背景完全對齊首幀。
+【人物】小晴：十七歲女生，全黑單一高馬尾（深色小髮圈）、齊瀏海、深藍長袖防風外套（拉到胸口）、黑色長緊身褲、純紅跑鞋配白底（無標誌、無記號）。
+【逐秒】
+0–0.2 秒：畫面完全靜止，與首幀一模一樣。
+0.2–7.7 秒：小晴以非常輕鬆、緩慢、平穩的小步幅慢跑，由左往右，側面朝向右方；雙腿與雙臂全程規律交替擺動，腳掌每一步都確實落地、蹬離地面，不滑行、不凍結；鼻前每隔幾步呼出一小縷白氣，很快散去；馬尾與白氣始終往畫面左後方飄。攝影機與她同速向右平移，因此背景以平穩、緩慢、固定的速度向左流動，不加速：欄杆、長椅、街燈柱、垃圾桶一路往左移，右側光禿的大樹從畫面右緣慢慢滑入，左側的看台慢慢滑出。街燈柱始終在她身後，不碰到她。
+最後 0.3 秒：所有人完全停住，畫面與尾幀完全一致。
+【聲音】只有輕微的風聲、規律的腳步聲與輕微的呼吸聲。人物不說話。無背景音樂。
+【約束】畫面裡自始至終只有小晴一個人；臉與側面輪廓、身形全程不變；紅鞋全程兩隻、無標誌。背景物件（長椅、街燈柱、垃圾桶、大樹）只往左流動，不新增、不消失、不變形，也不會疊到她身上。不要快跑、不要衝刺。畫面乾淨，無文字、無字幕、無浮水印、無商標。
+
+---
+
+## English prompt（直接貼進 Flow）
+
+```text
+[Style] Japanese animated-film look: cel-shaded character with clean linework, a softly painted detailed background with gentle depth-of-field and thin mist, warm golden winter-dawn light. Style, colors and character design stay exactly identical to the first frame and the last frame throughout.
+
+[Camera] 8 seconds total. Wide to medium-wide shot, eye-level, straight side-on view parallel to the track. The camera tracks to the RIGHT in parallel, at exactly the same speed as the runner: it does not push, pull or tilt, and there is no cut. Xiao Qing stays in the same position and the same size in the frame (her head at about 38% from the left edge).
+
+[Composition and color] Warm orange-tan running track with horizontal white lane lines. Behind the track: a low metal railing (with one gap), a wooden bench, a single lamppost, a trash can, and a large bare winter tree; far behind in thin mist are faint stands and bare trees. Light comes from the right-rear, the sun itself is not visible; shadows fall to the left; wind blows toward the left-rear. Match the first frame exactly.
+
+[Character] "Xiao Qing": a 17-year-old girl in pure side view facing right, a single high jet-black ponytail with a small plain dark hair tie, straight bangs, a dark navy long-sleeve windbreaker zipped to mid-chest, black full-length running tights, completely plain bright red running shoes with white soles (no logos, no marks).
+
+[Timeline]
+0–0.2 s: the picture is completely still, identical to the first frame.
+0.2–7.7 s: Xiao Qing jogs in a very relaxed, slow, steady rhythm with small strides, left to right. Her legs and arms alternate rhythmically the whole time; each foot clearly lands on the ground and pushes off, with no sliding and no freezing. Every few steps a small puff of white breath leaves her mouth and quickly fades. Her ponytail and her breath always drift toward the left-rear. The camera moves to the right at the same speed as her, so the background flows steadily to the left at a slow, constant speed, never accelerating: the railing, bench, lamppost and trash can slide left, the large bare tree slowly slides in from the right edge, and the stands slowly slide out at the left. The lamppost always stays behind her and never touches her.
+Last 0.3 s: everything stops completely, and the picture is identical to the last frame.
+
+[Sound] Only soft wind, regular footsteps and light breathing. No speech. No background music.
+
+[Constraints] Only Xiao Qing appears, no other person. Her face, side profile and body shape never change; she always wears two red shoes, no logos. The background objects (bench, lamppost, trash can, tree) only flow to the left: nothing new appears, nothing disappears or deforms, and nothing overlaps her body. No fast running, no sprinting. Clean image: no text, no captions, no watermark, no logos.
+```
+
+---
+
+## 送出後
+1. 存成 `06_clips/shot_03_v1.mp4`（新版本一律存新檔名）。
+2. **請你親自看動態**：腳有沒有滑（像跑步機或溜冰）、背景有沒有加速、燈柱有沒有碰到她、白氣是否正常、有沒有多出人。
+3. 有問題告訴我時間點，我先看能不能剪掉或用程式修，再問你是否重拍。
