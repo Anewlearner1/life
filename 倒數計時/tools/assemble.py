@@ -108,7 +108,20 @@ def overlay(t):
             k = min((t - n["t_in"]) / n["rollup"], 1.0)
             text = fmt_roll(text, 1 - (1 - k) ** 3)
         el = t - shot_start[n["shot"]]
-        nx, ny = n["x"] + n.get("vx", 0) * el, n["y"] + n.get("vy", 0) * el
+        if n.get("track"):  # [[秒(鏡內), x, y], ...] 線性內插，前後夾住
+            tr = n["track"]
+            if el <= tr[0][0]:
+                nx, ny = tr[0][1], tr[0][2]
+            elif el >= tr[-1][0]:
+                nx, ny = tr[-1][1], tr[-1][2]
+            else:
+                for (t0, x0, y0), (t1, x1, y1) in zip(tr, tr[1:]):
+                    if t0 <= el <= t1:
+                        k = (el - t0) / (t1 - t0); nx, ny = x0 + (x1 - x0) * k, y0 + (y1 - y0) * k
+                        break
+        else:
+            nx, ny = n["x"] + n.get("vx", 0) * el, n["y"] + n.get("vy", 0) * el
+        ny = max(ny, n.get("ymin", 0))
         layer = Image.alpha_composite(layer, glow_text(layer, (nx * W, ny * H + rise + bob), text,
                                                          n["size"], a * flick, n.get("blur", 0)))
     d = ImageDraw.Draw(layer)
