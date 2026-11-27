@@ -40,3 +40,18 @@ Static over-the-shoulder camera from behind the long-black-haired girl in the le
 Use the attached images as references for the outfits, hairstyles, glasses and courtyard location. Medium two-shot at chest height in the rainy courtyard: the long-black-haired girl with round gold glasses on the left, seen in three-quarter profile, a few strands of hair falling across her cheek and a soft grey reflection on her lenses; her smile is fading and her eyes are glossy with tears. The chestnut-bob friend on the right, half-turned, smiling at her. Both look like ordinary everyday students with natural, imperfect skin, a few freckles and unstyled hair — not models. Photorealistic, overcast soft daylight, cool muted colors, shallow depth of field. No text, no numbers, no watermark. Landscape 3:2.
 ```
 裁成 16:9 後，用方案 A 的提示詞，只放首幀。
+
+---
+
+# 第二批：S5（方案 B）與 S6_v2（重抽）
+
+點數：70／70 用完（S1–S4、S6 共 50，S5 方案 B 10，S6 重抽 10）。
+
+| 鏡 | 結論 | 取用 | 說明 |
+|---|---|---|---|
+| S5（方案 B，S4 尾幀當首幀） | **PASS** | 1.5–6.0 秒 | 0–1.5 秒好友微笑等待，1.7 秒主角上前抱住，3.3–3.7 秒好友驚訝，4.3 秒起笑開，5.3 秒回抱、閉眼。沒有換臉或跳格，和 S4 動作連貫。小瑕疵：抱住時主角背上多出一個深藍書包，S4 沒有，一閃而過不明顯 |
+| S6_v2 | **PASS，採用（取代 v1）** | 0.2–6.0 秒 | 0–0.7 秒拭淚、相撞、書散落，1.0 秒蹲下，1.3 秒她摀臉道歉，2.7–4.3 秒撿書，4.6 秒他轉頭看她，5.3 秒起微笑。全程女左男右、沒有換臉、沒有溶接，鏡頭固定。勝過 v1：保留了相撞，也沒有融化瑕疵 |
+
+原版 S6 保留為 `shots/S6_v1.mp4` 備查。
+
+為了同時放進相撞和對視，剪輯改成 S5 19.0–23.5 秒、S6 23.5–29.25 秒、片尾字卡 29.25–32 秒。字幕、數字（27.8 秒開始滾到 8,760）和配樂（落書聲 24.05 秒、轉大調 27.8 秒）都跟著對齊。

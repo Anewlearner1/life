@@ -41,15 +41,16 @@ def run(cmd):
 tmp = tempfile.mkdtemp(prefix="cd_")
 parts = []
 for s in cfg["shots"]:
-    d = s["end"] - s["start"]
+    nf = round(s["end"] * FPS) - round(s["start"] * FPS)  # 以格數切，避免累積誤差
+    d = nf / FPS
     p = os.path.join(tmp, f"{s['id']}.mp4")
     src = os.path.join(ROOT, "shots", f"{s['id']}.mp4")
     if s.get("card"):
-        run(["ffmpeg", "-y", "-f", "lavfi", "-i", f"color=black:s={W}x{H}:r={FPS}:d={d}", "-pix_fmt", "yuv420p", p])
+        run(["ffmpeg", "-y", "-f", "lavfi", "-i", f"color=black:s={W}x{H}:r={FPS}:d={d + 1}", "-frames:v", str(nf), "-pix_fmt", "yuv420p", p])
     elif os.path.exists(src):
         vf = (f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},"
-              f"tpad=stop_mode=clone:stop_duration={d},trim=duration={d},setpts=PTS-STARTPTS")
-        run(["ffmpeg", "-y", "-ss", str(s.get("src_in", 0)), "-i", src, "-an", "-vf", vf, "-pix_fmt", "yuv420p", p])
+              f"tpad=stop_mode=clone:stop_duration={d},trim=end_frame={nf},setpts=PTS-STARTPTS")
+        run(["ffmpeg", "-y", "-ss", str(s.get("src_in", 0)), "-i", src, "-an", "-vf", vf, "-frames:v", str(nf), "-pix_fmt", "yuv420p", p])
         print("鏡頭", s["id"], "← 實拍片段")
     else:
         img = Image.new("RGB", (W, H), (58, 62, 68))
@@ -61,7 +62,7 @@ for s in cfg["shots"]:
         g.text((80, 280), f"{s['start']:.1f}s – {s['end']:.1f}s（佔位，待放入 shots/{s['id']}.mp4）",
                font=F(32), fill=(180, 180, 180))
         ip = os.path.join(tmp, f"{s['id']}.png"); img.save(ip)
-        run(["ffmpeg", "-y", "-loop", "1", "-i", ip, "-t", str(d), "-r", str(FPS), "-pix_fmt", "yuv420p", p])
+        run(["ffmpeg", "-y", "-loop", "1", "-i", ip, "-r", str(FPS), "-frames:v", str(nf), "-pix_fmt", "yuv420p", p])
         print("鏡頭", s["id"], "← 佔位卡")
     parts.append(p)
 lst = os.path.join(tmp, "list.txt")
