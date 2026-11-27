@@ -4,6 +4,7 @@
 - 首幀：`04_frames/shot_01_start.png`　尾幀：`04_frames/shot_01_end.png`
 - 後期取用：生成第 0.3–5.63 秒（摔倒約在生成第 1.2 秒）；固定機位。
 - 預算：10 點（已用 40；送出後剩 20，再留給 S6 10 點）。
+- v1 審核修正：雨向改往左下（實測圖上雨往左下斜）、鞋「不見破洞」不寫「在暗處」、距離只稍近、原地前撲、in pain→worn out。
 - 措辭依 S2 經驗：不寫年齡、不寫「濕透的衣服／身體」等身體或衣物細節，只寫「暴雨中的跑者」。
 
 ## English prompt（直接貼進 Flow）
@@ -13,14 +14,14 @@
 
 [Camera] 8 seconds total. A low camera close to the ground, slightly from the front-left, a wide shot that keeps the runner's whole body in the frame. Locked-off static camera: no push, no pull, no pan, no cut.
 
-[Scene] A rainstorm on an athletics track at night. The track is dark and glossy, with puddles reflecting warm light. At the back right a tall floodlight shines orange straight toward the camera, creating a strong backlight and a glowing halo of misty rain behind the runner. Rain falls almost vertically, tilting very slightly toward the lower right, with bright droplets and small splashes. Blurred dark stands and trees on the left. Match the first frame exactly.
+[Scene] A rainstorm on an athletics track at night. The track is dark and glossy, with puddles reflecting warm light. At the back right a tall floodlight shines orange straight toward the camera, creating a strong backlight and a glowing halo of misty rain behind the runner. Rain falls almost vertically, tilting very slightly toward the lower left, with bright droplets and small splashes. Blurred dark stands and trees on the left. Match the first frame exactly.
 
-[Character] "Xiao Qing": a runner with a single high black-brown ponytail, a dark navy sleeveless running top, black running shorts, and worn white running shoes with a blue band (the shoes stay in shadow, and no hole is ever visible on them). She is exhausted and in pain, her face is turned toward the camera or down.
+[Character] "Xiao Qing": a runner with a single high black-brown ponytail, a dark navy sleeveless running top, black running shorts, and worn white running shoes with a blue band (no hole is ever visible on either shoe; both toes stay intact). She is worn out and exhausted, her face turned toward the camera or down.
 
 [Timeline]
 0–0.2 s: the picture is completely still, identical to the first frame: she is running toward the camera in mid-stride, exhausted, with the floodlight glowing behind her.
-0.2–1.2 s: she keeps running toward the camera, getting slightly closer, her stride faltering.
-1.2–2.2 s: her legs give way; she stumbles forward and drops onto her knees, both hands landing flat on the track in front of her, with water splashing around her hands and knees.
+0.2–1.2 s: she keeps running toward the camera, staying at about the same distance from it and getting only a little closer, her stride faltering.
+1.2–2.2 s: her legs give way; she drops forward almost in place onto her knees, both hands landing flat on the track in front of her, with water splashing around her hands and knees.
 2.2–5.0 s: she stays kneeling with both hands on the track, her head bowed, breathing hard, her shoulders rising and falling slowly while the rain keeps falling.
 5.0–7.7 s: she stays in the same kneeling pose, only breathing.
 Last 0.3 s: everything stops completely, and the picture is identical to the last frame: kneeling on the track with both hands on the ground and her head bowed.

@@ -4,6 +4,7 @@
 - 首幀：`04_frames/shot_06_start.png`　尾幀：`04_frames/shot_06_end.png`
 - 後期取用：生成第 0.3–5.63 秒；固定機位。
 - 預算：10 點（全片最後一鏡）。
+- v1 審核修正：刪年齡（與 S2 的低風險措辭一致）、clean→washed with faint stains、媽媽首幀「anxious, NOT angry」、2.0–4.0 抬下巴視線上移、時間軸提前（落淚 1.5–3.5、阿姨 3.0–5.0）讓關鍵動作在取用區間 0.3–5.63 內完成。
 
 ## English prompt（直接貼進 Flow）
 
@@ -12,16 +13,16 @@
 
 [Camera] 8 seconds total. A medium close-up at eye level, straight from the front. Locked-off static camera: no push, no pull, no pan, no cut.
 
-[Scene] A sunny golden afternoon in a stadium grandstand, with warm golden backlight and softly blurred rows of warm brown seats and green trees behind. Mom stands on the left of the frame (her head at about one third of the frame width), hugging a clean pair of old white running shoes with a blue band against her chest with both arms. Auntie sits on the right of the frame, lower than Mom. Far behind them, three small spectators stay in fixed poses: one raising a single hand with a towel around his neck, one sitting with her hands resting on her lap, one standing with a hand on his hip. Match the first frame exactly.
+[Scene] A sunny golden afternoon in a stadium grandstand, with warm golden backlight and softly blurred rows of warm brown seats and green trees behind. Mom stands on the left of the frame (her head at about one third of the frame width), hugging a pair of washed old white running shoes with a blue band and a few faint stains against her chest with both arms. Auntie sits on the right of the frame, lower than Mom. Far behind them, three small spectators stay in fixed poses: one raising a single hand with a towel around his neck, one sitting with her hands resting on her lap, one standing with a hand on his hip. Match the first frame exactly.
 
-[Characters] "Mom": about 45 years old, a black chin-length bob, a beige knit cardigan over a white top. The shoes she hugs: exactly two worn old white shoes with a blue band; only the shoe on the LEFT side of the image has a small torn hole at the toe with a dark gray inside, the other shoe has no hole. "Auntie": about 60 years old, short curly gray-white hair, an olive-green short-sleeve top.
+[Characters] "Mom": a black chin-length bob, a beige knit cardigan over a white top. The shoes she hugs: exactly two worn old white shoes with a blue band; only the shoe on the LEFT side of the image has a small torn hole at the toe with a dark gray inside, the other shoe has no hole. "Auntie": short curly gray-white hair, an olive-green short-sleeve top.
 
 [Timeline]
-0–0.2 s: the picture is completely still, identical to the first frame: Mom is tense, holding her breath, her eyes fixed on the running track at the lower left of the frame, her arms hugging the shoes; Auntie sits calmly, looking at the track at the lower left, her hands resting in her lap out of view.
-0.2–2.0 s: both keep watching the track, only breathing softly.
-2.0–4.0 s: Mom's expression slowly breaks: her eyes fill with tears that run down her cheeks, and her tight lips tremble into a trembling, happy smile. Her arms keep hugging the shoes in the same way.
-3.5–5.5 s: Auntie turns her head and looks up toward Mom, smiles warmly, and starts to clap softly, her hands rising in front of her chest.
-5.5–7.7 s: Mom, smiling through her tears, hugs the shoes a little tighter; Auntie keeps clapping gently, looking at Mom.
+0–0.2 s: the picture is completely still, identical to the first frame: Mom is anxious and worried, holding her breath, her eyes wide and her brows drawn together (NOT angry), her eyes fixed on the running track at the lower left of the frame, her arms hugging the shoes; Auntie sits calmly, looking at the track at the lower left, her hands resting in her lap out of view.
+0.2–1.5 s: both keep watching the track, only breathing softly.
+1.5–3.5 s: Mom's expression slowly breaks: her eyes fill with tears that run down her cheeks, she lifts her chin and her gaze rises slightly, and her tight lips tremble into a trembling, happy smile. Her arms keep hugging the shoes in the same way.
+3.0–5.0 s: Auntie turns her head and looks up toward Mom, smiles warmly, and starts to clap softly, her hands rising in front of her chest.
+5.0–7.7 s: Mom, smiling through her tears, hugs the shoes a little tighter; Auntie keeps clapping gently, looking at Mom.
 Last 0.3 s: everything stops completely, and the picture is identical to the last frame: Mom smiling through tears and hugging the shoes, Auntie clapping and smiling at her.
 
 [Sound] Only a soft breeze, quiet breathing, and the gentle sound of Auntie's light clapping. No speech. No cheering. No background music.
