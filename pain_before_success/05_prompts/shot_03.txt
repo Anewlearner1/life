@@ -11,14 +11,14 @@ v1 → v2：燈柱位置改成「始終在她右側、不越過她」；外套�
 ## 中文底稿
 【畫風】日系動畫電影質感：角色賽璐珞上色、線條俐落，背景是細緻手繪、帶柔焦與薄霧，冬天清晨暖金色朝陽光。整段畫風、顏色、人物設計與首幀和尾幀完全一致。
 【鏡頭】整段 8 秒，全景到中全景，視線與地面平行的側面平視，攝影機向右平行跟拍：與小晴同速平移，不推不拉不搖，不切鏡。小晴在畫面中的位置與大小固定（頭約在畫面左側 38%）。
-【構圖與配色】暖橘褐色跑道、橫向白色分道線；跑道後方是低矮金屬欄杆（有一個缺口，缺口旁有一條小路）、一張木長椅、一根街燈柱（燈頭上方有一個小黑點，保持不動）、一個灰色石柱、一個垃圾桶、右上角已入鏡的一棵光禿大樹；左側是被薄霧柔化的大型看台，霧中右側有一棟淺色大樓與光禿的樹林。光從畫面右後方來，太陽不入鏡；影子往畫面左側；風往畫面左後方。背景完全對齊首幀。
-【人物】小晴：十七歲女生，側面朝向右方，深黑褐色單一高馬尾（同首幀，小而深色的髮圈）、齊瀏海、深藍長袖立領防風外套（拉鍊拉到頸部）、黑色長緊身褲、紅色慢跑鞋（有鞋帶、白底，同首幀；無商標、無文字、無條紋）。
+【構圖與配色】暖橘褐色跑道、橫向白色分道線；跑道後方是低矮金屬欄杆（有一個缺口，缺口旁有一條小路）、一張木長椅、一根街燈柱（燈頭正上方有一個小黑點，固定在燈頭上方、隨燈柱一起往左移，不飛動、不消失）、一個灰色石柱、一個垃圾桶、右上角已入鏡的一棵光禿大樹；左側是被薄霧柔化的大型看台，霧中右側有一棟淺色大樓與光禿的樹林。光從畫面右後方來，太陽不入鏡；影子往畫面左側；風往畫面左後方。背景完全對齊首幀。
+【人物】小晴：十七歲女生，側面朝向右方，深黑褐色單一高馬尾（同首幀，小而深色的髮圈）、齊瀏海、深藍長袖立領防風外套（拉鍊拉到頸部）、黑色長緊身褲、紅色慢跑鞋（有鞋帶、白底，同首幀；無商標、無文字）。
 【逐秒】
 0–0.2 秒：畫面完全靜止，與首幀一模一樣。
-0.2–7.7 秒：小晴以非常輕鬆、緩慢、平穩的小步幅慢跑（約每秒 2 步、低抬膝、不騰空），由左往右；雙腿與雙臂全程規律交替擺動，腳掌每一步都確實落地、蹬離地面，不滑行、不凍結；口前每隔幾步呼出一小縷白氣，往左後方散去；馬尾也始終往畫面左後方飄。攝影機與她同速向右平移，因此背景以平穩、緩慢、固定的速度向左流動，不加速：欄杆、長椅、石柱、垃圾桶、街燈柱一路往左移，右上角已入鏡的大樹慢慢移入畫面（尾幀時樹幹約在畫寬 76%），左側的看台慢慢滑出；跑道上的樹影和她腳下的影子也隨背景以同樣的慢速往左滑。街燈柱始終留在背景、欄杆後方，在她的右側，慢慢靠近她，直到結束都還在她右邊，不穿過她、不疊到她的身體或白氣。
+0.2–7.7 秒：小晴以非常輕鬆、緩慢、平穩的小步幅慢跑（約每秒 2 步、低抬膝、不騰空），由左往右；雙腿與雙臂全程規律交替擺動，腳掌每一步都確實落地、蹬離地面，不滑行、不凍結；口前每隔幾步呼出一小縷白氣，往左後方散去；馬尾也始終往畫面左後方飄。攝影機與她同速向右平移，因此背景以平穩、緩慢、固定的速度向左流動，不加速：欄杆、長椅、石柱、垃圾桶、街燈柱一路往左移，右上角已入鏡的大樹慢慢移入畫面（尾幀時樹幹約在畫寬 76%），左側的看台慢慢滑出；跑道上的樹影和她腳下的影子也隨背景以同樣的慢速往左滑。街燈柱與欄杆同在一條線上、在欄杆前方（遮住欄杆，欄杆在更後一層），始終在她的右側，慢慢靠近她，直到結束都還在她右邊，不穿過她、不疊到她的身體或白氣。
 最後 0.3 秒：所有人完全停住，畫面與尾幀完全一致。
 【聲音】只有輕微的風聲、規律的腳步聲與輕微的呼吸聲。人物不說話。無背景音樂。
-【約束】畫面裡自始至終只有小晴一個人；臉與側面輪廓、身形、髮色全程不變；紅鞋全程兩隻。背景物件（長椅、街燈柱、石柱、垃圾桶、大樹、大樓、小路）只往左流動，不新增、不消失、不變形，也不會疊到她身上，燈柱不越過她。不要快跑、不要衝刺。畫面乾淨，無文字、無字幕、無浮水印、無商標。
+【約束】畫面裡自始至終只有小晴一個人；臉與側面輪廓、身形、髮色全程不變；紅鞋全程兩隻。背景物件（長椅、街燈柱、石柱、垃圾桶、大樹、大樓、小路）只往左流動，不重複、不消失、不變形；長椅等背景物從她身後經過、被她的身體正常遮住是允許的；只有街燈柱絕不越過她、不疊到她的身體或白氣。右側畫面外的欄杆與樹林會自然進入畫面。不要快跑、不要衝刺。畫面乾淨，無文字、無字幕、無浮水印、無商標。
 
 ---
 
@@ -29,18 +29,18 @@ v1 → v2：燈柱位置改成「始終在她右側、不越過她」；外套�
 
 [Camera] 8 seconds total. Wide to medium-wide shot, eye-level, straight side-on view parallel to the track. The camera tracks to the RIGHT in parallel, at exactly the same speed as the runner: it does not push, pull or tilt, and there is no cut. Xiao Qing stays in the same position and the same size in the frame (her head at about 38% from the left edge).
 
-[Composition and color] Warm orange-tan running track with horizontal white lane lines. Behind the track: a low metal railing (with one gap, and a small footpath beside the gap), a wooden bench, a single lamppost (a tiny dark dot above the lamp head stays perfectly still), a gray stone pillar, a trash can, and a large bare winter tree already entering at the top-right corner; on the left a large grandstand softened by thin mist; in the mist on the right a pale building and bare trees. Light comes from the right-rear, the sun itself is not visible; shadows fall to the left; wind blows toward the left-rear. Match the first frame exactly.
+[Composition and color] Warm orange-tan running track with horizontal white lane lines. Behind the track: a low metal railing (with one gap, and a small footpath beside the gap), a wooden bench, a single lamppost (a tiny dark dot sits right above the lamp head and moves left together with the lamppost, never flying and never disappearing), a gray stone pillar, a trash can, and a large bare winter tree already entering at the top-right corner; on the left a large grandstand softened by thin mist; in the mist on the right a pale building and bare trees. Light comes from the right-rear, the sun itself is not visible; shadows fall to the left; wind blows toward the left-rear. Match the first frame exactly.
 
-[Character] "Xiao Qing": a 17-year-old girl in pure side view facing right, a single high dark black-brown ponytail (same as the first frame) with a small, dark hair tie, straight bangs, a dark navy long-sleeve windbreaker with a stand-up collar zipped up to the neck, black full-length running tights, red running shoes with laces and white soles (same as the first frame; no logos, no text, no stripes).
+[Character] "Xiao Qing": a 17-year-old girl in pure side view facing right, a single high dark black-brown ponytail (same as the first frame) with a small, dark hair tie, straight bangs, a dark navy long-sleeve windbreaker with a stand-up collar zipped up to the neck, black full-length running tights, red running shoes with laces and white soles (same as the first frame; no logos and no text).
 
 [Timeline]
 0–0.2 s: the picture is completely still, identical to the first frame.
-0.2–7.7 s: Xiao Qing jogs in a very relaxed, slow, steady rhythm with small strides (about two steps per second, low knee lift, no airborne phase), left to right. Her legs and arms alternate rhythmically the whole time; each foot clearly lands on the ground and pushes off, with no sliding and no freezing. Every few steps a small puff of white breath leaves her mouth and drifts away toward the left-rear. Her ponytail also always drifts toward the left-rear. The camera moves to the right at the same speed as her, so the background flows steadily to the left at a slow, constant speed, never accelerating: the railing, bench, stone pillar, trash can and lamppost slide left, the large bare tree that is already entering at the top-right slowly slides further into the frame (by the end its trunk is at about 76% of the frame width), and the grandstand slowly slides out at the left. The tree shadows on the track and her own shadow also slide left at the same slow speed. The lamppost always stays in the background behind the railing, on her right side; it slowly gets closer to her but remains on her right until the end, never passing her and never overlapping her body or her breath.
+0.2–7.7 s: Xiao Qing jogs in a very relaxed, slow, steady rhythm with small strides (about two steps per second, low knee lift, no airborne phase), left to right. Her legs and arms alternate rhythmically the whole time; each foot clearly lands on the ground and pushes off, with no sliding and no freezing. Every few steps a small puff of white breath leaves her mouth and drifts away toward the left-rear. Her ponytail also always drifts toward the left-rear. The camera moves to the right at the same speed as her, so the background flows steadily to the left at a slow, constant speed, never accelerating: the railing, bench, stone pillar, trash can and lamppost slide left, the large bare tree that is already entering at the top-right slowly slides further into the frame (by the end its trunk is at about 76% of the frame width), and the grandstand slowly slides out at the left. The tree shadows on the track and her own shadow also slide left at the same slow speed. The lamppost stands in line with the railing, in front of the railing (it covers part of the railing, which is a layer further back), always on her right side; it slowly gets closer to her but remains on her right until the end, never passing her and never overlapping her body or her breath.
 Last 0.3 s: everything stops completely, and the picture is identical to the last frame.
 
 [Sound] Only soft wind, regular footsteps and light breathing. No speech. No background music.
 
-[Constraints] Only Xiao Qing appears, no other person. Her face, side profile, body shape and hair color never change; she always wears two red shoes. The background objects (bench, lamppost, stone pillar, trash can, tree, building, footpath) only flow to the left: nothing new appears, nothing disappears or deforms, nothing overlaps her body, and the lamppost never gets past her. No fast running, no sprinting. Clean image: no text, no captions, no watermark, no logos.
+[Constraints] Only Xiao Qing appears, no other person. Her face, side profile, body shape and hair color never change; she always wears two red shoes. The background objects (bench, lamppost, stone pillar, trash can, tree, building, footpath) only flow to the left: they are never duplicated, never disappear and never deform. The bench and other background objects may pass behind her and be partly hidden by her body; only the lamppost must never get past her or overlap her body or her breath. The railing and trees just beyond the right edge naturally slide into view. No fast running, no sprinting. Clean image: no text, no captions, no watermark, no logos.
 ```
 
 ---
