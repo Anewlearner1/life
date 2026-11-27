@@ -14,11 +14,11 @@
 【逐秒】
 0–0.2 秒：畫面完全靜止，與首幀一模一樣：閉著眼、嘴微張大口喘氣。
 0.2–2.5 秒：她閉著眼，胸口與肩膀緩慢、小幅度地起伏，大口喘氣。
-2.5–4.5 秒：她慢慢睜開眼睛，看向正上方的天空；嘴巴慢慢閉上，嘴角輕輕上揚，露出淺淺的微笑。
-4.5–7.7 秒：微笑保持，呼吸漸漸平緩，胸口與肩膀起伏更小；眼睛一直睜著，看著天空。
+2.5–4.5 秒：她慢慢睜開眼睛，看向正上方（視線朝向鏡頭上方的天空）；嘴巴慢慢閉上，嘴角輕輕上揚，露出淺淺的微笑。
+4.5–7.7 秒：微笑保持，呼吸漸漸平緩，胸口與肩膀起伏更小，並輕輕下沉放鬆；眼睛一直睜著，看著天空。
 最後 0.3 秒：完全停住，畫面與尾幀一致：睜眼、淺笑、嘴閉。
 【聲音】只有輕微的風吹草聲與漸漸平緩的呼吸聲。人物不說話。無背景音樂。
-【約束】臉朝上不轉動、不抬頭，五官不顛倒、不變形，只睜眼一次、不眨眼多次；頭、馬尾與頭髮位置幾乎不動，只有極輕微飄動；草葉只往畫面左側輕輕擺動；夕陽從畫面右側，太陽不入鏡；額頭的汗珠不增不減；手不入鏡。畫面裡只有小晴一個人。畫面乾淨，無文字、無字幕、無浮水印。
+【約束】臉朝上不轉動、不抬頭，五官不顛倒、不變形，只睜眼一次、不眨眼多次；頭、馬尾與頭髮位置幾乎不動，只有極輕微飄動；草葉輕輕前後擺動、整體偏向畫面左側；夕陽從畫面右側，太陽不入鏡；額頭的汗珠不增不減；手不入鏡。畫面裡只有小晴一個人。畫面乾淨，無文字、無字幕、無浮水印。
 
 ---
 
@@ -36,13 +36,13 @@
 [Timeline]
 0–0.2 s: the picture is completely still, identical to the first frame: eyes closed, mouth slightly open, panting heavily.
 0.2–2.5 s: with her eyes closed, her chest and shoulders rise and fall slowly with small movements as she pants.
-2.5–4.5 s: she slowly opens her eyes and looks straight up at the sky; her mouth slowly closes and the corners of her mouth lift into a soft, gentle smile.
-4.5–7.7 s: the smile stays; her breathing gradually calms and the rise and fall of her chest and shoulders gets even smaller; her eyes stay open, looking at the sky.
+2.5–4.5 s: she slowly opens her eyes and looks straight up (her gaze toward the sky above the camera); her mouth slowly closes and the corners of her mouth lift into a soft, gentle smile.
+4.5–7.7 s: the smile stays; her breathing gradually calms and the rise and fall of her chest and shoulders gets even smaller and they settle gently down and relax; her eyes stay open, looking at the sky.
 Last 0.3 s: everything stops completely, and the picture is identical to the last frame: eyes open, a faint smile, mouth closed.
 
 [Sound] Only soft wind in the grass and her breathing slowly calming down. No speech. No background music.
 
-[Constraints] Her face stays pointing up: she does not turn her head or lift it, her features never flip or deform, she opens her eyes only once and does not blink repeatedly. Her head, ponytail and hair stay almost exactly in place with only very slight movement. The grass blades only sway gently toward the left of the frame. The sunset light comes from the right and the sun never appears in the frame. The bead of sweat on her forehead neither increases nor disappears. No hands in the frame. Only Xiao Qing appears. Clean image: no text, no captions, no watermark.
+[Constraints] Her face stays pointing up: she does not turn her head or lift it, her features never flip or deform, she opens her eyes only once and does not blink repeatedly. Her head, ponytail and hair stay almost exactly in place with only very slight movement. The grass blades sway gently back and forth, leaning overall toward the left of the frame. The sunset light comes from the right and the sun never appears in the frame. The bead of sweat on her forehead neither increases nor disappears. No hands in the frame. Only Xiao Qing appears. Clean image: no text, no captions, no watermark.
 ```
 
 ---

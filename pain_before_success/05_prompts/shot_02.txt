@@ -16,10 +16,11 @@
 0.2–1.0 秒：媽媽保持原姿勢，只有輕微呼吸。
 1.0–2.5 秒：媽媽慢慢抬起頭，看向熟睡的女兒。
 2.5–5.0 秒：媽媽慢慢低下頭，雙手同時把兩隻紅鞋輕輕放在舊鞋右邊的空地板上，兩隻紅鞋並排、鞋尖朝鏡頭、不旋轉，和舊鞋同方向。約第 5.5 秒前放好。
-5.0–7.7 秒：媽媽的雙手收回、放在大腿上，看著女兒，不再有其他動作。
+5.0–6.0 秒：媽媽雙手收回放在大腿上，同時抬頭看向女兒。
+6.0–7.7 秒：保持不動，看著女兒。
 最後 0.3 秒：所有人完全停住，畫面與尾幀完全一致：地上共四隻鞋，舊鞋在左、紅鞋在右。
 【聲音】只有安靜的夜間室內聲、輕微的衣料摩擦聲，以及鞋子輕輕放在木地板上的聲音。人物不說話。無背景音樂。
-【約束】小晴全程熟睡，不動、不翻身、不睜眼、不蓋被，兩塊紗布位置不變；畫面左邊那隻手（媽媽的右手）不碰小晴的腳與床沿。地上最終只有四隻鞋，不多不少；紅鞋純紅、無商標、無文字、無紋理；破洞只在畫面左邊那隻舊鞋。媽媽穿襪子，腳不入鏡、不穿鞋，雙手不插口袋，臉不背對鏡頭。畫面裡自始至終只有小晴與媽媽兩個人。畫面乾淨，無文字、無字幕、無浮水印。
+【約束】小晴全程熟睡，不動、不翻身、不睜眼、不蓋被，兩塊紗布位置不變；畫面左邊那隻手（媽媽的右手）位在小晴腳尖前方的前景，放鞋往下移動時不碰、不推小晴的腳與床沿。地上最終只有四隻鞋，不多不少；紅鞋純紅、無商標、無文字、無紋理；破洞只在畫面左邊那隻舊鞋。媽媽穿襪子、不穿鞋，不要多出任何鞋子，雙手不插口袋，臉不背對鏡頭。畫面裡自始至終只有小晴與媽媽兩個人。畫面乾淨，無文字、無字幕、無浮水印。
 
 ---
 
@@ -39,12 +40,13 @@
 0.2–1.0 s: Mom keeps the same pose, only breathing slightly.
 1.0–2.5 s: Mom slowly raises her head and looks at her sleeping daughter.
 2.5–5.0 s: Mom slowly lowers her head and, with both hands at the same time, gently sets the two red shoes down on the empty floor to the right of the old shoes, side by side, toes toward the camera, without rotating them, pointing the same way as the old shoes. The shoes are set down by about 5.5 s.
-5.0–7.7 s: Mom draws both hands back and rests them on her thighs, looking at her daughter, with no further movement.
+5.0–6.0 s: Mom draws both hands back and rests them on her thighs while raising her head to look at her daughter.
+6.0–7.7 s: she stays still, looking at her daughter.
 Last 0.3 s: everything stops completely, and the picture is identical to the last frame: four shoes on the floor, the old pair on the left, the red pair on the right.
 
 [Sound] Only quiet night-time room tone, light fabric rustle, and the soft sound of shoes being set down on the wooden floor. No speech. No background music.
 
-[Constraints] Xiao Qing stays fast asleep the whole time: she does not move, roll over, open her eyes or pull up a blanket, and both gauze pads stay exactly where they are. The hand on the left side of the image (Mom's right hand) never touches the girl's feet or the bed edge. In the end there are exactly four shoes on the floor, no more, no fewer; the red shoes stay plain red with no logos, no text and no texture; the hole is only on the old shoe on the left side of the image. Mom wears socks, her feet stay out of view and she wears no shoes, her hands never go into pockets, and her face never turns away from the camera. Only these two people appear. Clean image: no text, no captions, no watermark.
+[Constraints] Xiao Qing stays fast asleep the whole time: she does not move, roll over, open her eyes or pull up a blanket, and both gauze pads stay exactly where they are. The hand on the left side of the image (Mom's right hand) stays in the foreground in front of the girl's toes, and while moving down to set the shoes it never touches or pushes the girl's feet or the bed edge. In the end there are exactly four shoes on the floor, no more, no fewer; the red shoes stay plain red with no logos, no text and no texture; the hole is only on the old shoe on the left side of the image. Mom wears socks and no shoes, no extra shoes ever appear, her hands never go into pockets, and her face never turns away from the camera. Only these two people appear. Clean image: no text, no captions, no watermark.
 ```
 
 ---
