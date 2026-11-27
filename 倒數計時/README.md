@@ -4,10 +4,12 @@
 
 | 項目 | 設定 |
 |---|---|
-| 片長 | 32 秒（6 個 AI 鏡頭共 29 秒，加 3 秒片尾字卡） |
-| 畫幅 | 16:9，1920×1080，24fps |
+| 片長 | 32 秒（6 個 AI 鏡頭共 29 秒，從每段 8 秒中取用 4–5 秒，加 3 秒片尾字卡） |
+| 畫幅 | 16:9；素材是 720p，成片放大到 1920×1080、24fps 輸出 |
 | 畫風 | 參考上傳影片：寫實韓系校園劇。陰天的柔光、酒紅色西裝制服、深藍格紋裙、玻璃帷幕校舍的中庭、淺景深、色調偏冷偏低飽和 |
-| 預算 | 60 點（見下方「點數分配」） |
+| 生片 | Google Flow：Veo 3.1 Lite，每段 8 秒、720p、16:9，一段 10 點；用首幀（S5、S6 另加尾幀）生影片 |
+| 生圖 | ChatGPT，共 12 張，提示詞與順序見 `生圖提示詞.md` |
+| 預算 | 70 點：6 鏡 × 10 = 60，另留 10 點重抽一次 |
 | 配樂 | Python 合成：`tools/music.py`，鋼琴、弦樂 pad、時鐘滴答、心跳 |
 | 字幕 | 中文字幕燒進畫面，仿參考片的白字加細黑邊、置中壓底 |
 | 頭上的數字 | **不交給 AI 生成**，後製時用 `tools/assemble.py` 疊上去（AI 生成的文字很容易亂碼） |
@@ -18,7 +20,10 @@
 - `tools/music.py`：配樂合成
 - `tools/assemble.py`：合成成片（鏡頭＋數字＋字幕＋字卡＋配樂）
 - `倒數計時_動態分鏡.mp4`：用佔位卡先跑的版本，可以拿來確認節奏和配樂
-- `shots/`：AI 生成的鏡頭放這裡，檔名用 `S1.mp4` 到 `S6.mp4`
+- `生圖提示詞.md`：ChatGPT 生圖的 12 張提示詞、張數與順序
+- `tools/frame169.py`：把 3:2 的圖裁成 16:9 的 1280×720，給 Flow 當首尾幀
+- `refs/`：ChatGPT 生的圖放這裡
+- `shots/`：Veo 生成的鏡頭放這裡，檔名用 `S1.mp4` 到 `S6.mp4`
 
 ## 分鏡表
 
@@ -34,71 +39,70 @@
 
 情緒曲線：好奇（S1–S3）→ 心碎（S4–S5）→ 轉折帶出希望（S6–S7）。8,760 剛好約等於「每天見一次，見 24 年」，留給觀眾在留言區算。
 
-## 角色設定（每個提示詞都貼上同一段，維持一致性）
+## 角色
 
-- **她（主角）**：17 歲東亞女生，黑色長直髮，有空氣瀏海，戴細金屬圓框眼鏡，素顏，安靜書卷氣；酒紅色西裝外套、白襯衫、深藍蝴蝶結、深藍格紋長裙，手上抱著一本舊的米色精裝書
-- **好友**：17 歲東亞女生，下巴長度的栗色鮑伯頭，表情開朗，制服相同、配短格紋裙，書包背帶掛著一個小吊飾
-- **他**：18 歲東亞男生，高個子，黑色微亂短髮，五官溫和，酒紅色西裝外套、白襯衫、深藍領帶，懷裡抱著一疊課本
+- **她（主角）**：17 歲，黑色長直髮，空氣瀏海，細金屬圓框眼鏡，長格紋裙，抱著一本舊的米色精裝書
+- **好友**：栗色鮑伯頭，開朗，短格紋裙，書包上掛著小吊飾
+- **他**：18 歲，高個子，黑色微亂短髮，溫和，抱著一疊課本
 
-建議做法：先用平台的文生圖（通常不扣影片點數，或扣得很少）各生一張角色定裝照，之後每個鏡頭都用**圖生影片**，拿定裝照當參考圖。
+完整外觀描述寫在 `生圖提示詞.md` 的定裝照提示詞裡，以那裡為準。
 
-## 共用風格字串（貼在每個提示詞最後）
+## Flow 影片提示詞（Veo 3.1 Lite，8 秒，首幀模式）
 
+首幀已經決定了長相和構圖，所以提示詞只寫**動作、鏡頭和時間點**。Veo 自帶的聲音會在合成時丟掉，配樂一律用 `music.py`。
+每段只會用到其中 4–5 秒，取用起點寫在 `timeline.json` 的 `src_in`，看過片段後我再幫你調。
+
+共用尾句（貼在每段最後）：
 ```
-photorealistic Korean high-school drama, overcast soft daylight, modern glass-and-concrete campus courtyard with lawn and young trees, burgundy blazer uniforms, shallow depth of field, cool desaturated color grade, 35mm film look, natural skin texture, 24fps cinematic, 16:9. No text, no subtitles, no numbers, no logos.
-```
-
-## 各鏡提示詞（英文直接貼進平台，每段 5 秒）
-
-**S1（4 秒，生成 5 秒後剪掉前面）**
-```
-Extreme close-up of a 17-year-old East Asian girl's eye behind thin round metal glasses, long black hair with bangs at the edge of frame. She blinks slowly; a faint white glint blooms in the lens reflection, as if she sees something appear. Very slow push-in. [角色:她] [風格字串]
+Photorealistic Korean high-school drama, overcast soft daylight, cool desaturated grade, shallow depth of field, 35mm film look. Keep faces, hair, glasses and uniforms exactly as in the first frame. No on-screen text, no subtitles, no numbers. Ambient sound only, no music.
 ```
 
-**S2**
+**S1（首幀 S1_first，取用第 2–6 秒）**
 ```
-Static wide shot from a second-floor balcony looking down into a school courtyard. 6–8 students in burgundy blazers walk across the paved path in small groups at different distances, spaced apart, heads clearly visible against the lawn. Locked-off camera, no camera movement. [風格字串]
-```
-> 鏡頭一定要固定不動，數字才能直接疊在固定位置。生成後依人頭位置修改 `timeline.json` 裡 S2 的 x、y。
-
-**S3**
-```
-Medium shot, the girl stands in the courtyard holding an old beige book. She takes off her round glasses, rubs her eyes, puts the glasses back on and looks up and around in confusion. A blurred student walks in the far background, right side. Static camera. [角色:她] [風格字串]
+Extreme close-up on her eye behind round glasses, very slow push-in for the whole shot. 0–2s: still, calm. 2–3s: one slow blink. 3–6s: a faint white glow blooms in the lens reflection and her pupil widens slightly, as if she sees something appear in front of her. 6–8s: she stares, motionless.
 ```
 
-**S4**
+**S2（首幀 S2_first，取用第 1–6 秒）**
 ```
-Over-the-shoulder from behind the girl. A cheerful girl with a chestnut chin-length bob runs in from the right, waving and smiling widely, stops right in front of her and talks happily. Static camera, plenty of headroom above the bob-haired girl. [角色:好友] [風格字串]
-```
-
-**S5**
-```
-Close-up on the long-haired girl with round glasses. Her smile freezes, her eyes slowly well up with tears, then she suddenly steps forward and hugs her bob-haired friend tightly; the friend looks surprised, then laughs and hugs back. Handheld, gentle. [角色:她+好友] [風格字串]
+Locked-off static camera, absolutely no camera movement or zoom. The students in the courtyard keep walking slowly and naturally along the paths in the directions they face, chatting; they stay spread out and never cross in front of each other. Light breeze in the young trees.
 ```
 
-**S6**
+**S3（首幀 S3_first，取用第 0.5–5.5 秒）**
 ```
-The long-haired girl turns away wiping her tears and bumps into a tall boy carrying a stack of textbooks; the books fall to the wet pavement. Both crouch to pick them up and their eyes meet; he smiles softly. Medium shot, slow push-in, generous headroom above the boy. [角色:她+他] [風格字串]
+Static camera. 0–2s: she rubs her eyes. 2–4s: she puts her round glasses back on. 4–6s: she looks up and around, confused, glancing at the space above people's heads. 6–8s: she freezes, lips slightly parted. The background student keeps walking slowly, out of focus.
 ```
 
-負面提示詞（平台有提供欄位就填）：`text, subtitles, numbers, watermark, deformed hands, extra fingers, cartoon, anime, oversaturated`
+**S4（首幀 S4_first，取用第 0.5–5.5 秒）**
+```
+Static over-the-shoulder camera. 0–3s: the bob-haired friend keeps waving and bounces on her toes, beaming. 3–8s: she lowers her hand and talks excitedly, pointing back toward the school gate with her thumb, then tilts her head waiting for an answer. Keep the empty space above her head.
+```
 
-## 點數分配（60 點）
+**S5（首幀 S5_first、尾幀 S5_end，取用第 1–6 秒）**
+```
+Gentle handheld camera. 0–2s: her smile fades and tears well up behind her glasses. 2–4s: she suddenly steps forward and throws her arms around her friend. 4–8s: she hugs her tightly, eyes closed; the friend is surprised, then laughs softly and hugs her back.
+```
 
-各平台計價不同。下面假設「5 秒、1080p、圖生影片」一段 8 點：
+**S6（首幀 S6_first、尾幀 S6_end，取用第 0.8–5.8 秒）**
+```
+Slow push-in. 0–1s: the textbooks fall from his arms and hit the wet pavement. 1–3s: both quickly crouch down, she bows her head apologizing. 3–5s: they each pick up a book and look up at the same moment; their eyes meet. 5–8s: he smiles softly, she stares at him, stunned. Keep the empty space above his head.
+```
+
+## 點數分配（70 點）
 
 | 用途 | 點數 |
 |---|---|
-| S1–S6 各生一次 | 48 |
-| 預留重抽 | 12（優先給 S6 和 S5，動作最複雜） |
-| **合計** | **60** |
+| S1–S6 各生一次（每次 8 秒、720p） | 60 |
+| 重抽備用（一次） | 10 |
+| **合計** | **70** |
 
-如果你的平台一段要 10 點（6 段＝60 點，沒有重抽空間），就**刪掉 S1**：改用 `ffmpeg` 從 S3 第一格做 4 秒慢推，數字和字幕照常，省下 10 點留給重抽。順序優先度：S4 > S6 > S5 > S2 > S3 > S1。
+- 生成前確認 Flow 的**每次產出數設為 1**（設成 2 以上會照倍數扣點）。
+- 重抽給最容易出錯的鏡頭，優先順序 S6 > S5 > S4。S1、S2、S3 只要大致可用就不重抽，數字和字幕會蓋掉小瑕疵。
+- 如果你選用的模式或模型不支援尾幀，S5、S6 就只用首幀，提示詞照貼。
 
-## 出片流程
+## 執行順序
 
-```bash
-# 1. 把生成好的片段放進 shots/（S1.mp4 … S6.mp4，任何長度、比例都可以）
-# 2. 依實際人頭位置調整 timeline.json 的 numbers.x / numbers.y
-python3 tools/assemble.py                # → 倒數計時_成片.mp4（缺少的鏡頭會用佔位卡補上）
-```
+1. **ChatGPT 生圖**：照 `生圖提示詞.md` 第 1 到 12 張的順序生成，存進 `refs/`。
+2. **裁成 16:9**：`python3 tools/frame169.py refs`，輸出到 `refs/169/`。頭頂空間被裁掉的話，加 `--shift -0.05` 讓裁切框往上移。
+3. **先把 `refs/169/S2_first.png` 傳給我**：我照人頭位置設定好數字座標，你同時就可以開始生影片。
+4. **Flow 生片**，順序 S2 → S3 → S4 → S1 → S5 → S6。先做最簡單的，確認色調沒跑掉，再處理有尾幀的難鏡頭。生完存成 `shots/S1.mp4` 到 `S6.mp4`。
+5. **合成**：`python3 tools/assemble.py`，輸出 `倒數計時_成片.mp4`。或把片段丟回來，我幫你對時間、合成。

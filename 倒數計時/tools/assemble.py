@@ -3,8 +3,9 @@
   python3 tools/assemble.py            # shots/ 裡有的鏡頭就用，缺的用灰底分鏡卡代替（= 動態分鏡）
   python3 tools/assemble.py --out final.mp4
 
-把 AI 生成的片段放到 shots/S1.mp4 … shots/S6.mp4。任何比例都會被裁成 16:9、轉 24fps，
-長度不足會凍結最後一格補齊。數字的位置在 timeline.json 的 numbers（x, y 是 0–1 的畫面比例），
+把 Veo 生成的 8 秒片段放到 shots/S1.mp4 … shots/S6.mp4（原檔就好，Veo 自帶的聲音會被丟掉）。
+每段從 timeline.json 的 src_in 秒開始取用所需長度；720p 會放大到 1080p 輸出（字幕和數字因此更銳利），
+任何比例都會被裁成 16:9、轉 24fps，長度不足會凍結最後一格補齊。數字的位置在 timeline.json 的 numbers（x, y 是 0–1 的畫面比例），
 拿到實際片段後依人物頭頂位置微調即可。
 """
 import json, math, os, subprocess, sys, tempfile
@@ -48,7 +49,7 @@ for s in cfg["shots"]:
     elif os.path.exists(src):
         vf = (f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},"
               f"tpad=stop_mode=clone:stop_duration={d},trim=duration={d},setpts=PTS-STARTPTS")
-        run(["ffmpeg", "-y", "-i", src, "-an", "-vf", vf, "-pix_fmt", "yuv420p", p])
+        run(["ffmpeg", "-y", "-ss", str(s.get("src_in", 0)), "-i", src, "-an", "-vf", vf, "-pix_fmt", "yuv420p", p])
         print("鏡頭", s["id"], "← 實拍片段")
     else:
         img = Image.new("RGB", (W, H), (58, 62, 68))
