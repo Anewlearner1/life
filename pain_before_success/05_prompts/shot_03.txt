@@ -1,4 +1,4 @@
-# S3 冬晨慢跑｜Google Flow：Frames to Video（首幀＋尾幀）　v2（送審修正版）
+# S3 冬晨慢跑｜Google Flow：Frames to Video（首幀＋尾幀）　v3（複審通過版）
 
 - 模型：Veo 3.1 Lite｜長度：8 秒｜畫幅：16:9｜720p
 - 首幀：`04_frames/shot_03_start.png`
@@ -6,7 +6,8 @@
 - 後期取用：生成第 1.0–6.33 秒（5.33 秒）。
 - 預算：10 點（全片 70 點的第 2 次；S5 已用 10 點，剩 60 點，送出後剩 50 點）。
 
-v1 → v2：燈柱位置改成「始終在她右側、不越過她」；外套改立領拉到頸部；紅鞋改「有鞋帶、側縫、白底，無商標文字條紋」（不再寫完全無記號）；補灰色石柱、右側淺色大樓、欄杆缺口旁小路；看台改「左側大型看台、被薄霧柔化」；大樹改「右上角已入鏡、慢慢移入」；白氣改口前；髮色改「深黑褐色，同首幀」；加慢節奏數字與樹影／投影一起流動；燈頭小黑點保持不動。
+v1 → v2 → v3：（v3：長椅可被她遮住只限燈柱不越過；燈柱在欄杆前方；燈頭小黑點隨燈柱左移；影子貼腳不隨背景滑；不新增第二根燈柱／長椅）
+v1 → v2：（以下為 v2 說明；其中「燈頭小黑點保持不動」已被 v3 改成「隨燈柱左移」）燈柱位置改成「始終在她右側、不越過她」；外套改立領拉到頸部；紅鞋改「有鞋帶、側縫、白底，無商標文字條紋」（不再寫完全無記號）；補灰色石柱、右側淺色大樓、欄杆缺口旁小路；看台改「左側大型看台、被薄霧柔化」；大樹改「右上角已入鏡、慢慢移入」；白氣改口前；髮色改「深黑褐色，同首幀」；加慢節奏數字與樹影／投影一起流動；燈頭小黑點保持不動。
 
 ## 中文底稿
 【畫風】日系動畫電影質感：角色賽璐珞上色、線條俐落，背景是細緻手繪、帶柔焦與薄霧，冬天清晨暖金色朝陽光。整段畫風、顏色、人物設計與首幀和尾幀完全一致。
@@ -15,10 +16,10 @@ v1 → v2：燈柱位置改成「始終在她右側、不越過她」；外套�
 【人物】小晴：十七歲女生，側面朝向右方，深黑褐色單一高馬尾（同首幀，小而深色的髮圈）、齊瀏海、深藍長袖立領防風外套（拉鍊拉到頸部）、黑色長緊身褲、紅色慢跑鞋（有鞋帶、白底，同首幀；無商標、無文字）。
 【逐秒】
 0–0.2 秒：畫面完全靜止，與首幀一模一樣。
-0.2–7.7 秒：小晴以非常輕鬆、緩慢、平穩的小步幅慢跑（約每秒 2 步、低抬膝、不騰空），由左往右；雙腿與雙臂全程規律交替擺動，腳掌每一步都確實落地、蹬離地面，不滑行、不凍結；口前每隔幾步呼出一小縷白氣，往左後方散去；馬尾也始終往畫面左後方飄。攝影機與她同速向右平移，因此背景以平穩、緩慢、固定的速度向左流動，不加速：欄杆、長椅、石柱、垃圾桶、街燈柱一路往左移，右上角已入鏡的大樹慢慢移入畫面（尾幀時樹幹約在畫寬 76%），左側的看台慢慢滑出；跑道上的樹影和她腳下的影子也隨背景以同樣的慢速往左滑。街燈柱與欄杆同在一條線上、在欄杆前方（遮住欄杆，欄杆在更後一層），始終在她的右側，慢慢靠近她，直到結束都還在她右邊，不穿過她、不疊到她的身體或白氣。
+0.2–7.7 秒：小晴以非常輕鬆、緩慢、平穩的小步幅慢跑（約每秒 2 步、低抬膝、不騰空），由左往右；雙腿與雙臂全程規律交替擺動，腳掌每一步都確實落地、蹬離地面，不滑行、不凍結；口前每隔幾步呼出一小縷白氣，往左後方散去；馬尾也始終往畫面左後方飄。攝影機與她同速向右平移，因此背景以平穩、緩慢、固定的速度向左流動，不加速：欄杆、長椅、石柱、垃圾桶、街燈柱一路往左移，右上角已入鏡的大樹慢慢移入畫面（尾幀時樹幹約在畫寬 76%），左側的看台慢慢滑出；跑道上的樹影隨背景以同樣的慢速往左滑；她的影子始終貼在她腳下，不隨背景移動。街燈柱在欄杆前方（遮住欄杆，欄杆在更後一層），始終在她的右側，長椅會被她遮住、燈柱不會，因為它始終在她右邊，慢慢靠近她，直到結束都還在她右邊，不穿過她、不疊到她的身體或白氣。
 最後 0.3 秒：所有人完全停住，畫面與尾幀完全一致。
 【聲音】只有輕微的風聲、規律的腳步聲與輕微的呼吸聲。人物不說話。無背景音樂。
-【約束】畫面裡自始至終只有小晴一個人；臉與側面輪廓、身形、髮色全程不變；紅鞋全程兩隻。背景物件（長椅、街燈柱、石柱、垃圾桶、大樹、大樓、小路）只往左流動，不重複、不消失、不變形；長椅等背景物從她身後經過、被她的身體正常遮住是允許的；只有街燈柱絕不越過她、不疊到她的身體或白氣。右側畫面外的欄杆與樹林會自然進入畫面。不要快跑、不要衝刺。畫面乾淨，無文字、無字幕、無浮水印、無商標。
+【約束】畫面裡自始至終只有小晴一個人；臉與側面輪廓、身形、髮色全程不變；紅鞋全程兩隻。背景物件（長椅、街燈柱、石柱、垃圾桶、大樹、大樓、小路）只往左流動，不重複、不消失、不變形；長椅等背景物從她身後經過、被她的身體正常遮住是允許的；只有街燈柱絕不越過她、不疊到她的身體或白氣。右側畫面外的欄杆與樹林會自然進入畫面。不會出現第二根燈柱或第二張長椅。不要快跑、不要衝刺。畫面乾淨，無文字、無字幕、無浮水印、無商標。
 
 ---
 
@@ -35,12 +36,12 @@ v1 → v2：燈柱位置改成「始終在她右側、不越過她」；外套�
 
 [Timeline]
 0–0.2 s: the picture is completely still, identical to the first frame.
-0.2–7.7 s: Xiao Qing jogs in a very relaxed, slow, steady rhythm with small strides (about two steps per second, low knee lift, no airborne phase), left to right. Her legs and arms alternate rhythmically the whole time; each foot clearly lands on the ground and pushes off, with no sliding and no freezing. Every few steps a small puff of white breath leaves her mouth and drifts away toward the left-rear. Her ponytail also always drifts toward the left-rear. The camera moves to the right at the same speed as her, so the background flows steadily to the left at a slow, constant speed, never accelerating: the railing, bench, stone pillar, trash can and lamppost slide left, the large bare tree that is already entering at the top-right slowly slides further into the frame (by the end its trunk is at about 76% of the frame width), and the grandstand slowly slides out at the left. The tree shadows on the track and her own shadow also slide left at the same slow speed. The lamppost stands in line with the railing, in front of the railing (it covers part of the railing, which is a layer further back), always on her right side; it slowly gets closer to her but remains on her right until the end, never passing her and never overlapping her body or her breath.
+0.2–7.7 s: Xiao Qing jogs in a very relaxed, slow, steady rhythm with small strides (about two steps per second, low knee lift, no airborne phase), left to right. Her legs and arms alternate rhythmically the whole time; each foot clearly lands on the ground and pushes off, with no sliding and no freezing. Every few steps a small puff of white breath leaves her mouth and drifts away toward the left-rear. Her ponytail also always drifts toward the left-rear. The camera moves to the right at the same speed as her, so the background flows steadily to the left at a slow, constant speed, never accelerating: the railing, bench, stone pillar, trash can and lamppost slide left, the large bare tree that is already entering at the top-right slowly slides further into the frame (by the end its trunk is at about 76% of the frame width), and most of the grandstand slowly slides out at the left, with its edge remaining in the top-left corner. The tree shadows on the track slide left with the background at the same slow speed; her own shadow always stays attached under her feet and does not slide with the background. The lamppost stands in front of the railing (it covers part of the railing, which is a layer further back), always on her right side; the bench may be hidden by her but the lamppost never is, because it always stays on her right; it slowly gets closer to her but remains on her right until the end, never passing her and never overlapping her body or her breath.
 Last 0.3 s: everything stops completely, and the picture is identical to the last frame.
 
 [Sound] Only soft wind, regular footsteps and light breathing. No speech. No background music.
 
-[Constraints] Only Xiao Qing appears, no other person. Her face, side profile, body shape and hair color never change; she always wears two red shoes. The background objects (bench, lamppost, stone pillar, trash can, tree, building, footpath) only flow to the left: they are never duplicated, never disappear and never deform. The bench and other background objects may pass behind her and be partly hidden by her body; only the lamppost must never get past her or overlap her body or her breath. The railing and trees just beyond the right edge naturally slide into view. No fast running, no sprinting. Clean image: no text, no captions, no watermark, no logos.
+[Constraints] Only Xiao Qing appears, no other person. Her face, side profile, body shape and hair color never change; she always wears two red shoes. The background objects (bench, lamppost, stone pillar, trash can, tree, building, footpath) only flow to the left: they are never duplicated, never disappear and never deform. The bench and other background objects may pass behind her and be partly hidden by her body; only the lamppost must never get past her or overlap her body or her breath. The railing and trees just beyond the right edge naturally slide into view. No second lamppost and no second bench ever appears. No fast running, no sprinting. Clean image: no text, no captions, no watermark, no logos.
 ```
 
 ---
