@@ -71,6 +71,7 @@ run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", base
 
 # ---------- 2. 逐格疊字 ----------
 shot_end = {s["id"]: s["end"] for s in cfg["shots"]}
+shot_start = {s["id"]: s["start"] for s in cfg["shots"]}
 
 
 def glow_text(layer, xy, text, size, alpha, blur_extra=0):
@@ -106,7 +107,9 @@ def overlay(t):
         if n.get("rollup"):
             k = min((t - n["t_in"]) / n["rollup"], 1.0)
             text = fmt_roll(text, 1 - (1 - k) ** 3)
-        layer = Image.alpha_composite(layer, glow_text(layer, (n["x"] * W, n["y"] * H + rise + bob), text,
+        el = t - shot_start[n["shot"]]
+        nx, ny = n["x"] + n.get("vx", 0) * el, n["y"] + n.get("vy", 0) * el
+        layer = Image.alpha_composite(layer, glow_text(layer, (nx * W, ny * H + rise + bob), text,
                                                          n["size"], a * flick, n.get("blur", 0)))
     d = ImageDraw.Draw(layer)
     for s in cfg["subs"]:

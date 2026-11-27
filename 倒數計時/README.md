@@ -62,10 +62,11 @@ Photorealistic Korean high-school drama, overcast soft daylight, cool desaturate
 Extreme close-up on her eye behind round glasses, very slow push-in for the whole shot. 0–2s: still, calm. 2–3s: one slow blink. 3–6s: a faint white glow blooms in the lens reflection and her pupil widens slightly, as if she sees something appear in front of her. 6–8s: she stares, motionless.
 ```
 
-**S2（首幀 S2_first，取用第 1–6 秒）**
+**S2（首幀 S2_first，取用第 0–5 秒）**
 ```
-Locked-off static camera, absolutely no camera movement or zoom. The students in the courtyard keep walking slowly and naturally along the paths in the directions they face, chatting; they stay spread out and never cross in front of each other. Light breeze in the young trees.
+Locked-off static camera, absolutely no camera movement, pan or zoom. The students stroll very slowly and casually, taking only a few small steps, chatting and glancing at each other; they stay roughly where they are, stay spread out and never cross in front of each other. Light breeze in the young trees, rain puddles on the pavement.
 ```
+> 數字是直接疊在首幀量好的位置上，所以人要走得很慢。如果片段裡有人移動明顯，在 `timeline.json` 填該數字的 `vx`／`vy`（每秒位移，畫面比例），數字就會跟著移動。
 
 **S3（首幀 S3_first，取用第 0.5–5.5 秒）**
 ```
